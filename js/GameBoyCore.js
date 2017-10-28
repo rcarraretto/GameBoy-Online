@@ -504,12 +504,7 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//INC E
 	//#0x1C:
-	function (parentObj) {
-		parentObj.registerE = (parentObj.registerE + 1) & 0xFF;
-		parentObj.FZero = (parentObj.registerE == 0);
-		parentObj.FHalfCarry = ((parentObj.registerE & 0xF) == 0);
-		parentObj.FSubtract = false;
-	},
+	incReg('E'),
 	//DEC E
 	//#0x1D:
 	function (parentObj) {
