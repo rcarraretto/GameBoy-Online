@@ -1,4 +1,5 @@
 describe("gameboy", function() {
+  var GameBoyCore = require('../js/GameBoyCore');
   var core;
 
   beforeEach(function() {

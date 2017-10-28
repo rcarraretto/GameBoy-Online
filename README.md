@@ -60,3 +60,8 @@ CPU instruction set accuracy test results (Blargg's cpu_instrs.gb test ROM):
 * **Gambatte:**
 
 	![Gambatte](http://i.imgur.com/vGHFz.png "Passes")
+
+Test
+----
+On the first time, `npm install`.
+Then `npm test`.
