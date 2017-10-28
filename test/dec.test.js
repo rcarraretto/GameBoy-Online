@@ -214,4 +214,15 @@ describe("dec", function() {
     expect(core.registerD).to.equal(254);
   });
 
+  it("DEC SP", function() {
+    core.stackPointer = 18;
+    core.OPCODE[0x3B](core);
+    expect(core.stackPointer).to.equal(17);
+
+    // underflow
+    core.stackPointer = 0;
+    core.OPCODE[0x3B](core);
+    expect(core.stackPointer).to.equal(0xFFFF);
+  });
+
 });

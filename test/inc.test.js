@@ -214,4 +214,15 @@ describe("inc", function() {
     expect(core.registerD).to.equal(1);
   });
 
+  it("INC SP", function() {
+    core.stackPointer = 18;
+    core.OPCODE[0x33](core);
+    expect(core.stackPointer).to.equal(19);
+
+    // overflow
+    core.stackPointer = 0xFFFF;
+    core.OPCODE[0x33](core);
+    expect(core.stackPointer).to.equal(0);
+  });
+
 });

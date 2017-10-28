@@ -364,6 +364,9 @@ function nop (parentObj) {
 var int16 = {
 	inc: function(value) {
 		return (value + 1) & 0xFFFF;
+	},
+	dec: function(value) {
+		return (value - 1) & 0xFFFF;
 	}
 };
 
@@ -711,7 +714,7 @@ GameBoyCore.prototype.OPCODE = [
 	//INC SP
 	//#0x33:
 	function (parentObj) {
-		parentObj.stackPointer = (parentObj.stackPointer + 1) & 0xFFFF;
+		parentObj.stackPointer = int16.inc(parentObj.stackPointer);
 	},
 	//INC (HL)
 	//#0x34:
@@ -772,7 +775,7 @@ GameBoyCore.prototype.OPCODE = [
 	//DEC SP
 	//#0x3B:
 	function (parentObj) {
-		parentObj.stackPointer = (parentObj.stackPointer - 1) & 0xFFFF;
+		parentObj.stackPointer = int16.dec(parentObj.stackPointer);
 	},
 	//INC A
 	//#0x3C:
