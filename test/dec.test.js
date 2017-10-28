@@ -8,8 +8,8 @@ describe("dec", function() {
   });
 
   it("DEC A", function() {
-    core.registerA = 18
-    core.OPCODE[0x3D](core)
+    core.registerA = 18;
+    core.OPCODE[0x3D](core);
     expect(core.registerA).to.equal(17);
     expect(core.FZero).to.equal(false);
     expect(core.FHalfCarry).to.equal(false);
@@ -17,8 +17,8 @@ describe("dec", function() {
   });
 
   it("DEC A - underflow", function() {
-    core.registerA = 0
-    core.OPCODE[0x3D](core)
+    core.registerA = 0;
+    core.OPCODE[0x3D](core);
     expect(core.registerA).to.equal(255);
     expect(core.FZero).to.equal(false);
     expect(core.FHalfCarry).to.equal(true);
@@ -26,8 +26,8 @@ describe("dec", function() {
   });
 
   it("DEC A - to zero", function() {
-    core.registerA = 1
-    core.OPCODE[0x3D](core)
+    core.registerA = 1;
+    core.OPCODE[0x3D](core);
     expect(core.registerA).to.equal(0);
     expect(core.FZero).to.equal(true);
     expect(core.FHalfCarry).to.equal(false);
@@ -35,8 +35,8 @@ describe("dec", function() {
   });
 
   it("DEC B", function() {
-    core.registerB = 18
-    core.OPCODE[0x05](core)
+    core.registerB = 18;
+    core.OPCODE[0x05](core);
     expect(core.registerB).to.equal(17);
     expect(core.FZero).to.equal(false);
     expect(core.FHalfCarry).to.equal(false);
@@ -44,8 +44,8 @@ describe("dec", function() {
   });
 
   it("DEC B - underflow", function() {
-    core.registerB = 0
-    core.OPCODE[0x05](core)
+    core.registerB = 0;
+    core.OPCODE[0x05](core);
     expect(core.registerB).to.equal(255);
     expect(core.FZero).to.equal(false);
     expect(core.FHalfCarry).to.equal(true);
@@ -53,8 +53,8 @@ describe("dec", function() {
   });
 
   it("DEC B - to zero", function() {
-    core.registerB = 1
-    core.OPCODE[0x05](core)
+    core.registerB = 1;
+    core.OPCODE[0x05](core);
     expect(core.registerB).to.equal(0);
     expect(core.FZero).to.equal(true);
     expect(core.FHalfCarry).to.equal(false);
@@ -62,8 +62,8 @@ describe("dec", function() {
   });
 
   it("DEC C", function() {
-    core.registerC = 18
-    core.OPCODE[0x0D](core)
+    core.registerC = 18;
+    core.OPCODE[0x0D](core);
     expect(core.registerC).to.equal(17);
     expect(core.FZero).to.equal(false);
     expect(core.FHalfCarry).to.equal(false);
@@ -71,8 +71,8 @@ describe("dec", function() {
   });
 
   it("DEC C - underflow", function() {
-    core.registerC = 0
-    core.OPCODE[0x0D](core)
+    core.registerC = 0;
+    core.OPCODE[0x0D](core);
     expect(core.registerC).to.equal(255);
     expect(core.FZero).to.equal(false);
     expect(core.FHalfCarry).to.equal(true);
@@ -80,8 +80,8 @@ describe("dec", function() {
   });
 
   it("DEC C - to zero", function() {
-    core.registerC = 1
-    core.OPCODE[0x0D](core)
+    core.registerC = 1;
+    core.OPCODE[0x0D](core);
     expect(core.registerC).to.equal(0);
     expect(core.FZero).to.equal(true);
     expect(core.FHalfCarry).to.equal(false);
@@ -89,8 +89,8 @@ describe("dec", function() {
   });
 
   it("DEC D", function() {
-    core.registerD = 18
-    core.OPCODE[0x15](core)
+    core.registerD = 18;
+    core.OPCODE[0x15](core);
     expect(core.registerD).to.equal(17);
     expect(core.FZero).to.equal(false);
     expect(core.FHalfCarry).to.equal(false);
@@ -98,8 +98,8 @@ describe("dec", function() {
   });
 
   it("DEC D - underflow", function() {
-    core.registerD = 0
-    core.OPCODE[0x15](core)
+    core.registerD = 0;
+    core.OPCODE[0x15](core);
     expect(core.registerD).to.equal(255);
     expect(core.FZero).to.equal(false);
     expect(core.FHalfCarry).to.equal(true);
@@ -107,8 +107,8 @@ describe("dec", function() {
   });
 
   it("DEC D - to zero", function() {
-    core.registerD = 1
-    core.OPCODE[0x15](core)
+    core.registerD = 1;
+    core.OPCODE[0x15](core);
     expect(core.registerD).to.equal(0);
     expect(core.FZero).to.equal(true);
     expect(core.FHalfCarry).to.equal(false);
@@ -116,8 +116,8 @@ describe("dec", function() {
   });
 
   it("DEC E", function() {
-    core.registerE = 18
-    core.OPCODE[0x1D](core)
+    core.registerE = 18;
+    core.OPCODE[0x1D](core);
     expect(core.registerE).to.equal(17);
     expect(core.FZero).to.equal(false);
     expect(core.FHalfCarry).to.equal(false);
@@ -125,8 +125,8 @@ describe("dec", function() {
   });
 
   it("DEC E - underflow", function() {
-    core.registerE = 0
-    core.OPCODE[0x1D](core)
+    core.registerE = 0;
+    core.OPCODE[0x1D](core);
     expect(core.registerE).to.equal(255);
     expect(core.FZero).to.equal(false);
     expect(core.FHalfCarry).to.equal(true);
@@ -134,8 +134,8 @@ describe("dec", function() {
   });
 
   it("DEC E - to zero", function() {
-    core.registerE = 1
-    core.OPCODE[0x1D](core)
+    core.registerE = 1;
+    core.OPCODE[0x1D](core);
     expect(core.registerE).to.equal(0);
     expect(core.FZero).to.equal(true);
     expect(core.FHalfCarry).to.equal(false);
