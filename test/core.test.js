@@ -14,6 +14,33 @@ describe("gameboy", function() {
     core.OPCODE[0x00](core)
   });
 
+  it("INC A", function() {
+    core.registerA = 18
+    core.OPCODE[0x3C](core)
+    expect(core.registerA).to.equal(19);
+    expect(core.FZero).to.equal(false);
+    expect(core.FHalfCarry).to.equal(false);
+    expect(core.FSubtract).to.equal(false);
+  });
+
+  it("INC A - overflow", function() {
+    core.registerA = 0xFF
+    core.OPCODE[0x3C](core)
+    expect(core.registerA).to.equal(0);
+    expect(core.FZero).to.equal(true);
+    expect(core.FHalfCarry).to.equal(true);
+    expect(core.FSubtract).to.equal(false);
+  });
+
+  it("INC A - half carry", function() {
+    core.registerA = 0x0F
+    core.OPCODE[0x3C](core)
+    expect(core.registerA).to.equal(0x10);
+    expect(core.FZero).to.equal(false);
+    expect(core.FHalfCarry).to.equal(true);
+    expect(core.FSubtract).to.equal(false);
+  });
+
   it("INC B", function() {
     core.registerB = 18
     core.OPCODE[0x04](core)
