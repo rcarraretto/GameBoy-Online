@@ -291,6 +291,29 @@ GameBoyCore.prototype.ffxxDump = [	//Dump of the post-BOOT I/O register state (F
 	0xD0, 0x7A, 0x00, 0x9E, 0x04, 0x5F, 0x41, 0x2F, 	0x1D, 0x77, 0x36, 0x75, 0x81, 0xAA, 0x70, 0x3A,
 	0x98, 0xD1, 0x71, 0x02, 0x4D, 0x01, 0xC1, 0xFF, 	0x0D, 0x00, 0xD3, 0x05, 0xF9, 0x00, 0x0B, 0x00
 ];
+
+function incReg (regName) {
+	var regKey = 'register' + regName;
+	return function (parentObj) {
+		var value = (parentObj[regKey] + 1) & 0xFF;
+		parentObj[regKey] = value;
+		parentObj.FZero = (value == 0);
+		parentObj.FHalfCarry = ((value & 0xF) == 0);
+		parentObj.FSubtract = false;
+	}
+}
+
+function decReg (regName) {
+	var regKey = 'register' + regName;
+	return function (parentObj) {
+		var value = (parentObj[regKey] - 1) & 0xFF;
+		parentObj[regKey] = value;
+		parentObj.FZero = (value == 0);
+		parentObj.FHalfCarry = ((value & 0xF) == 0xF);
+		parentObj.FSubtract = true;
+	}
+}
+
 GameBoyCore.prototype.OPCODE = [
 	//NOP
 	//#0x00:
@@ -318,20 +341,10 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//INC B
 	//#0x04:
-	function (parentObj) {
-		parentObj.registerB = (parentObj.registerB + 1) & 0xFF;
-		parentObj.FZero = (parentObj.registerB == 0);
-		parentObj.FHalfCarry = ((parentObj.registerB & 0xF) == 0);
-		parentObj.FSubtract = false;
-	},
+	incReg('B'),
 	//DEC B
 	//#0x05:
-	function (parentObj) {
-		parentObj.registerB = (parentObj.registerB - 1) & 0xFF;
-		parentObj.FZero = (parentObj.registerB == 0);
-		parentObj.FHalfCarry = ((parentObj.registerB & 0xF) == 0xF);
-		parentObj.FSubtract = true;
-	},
+	decReg('B'),
 	//LD B, n
 	//#0x06:
 	function (parentObj) {
@@ -762,20 +775,10 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//INC A
 	//#0x3C:
-	function (parentObj) {
-		parentObj.registerA = (parentObj.registerA + 1) & 0xFF;
-		parentObj.FZero = (parentObj.registerA == 0);
-		parentObj.FHalfCarry = ((parentObj.registerA & 0xF) == 0);
-		parentObj.FSubtract = false;
-	},
+	incReg('A'),
 	//DEC A
 	//#0x3D:
-	function (parentObj) {
-		parentObj.registerA = (parentObj.registerA - 1) & 0xFF;
-		parentObj.FZero = (parentObj.registerA == 0);
-		parentObj.FHalfCarry = ((parentObj.registerA & 0xF) == 0xF);
-		parentObj.FSubtract = true;
-	},
+	decReg('A'),
 	//LD A, n
 	//#0x3E:
 	function (parentObj) {
