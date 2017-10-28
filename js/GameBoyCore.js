@@ -322,23 +322,17 @@ function dec_reg (regName) {
 	};
 }
 
-function inc_reg16 (regNames) {
-	var reg_high = 'register' + regNames[0];
-	var reg_low = 'register' + regNames[1];
+function inc_reg16 (reg_name) {
 	return function (parentObj) {
-		var value = (parentObj[reg_high] << 8 | parentObj[reg_low]) + 1;
-		parentObj[reg_high] = (value >> 8) & 0xFF;
-		parentObj[reg_low] = value & 0xFF;
+		var value = get_reg16(parentObj, reg_name) + 1;
+		set_reg16(parentObj, reg_name, value);
 	};
 }
 
-function dec_reg16 (regNames) {
-	var reg_high = 'register' + regNames[0];
-	var reg_low = 'register' + regNames[1];
+function dec_reg16 (reg_name) {
 	return function (parentObj) {
-		var value = (((parentObj[reg_high] << 8) | parentObj[reg_low]) - 1) & 0xFFFF;
-		parentObj[reg_high] = value >> 8;
-		parentObj[reg_low] = value & 0xFF;
+		var value = (get_reg16(parentObj, reg_name) - 1) & 0xFFFF;
+		set_reg16(parentObj, reg_name, value);
 	};
 }
 
@@ -365,6 +359,24 @@ function ld_reg_nn (regNames, parentObj) {
 		ld_reg1(parentObj);
 		ld_reg0(parentObj);
 	};
+}
+
+function get_reg16(parentObj, reg_name) {
+	var reg_high = 'register' + reg_name[0];
+	var reg_low = 'register' + reg_name[1];
+	return (parentObj[reg_high] << 8) | parentObj[reg_low];
+}
+
+function set_reg16(parentObj, reg_name, value) {
+	var reg_high = 'register' + reg_name[0];
+	var reg_low = 'register' + reg_name[1];
+	parentObj[reg_high] = (value >> 8) & 0xFF;
+	parentObj[reg_low] = value & 0xFF;
+}
+
+function mem_reg16 (parentObj, reg_name) {
+	var address = get_reg16(parentObj, reg_name);
+	return parentObj.memoryRead(address);
 }
 
 GameBoyCore.prototype.OPCODE = [
@@ -418,7 +430,7 @@ GameBoyCore.prototype.OPCODE = [
 	//LD A, (BC)
 	//#0x0A:
 	function (parentObj) {
-		parentObj.registerA = parentObj.memoryRead((parentObj.registerB << 8) | parentObj.registerC);
+		parentObj.registerA = mem_reg16(parentObj, 'BC');
 	},
 	//DEC BC
 	//#0x0B:
@@ -509,7 +521,7 @@ GameBoyCore.prototype.OPCODE = [
 	//LD A, (DE)
 	//#0x1A:
 	function (parentObj) {
-		parentObj.registerA = parentObj.memoryRead((parentObj.registerD << 8) | parentObj.registerE);
+		parentObj.registerA = mem_reg16(parentObj, 'DE');
 	},
 	//DEC DE
 	//#0x1B:

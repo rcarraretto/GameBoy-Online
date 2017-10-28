@@ -1,4 +1,4 @@
-describe("LD [reg], [n]", function() {
+describe("ld", function() {
   var GameBoyCore = require('../js/GameBoyCore');
   var _ = require('lodash');
   var core;
@@ -80,6 +80,26 @@ describe("LD [reg], [n]", function() {
     expect(core.registerE).to.equal(0x32);
     expect(core.registerD).to.equal(0x33);
     expect(core.programCounter).to.equal(0x0102);
+  });
+
+  it("LD A, (BC)", function() {
+    core.registerB = 0x02;
+    core.registerC = 0xAB;
+    core.memory[0x02AB] = 0x32;
+
+    core.OPCODE[0x0A](core)
+
+    expect(core.registerA).to.equal(0x32);
+  });
+
+  it("LD A, (DE)", function() {
+    core.registerD = 0x02;
+    core.registerE = 0xAB;
+    core.memory[0x02AB] = 0x32;
+
+    core.OPCODE[0x1A](core)
+
+    expect(core.registerA).to.equal(0x32);
   });
 
 });
