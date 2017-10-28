@@ -395,12 +395,7 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//INC C
 	//#0x0C:
-	function (parentObj) {
-		parentObj.registerC = (parentObj.registerC + 1) & 0xFF;
-		parentObj.FZero = (parentObj.registerC == 0);
-		parentObj.FHalfCarry = ((parentObj.registerC & 0xF) == 0);
-		parentObj.FSubtract = false;
-	},
+	incReg('C'),
 	//DEC C
 	//#0x0D:
 	function (parentObj) {
