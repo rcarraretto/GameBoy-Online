@@ -308,7 +308,7 @@ function inc_reg (regName) {
 		parentObj.FZero = (value == 0);
 		parentObj.FHalfCarry = ((value & 0xF) == 0);
 		parentObj.FSubtract = false;
-	}
+	};
 }
 
 function dec_reg (regName) {
@@ -319,10 +319,30 @@ function dec_reg (regName) {
 		parentObj.FZero = (value == 0);
 		parentObj.FHalfCarry = ((value & 0xF) == 0xF);
 		parentObj.FSubtract = true;
-	}
+	};
 }
 
 function nop (parentObj) {
+}
+
+var int16 = {
+	inc: function(value) {
+		return (value + 1) & 0xFFFF;
+	}
+};
+
+function ld_reg_n (regName) {
+	return function(parentObj) {
+		parentObj['register' + regName] = parentObj.memoryRead(parentObj.programCounter);
+		parentObj.programCounter = int16.inc(parentObj.programCounter);
+	};
+}
+
+function ld_reg_nn (regNames, parentObj) {
+	return function(parentObj) {
+		ld_reg_n(regNames[1])(parentObj);
+		ld_reg_n(regNames[0])(parentObj);
+	};
 }
 
 GameBoyCore.prototype.OPCODE = [
@@ -331,11 +351,7 @@ GameBoyCore.prototype.OPCODE = [
 	nop,
 	//LD BC, nn
 	//#0x01:
-	function (parentObj) {
-		parentObj.registerC = parentObj.memoryReader[parentObj.programCounter](parentObj, parentObj.programCounter);
-		parentObj.registerB = parentObj.memoryRead((parentObj.programCounter + 1) & 0xFFFF);
-		parentObj.programCounter = (parentObj.programCounter + 2) & 0xFFFF;
-	},
+	ld_reg_nn('BC'),
 	//LD (BC), A
 	//#0x02:
 	function (parentObj) {
@@ -356,10 +372,7 @@ GameBoyCore.prototype.OPCODE = [
 	dec_reg('B'),
 	//LD B, n
 	//#0x06:
-	function (parentObj) {
-		parentObj.registerB = parentObj.memoryReader[parentObj.programCounter](parentObj, parentObj.programCounter);
-		parentObj.programCounter = (parentObj.programCounter + 1) & 0xFFFF;
-	},
+	ld_reg_n('B'),
 	//RLCA
 	//#0x07:
 	function (parentObj) {
@@ -404,10 +417,7 @@ GameBoyCore.prototype.OPCODE = [
 	dec_reg('C'),
 	//LD C, n
 	//#0x0E:
-	function (parentObj) {
-		parentObj.registerC = parentObj.memoryReader[parentObj.programCounter](parentObj, parentObj.programCounter);
-		parentObj.programCounter = (parentObj.programCounter + 1) & 0xFFFF;
-	},
+	ld_reg_n('C'),
 	//RRCA
 	//#0x0F:
 	function (parentObj) {
@@ -442,11 +452,7 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//LD DE, nn
 	//#0x11:
-	function (parentObj) {
-		parentObj.registerE = parentObj.memoryReader[parentObj.programCounter](parentObj, parentObj.programCounter);
-		parentObj.registerD = parentObj.memoryRead((parentObj.programCounter + 1) & 0xFFFF);
-		parentObj.programCounter = (parentObj.programCounter + 2) & 0xFFFF;
-	},
+	ld_reg_nn('DE'),
 	//LD (DE), A
 	//#0x12:
 	function (parentObj) {
@@ -467,10 +473,7 @@ GameBoyCore.prototype.OPCODE = [
 	dec_reg('D'),
 	//LD D, n
 	//#0x16:
-	function (parentObj) {
-		parentObj.registerD = parentObj.memoryReader[parentObj.programCounter](parentObj, parentObj.programCounter);
-		parentObj.programCounter = (parentObj.programCounter + 1) & 0xFFFF;
-	},
+	ld_reg_n('D'),
 	//RLA
 	//#0x17:
 	function (parentObj) {
@@ -513,10 +516,7 @@ GameBoyCore.prototype.OPCODE = [
 	dec_reg('E'),
 	//LD E, n
 	//#0x1E:
-	function (parentObj) {
-		parentObj.registerE = parentObj.memoryReader[parentObj.programCounter](parentObj, parentObj.programCounter);
-		parentObj.programCounter = (parentObj.programCounter + 1) & 0xFFFF;
-	},
+	ld_reg_n('E'),
 	//RRA
 	//#0x1F:
 	function (parentObj) {
@@ -760,10 +760,7 @@ GameBoyCore.prototype.OPCODE = [
 	dec_reg('A'),
 	//LD A, n
 	//#0x3E:
-	function (parentObj) {
-		parentObj.registerA = parentObj.memoryReader[parentObj.programCounter](parentObj, parentObj.programCounter);
-		parentObj.programCounter = (parentObj.programCounter + 1) & 0xFFFF;
-	},
+	ld_reg_n('A'),
 	//CCF
 	//#0x3F:
 	function (parentObj) {
