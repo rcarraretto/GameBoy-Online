@@ -387,29 +387,17 @@ function ld_reg_nn (regNames, parentObj) {
 }
 
 GameBoyCore.prototype.OPCODE = [
-	//NOP
-	//#0x00:
-	nop,
-	//LD BC, nn
-	//#0x01:
-	ld_reg_nn('BC'),
+	null,
+	null,
 	//LD (BC), A
 	//#0x02:
 	function (parentObj) {
 		parentObj.memoryWrite((parentObj.registerB << 8) | parentObj.registerC, parentObj.registerA);
 	},
-	//INC BC
-	//#0x03:
-	reg_combo.inc_op('BC'),
-	//INC B
-	//#0x04:
-	inc_reg('B'),
-	//DEC B
-	//#0x05:
-	dec_reg('B'),
-	//LD B, n
-	//#0x06:
-	ld_reg_n('B'),
+	null,
+	null,
+	null,
+	null,
 	//RLCA
 	//#0x07:
 	function (parentObj) {
@@ -434,23 +422,11 @@ GameBoyCore.prototype.OPCODE = [
 		parentObj.registersHL = dirtySum & 0xFFFF;
 		parentObj.FSubtract = false;
 	},
-	//LD A, (BC)
-	//#0x0A:
-	function (parentObj) {
-		parentObj.registerA = reg_combo.read_mem(parentObj, 'BC');
-	},
-	//DEC BC
-	//#0x0B:
-	reg_combo.dec_op('BC'),
-	//INC C
-	//#0x0C:
-	inc_reg('C'),
-	//DEC C
-	//#0x0D:
-	dec_reg('C'),
-	//LD C, n
-	//#0x0E:
-	ld_reg_n('C'),
+	null,
+	null,
+	null,
+	null,
+	null,
 	//RRCA
 	//#0x0F:
 	function (parentObj) {
@@ -483,26 +459,16 @@ GameBoyCore.prototype.OPCODE = [
 			parentObj.handleSTOP();
 		}
 	},
-	//LD DE, nn
-	//#0x11:
-	ld_reg_nn('DE'),
+	null,
 	//LD (DE), A
 	//#0x12:
 	function (parentObj) {
 		parentObj.memoryWrite((parentObj.registerD << 8) | parentObj.registerE, parentObj.registerA);
 	},
-	//INC DE
-	//#0x13:
-	reg_combo.inc_op('DE'),
-	//INC D
-	//#0x14:
-	inc_reg('D'),
-	//DEC D
-	//#0x15:
-	dec_reg('D'),
-	//LD D, n
-	//#0x16:
-	ld_reg_n('D'),
+	null,
+	null,
+	null,
+	null,
 	//RLA
 	//#0x17:
 	function (parentObj) {
@@ -525,23 +491,11 @@ GameBoyCore.prototype.OPCODE = [
 		parentObj.registersHL = dirtySum & 0xFFFF;
 		parentObj.FSubtract = false;
 	},
-	//LD A, (DE)
-	//#0x1A:
-	function (parentObj) {
-		parentObj.registerA = reg_combo.read_mem(parentObj, 'DE');
-	},
-	//DEC DE
-	//#0x1B:
-	reg_combo.dec_op('DE'),
-	//INC E
-	//#0x1C:
-	inc_reg('E'),
-	//DEC E
-	//#0x1D:
-	dec_reg('E'),
-	//LD E, n
-	//#0x1E:
-	ld_reg_n('E'),
+	null,
+	null,
+	null,
+	null,
+	null,
 	//RRA
 	//#0x1F:
 	function (parentObj) {
@@ -711,11 +665,7 @@ GameBoyCore.prototype.OPCODE = [
 		parentObj.memoryWriter[parentObj.registersHL](parentObj, parentObj.registersHL, parentObj.registerA);
 		parentObj.registersHL = (parentObj.registersHL - 1) & 0xFFFF;
 	},
-	//INC SP
-	//#0x33:
-	function (parentObj) {
-		parentObj.stackPointer = int16.inc(parentObj.stackPointer);
-	},
+	null,
 	//INC (HL)
 	//#0x34:
 	function (parentObj) {
@@ -772,20 +722,10 @@ GameBoyCore.prototype.OPCODE = [
 		parentObj.registerA = parentObj.memoryReader[parentObj.registersHL](parentObj, parentObj.registersHL);
 		parentObj.registersHL = (parentObj.registersHL - 1) & 0xFFFF;
 	},
-	//DEC SP
-	//#0x3B:
-	function (parentObj) {
-		parentObj.stackPointer = int16.dec(parentObj.stackPointer);
-	},
-	//INC A
-	//#0x3C:
-	inc_reg('A'),
-	//DEC A
-	//#0x3D:
-	dec_reg('A'),
-	//LD A, n
-	//#0x3E:
-	ld_reg_n('A'),
+	null,
+	null,
+	null,
+	null,
 	//CCF
 	//#0x3F:
 	function (parentObj) {
@@ -2237,6 +2177,70 @@ GameBoyCore.prototype.OPCODE = [
 		parentObj.programCounter = 0x38;
 	}
 ];
+
+// NOP
+GameBoyCore.prototype.OPCODE[0x00] = nop;
+
+// INC A
+GameBoyCore.prototype.OPCODE[0x3C] = inc_reg('A');
+// INC B
+GameBoyCore.prototype.OPCODE[0x04] = inc_reg('B');
+// INC C
+GameBoyCore.prototype.OPCODE[0x0C] = inc_reg('C');
+// INC D
+GameBoyCore.prototype.OPCODE[0x14] = inc_reg('D');
+// INC E
+GameBoyCore.prototype.OPCODE[0x1C] = inc_reg('E');
+// INC BC
+GameBoyCore.prototype.OPCODE[0x03] = reg_combo.inc_op('BC');
+// INC DE
+GameBoyCore.prototype.OPCODE[0x13] = reg_combo.inc_op('DE');
+// INC SP
+GameBoyCore.prototype.OPCODE[0x33] = function (parentObj) {
+	parentObj.stackPointer = int16.inc(parentObj.stackPointer);
+};
+
+// DEC A
+GameBoyCore.prototype.OPCODE[0x3D] = dec_reg('A');
+// DEC B
+GameBoyCore.prototype.OPCODE[0x05] = dec_reg('B');
+// DEC C
+GameBoyCore.prototype.OPCODE[0x0D] = dec_reg('C');
+// DEC D
+GameBoyCore.prototype.OPCODE[0x15] = dec_reg('D');
+// DEC E
+GameBoyCore.prototype.OPCODE[0x1D] = dec_reg('E');
+// DEC BC
+GameBoyCore.prototype.OPCODE[0x0B] = reg_combo.dec_op('BC');
+// DEC DE
+GameBoyCore.prototype.OPCODE[0x1B] = reg_combo.dec_op('DE');
+// DEC SP
+GameBoyCore.prototype.OPCODE[0x3B] = function (parentObj) {
+	parentObj.stackPointer = int16.dec(parentObj.stackPointer);
+};
+
+// LD A, n
+GameBoyCore.prototype.OPCODE[0x3E] = ld_reg_n('A');
+// LD B, n
+GameBoyCore.prototype.OPCODE[0x06] = ld_reg_n('B');
+// LD C, n
+GameBoyCore.prototype.OPCODE[0x0E] = ld_reg_n('C');
+// LD D, n
+GameBoyCore.prototype.OPCODE[0x16] = ld_reg_n('D');
+// LD E, n
+GameBoyCore.prototype.OPCODE[0x1E] = ld_reg_n('E');
+// LD BC, nn
+GameBoyCore.prototype.OPCODE[0x01] = ld_reg_nn('BC');
+// LD DE, nn
+GameBoyCore.prototype.OPCODE[0x11] = ld_reg_nn('DE');
+// LD A, (BC)
+GameBoyCore.prototype.OPCODE[0x0A] = function (parentObj) {
+	parentObj.registerA = reg_combo.read_mem(parentObj, 'BC');
+};
+// LD A, (DE)
+GameBoyCore.prototype.OPCODE[0x1A] = function (parentObj) {
+	parentObj.registerA = reg_combo.read_mem(parentObj, 'DE');
+};
 
 GameBoyCore.prototype.CBOPCODE = [
 	//RLC B
