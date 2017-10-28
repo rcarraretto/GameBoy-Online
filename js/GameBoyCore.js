@@ -332,6 +332,16 @@ function inc_reg16 (regNames) {
 	};
 }
 
+function dec_reg16 (regNames) {
+	var reg_high = 'register' + regNames[0];
+	var reg_low = 'register' + regNames[1];
+	return function (parentObj) {
+		var value = (((parentObj[reg_high] << 8) | parentObj[reg_low]) - 1) & 0xFFFF;
+		parentObj[reg_high] = value >> 8;
+		parentObj[reg_low] = value & 0xFF;
+	};
+}
+
 function nop (parentObj) {
 }
 
@@ -412,11 +422,7 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//DEC BC
 	//#0x0B:
-	function (parentObj) {
-		var temp_var = (((parentObj.registerB << 8) | parentObj.registerC) - 1) & 0xFFFF;
-		parentObj.registerB = temp_var >> 8;
-		parentObj.registerC = temp_var & 0xFF;
-	},
+	dec_reg16('BC'),
 	//INC C
 	//#0x0C:
 	inc_reg('C'),
@@ -507,11 +513,7 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//DEC DE
 	//#0x1B:
-	function (parentObj) {
-		var temp_var = (((parentObj.registerD << 8) | parentObj.registerE) - 1) & 0xFFFF;
-		parentObj.registerD = temp_var >> 8;
-		parentObj.registerE = temp_var & 0xFF;
-	},
+	dec_reg16('DE'),
 	//INC E
 	//#0x1C:
 	inc_reg('E'),

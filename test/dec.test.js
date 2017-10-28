@@ -142,4 +142,76 @@ describe("dec", function() {
     expect(core.FSubtract).to.equal(true);
   });
 
+  it("DEC BC", function() {
+    core.registerB = 1;
+    core.registerC = 2;
+    core.OPCODE[0x0B](core)
+    expect(core.registerC).to.equal(1);
+    expect(core.registerB).to.equal(1);
+
+    // 1 to 0
+    core.registerB = 0;
+    core.registerC = 1;
+    core.OPCODE[0x0B](core)
+    expect(core.registerC).to.equal(0);
+    expect(core.registerB).to.equal(0);
+
+    // from max 16 bit number
+    core.registerB = 255;
+    core.registerC = 255;
+    core.OPCODE[0x0B](core)
+    expect(core.registerC).to.equal(254);
+    expect(core.registerB).to.equal(255);
+
+    // underflow 16 bit
+    core.registerB = 0;
+    core.registerC = 0;
+    core.OPCODE[0x0B](core)
+    expect(core.registerC).to.equal(255);
+    expect(core.registerB).to.equal(255);
+
+    // C: 0 to 255
+    core.registerB = 255;
+    core.registerC = 0;
+    core.OPCODE[0x0B](core)
+    expect(core.registerC).to.equal(255);
+    expect(core.registerB).to.equal(254);
+  });
+
+  it("DEC DE", function() {
+    core.registerD = 1;
+    core.registerE = 2;
+    core.OPCODE[0x1B](core)
+    expect(core.registerE).to.equal(1);
+    expect(core.registerD).to.equal(1);
+
+    // 1 to 0
+    core.registerD = 0;
+    core.registerE = 1;
+    core.OPCODE[0x1B](core)
+    expect(core.registerE).to.equal(0);
+    expect(core.registerD).to.equal(0);
+
+    // from max 16 bit number
+    core.registerD = 255;
+    core.registerE = 255;
+    core.OPCODE[0x1B](core)
+    expect(core.registerE).to.equal(254);
+    expect(core.registerD).to.equal(255);
+
+    // underflow 16 bit
+    core.registerD = 0;
+    core.registerE = 0;
+    core.OPCODE[0x1B](core)
+    expect(core.registerE).to.equal(255);
+    expect(core.registerD).to.equal(255);
+
+    // C: 0 to 255
+    core.registerD = 255;
+    core.registerE = 0;
+    core.OPCODE[0x1B](core)
+    expect(core.registerE).to.equal(255);
+    expect(core.registerD).to.equal(254);
+  });
+
 });
