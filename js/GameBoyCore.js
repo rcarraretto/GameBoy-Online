@@ -120,7 +120,7 @@ function GameBoyCore(canvas, ROMImage) {
 	this.LSFR15Table = null;
 	this.LSFR7Table = null;
 	this.noiseSampleTable = null;
-	this.initializeAudioStartState();
+	// this.initializeAudioStartState();
 	this.soundMasterEnabled = false;			//As its name implies
 	this.channel3PCM = null;					//Channel 3 adjusted sample buffer.
 	//Vin Shit:
@@ -161,7 +161,7 @@ function GameBoyCore(canvas, ROMImage) {
 	this.mixerOutputCache = 0;
 	//Pre-multipliers to cache some calculations:
 	this.emulatorSpeed = 1;
-	this.initializeTiming();
+	// this.initializeTiming();
 	//Audio generation counters:
 	this.audioTicks = 0;				//Used to sample the audio system every x CPU instructions.
 	this.audioIndex = 0;				//Used to keep alignment on audio generation.
@@ -265,7 +265,7 @@ function GameBoyCore(canvas, ROMImage) {
 	this.offscreenRGBCount = this.onscreenWidth * this.onscreenHeight * 4;
 	this.resizePathClear = true;
 	//Initialize the white noise cache tables ahead of time:
-	this.intializeWhiteNoise();
+	// this.intializeWhiteNoise();
 }
 GameBoyCore.prototype.GBBOOTROM = [		//GB BOOT ROM
 	//Add 256 byte boot rom here if you are going to use it.
