@@ -11,8 +11,4 @@ describe("misc", function() {
     expect(core.registerA).to.equal(1);
   });
 
-  it("NOP", function() {
-    core.OPCODE[0x00](core)
-  });
-
 });

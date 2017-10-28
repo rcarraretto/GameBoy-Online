@@ -322,12 +322,13 @@ function decReg (regName) {
 	}
 }
 
+function nop (parentObj) {
+}
+
 GameBoyCore.prototype.OPCODE = [
 	//NOP
 	//#0x00:
-	function (parentObj) {
-		//Do Nothing...
-	},
+	nop,
 	//LD BC, nn
 	//#0x01:
 	function (parentObj) {
@@ -771,9 +772,7 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//LD B, B
 	//#0x40:
-	function (parentObj) {
-		//Do nothing...
-	},
+	nop,
 	//LD B, C
 	//#0x41:
 	function (parentObj) {
@@ -816,9 +815,7 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//LD C, C
 	//#0x49:
-	function (parentObj) {
-		//Do nothing...
-	},
+	nop,
 	//LD C, D
 	//#0x4A:
 	function (parentObj) {
@@ -861,9 +858,7 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//LD D, D
 	//#0x52:
-	function (parentObj) {
-		//Do nothing...
-	},
+	nop,
 	//LD D, E
 	//#0x53:
 	function (parentObj) {
@@ -906,9 +901,7 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//LD E, E
 	//#0x5B:
-	function (parentObj) {
-		//Do nothing...
-	},
+	nop,
 	//LD E, H
 	//#0x5C:
 	function (parentObj) {
@@ -951,9 +944,7 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//LD H, H
 	//#0x64:
-	function (parentObj) {
-		//Do nothing...
-	},
+	nop,
 	//LD H, L
 	//#0x65:
 	function (parentObj) {
@@ -996,9 +987,7 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//LD L, L
 	//#0x6D:
-	function (parentObj) {
-		//Do nothing...
-	},
+	nop,
 	//LD L, (HL)
 	//#0x6E:
 	function (parentObj) {
@@ -1100,9 +1089,7 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//LD A, A
 	//#0x7F:
-	function (parentObj) {
-		//Do Nothing...
-	},
+	nop,
 	//ADD A, B
 	//#0x80:
 	function (parentObj) {
