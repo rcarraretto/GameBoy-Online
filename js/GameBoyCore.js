@@ -322,6 +322,16 @@ function dec_reg (regName) {
 	};
 }
 
+function inc_reg16 (regNames) {
+	var reg_high = 'register' + regNames[0];
+	var reg_low = 'register' + regNames[1];
+	return function (parentObj) {
+		var value = (parentObj[reg_high] << 8 | parentObj[reg_low]) + 1;
+		parentObj[reg_high] = (value >> 8) & 0xFF;
+		parentObj[reg_low] = value & 0xFF;
+	};
+}
+
 function nop (parentObj) {
 }
 
@@ -339,9 +349,11 @@ function ld_reg_n (regName) {
 }
 
 function ld_reg_nn (regNames, parentObj) {
+	var ld_reg0 = ld_reg_n(regNames[0]);
+	var ld_reg1 = ld_reg_n(regNames[1]);
 	return function(parentObj) {
-		ld_reg_n(regNames[1])(parentObj);
-		ld_reg_n(regNames[0])(parentObj);
+		ld_reg1(parentObj);
+		ld_reg0(parentObj);
 	};
 }
 
@@ -359,11 +371,7 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//INC BC
 	//#0x03:
-	function (parentObj) {
-		var temp_var = ((parentObj.registerB << 8) | parentObj.registerC) + 1;
-		parentObj.registerB = (temp_var >> 8) & 0xFF;
-		parentObj.registerC = temp_var & 0xFF;
-	},
+	inc_reg16('BC'),
 	//INC B
 	//#0x04:
 	inc_reg('B'),
@@ -460,11 +468,7 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//INC DE
 	//#0x13:
-	function (parentObj) {
-		var temp_var = ((parentObj.registerD << 8) | parentObj.registerE) + 1;
-		parentObj.registerD = (temp_var >> 8) & 0xFF;
-		parentObj.registerE = temp_var & 0xFF;
-	},
+	inc_reg16('DE'),
 	//INC D
 	//#0x14:
 	inc_reg('D'),
