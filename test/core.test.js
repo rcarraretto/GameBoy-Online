@@ -149,4 +149,31 @@ describe("gameboy", function() {
     expect(core.FSubtract).to.equal(true);
   });
 
+  it("DEC C", function() {
+    core.registerC = 18
+    core.OPCODE[0x0D](core)
+    expect(core.registerC).to.equal(17);
+    expect(core.FZero).to.equal(false);
+    expect(core.FHalfCarry).to.equal(false);
+    expect(core.FSubtract).to.equal(true);
+  });
+
+  it("DEC C - underflow", function() {
+    core.registerC = 0
+    core.OPCODE[0x0D](core)
+    expect(core.registerC).to.equal(255);
+    expect(core.FZero).to.equal(false);
+    expect(core.FHalfCarry).to.equal(true);
+    expect(core.FSubtract).to.equal(true);
+  });
+
+  it("DEC C - to zero", function() {
+    core.registerC = 1
+    core.OPCODE[0x0D](core)
+    expect(core.registerC).to.equal(0);
+    expect(core.FZero).to.equal(true);
+    expect(core.FHalfCarry).to.equal(false);
+    expect(core.FSubtract).to.equal(true);
+  });
+
 });
