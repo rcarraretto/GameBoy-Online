@@ -300,7 +300,7 @@ GameBoyCore.prototype.ffxxDump = [	//Dump of the post-BOOT I/O register state (F
 	0x98, 0xD1, 0x71, 0x02, 0x4D, 0x01, 0xC1, 0xFF, 	0x0D, 0x00, 0xD3, 0x05, 0xF9, 0x00, 0x0B, 0x00
 ];
 
-function incReg (regName) {
+function inc_reg (regName) {
 	var regKey = 'register' + regName;
 	return function (parentObj) {
 		var value = (parentObj[regKey] + 1) & 0xFF;
@@ -311,7 +311,7 @@ function incReg (regName) {
 	}
 }
 
-function decReg (regName) {
+function dec_reg (regName) {
 	var regKey = 'register' + regName;
 	return function (parentObj) {
 		var value = (parentObj[regKey] - 1) & 0xFF;
@@ -350,10 +350,10 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//INC B
 	//#0x04:
-	incReg('B'),
+	inc_reg('B'),
 	//DEC B
 	//#0x05:
-	decReg('B'),
+	dec_reg('B'),
 	//LD B, n
 	//#0x06:
 	function (parentObj) {
@@ -398,10 +398,10 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//INC C
 	//#0x0C:
-	incReg('C'),
+	inc_reg('C'),
 	//DEC C
 	//#0x0D:
-	decReg('C'),
+	dec_reg('C'),
 	//LD C, n
 	//#0x0E:
 	function (parentObj) {
@@ -461,10 +461,10 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//INC D
 	//#0x14:
-	incReg('D'),
+	inc_reg('D'),
 	//DEC D
 	//#0x15:
-	decReg('D'),
+	dec_reg('D'),
 	//LD D, n
 	//#0x16:
 	function (parentObj) {
@@ -507,10 +507,10 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//INC E
 	//#0x1C:
-	incReg('E'),
+	inc_reg('E'),
 	//DEC E
 	//#0x1D:
-	decReg('E'),
+	dec_reg('E'),
 	//LD E, n
 	//#0x1E:
 	function (parentObj) {
@@ -754,10 +754,10 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//INC A
 	//#0x3C:
-	incReg('A'),
+	inc_reg('A'),
 	//DEC A
 	//#0x3D:
-	decReg('A'),
+	dec_reg('A'),
 	//LD A, n
 	//#0x3E:
 	function (parentObj) {
