@@ -225,6 +225,23 @@ describe("inc", function() {
     expect(core.registersHL).to.equal(0);
   });
 
+  it("INC H", function() {
+    core.registersHL = 0x2018;
+    core.OPCODE[0x24](core);
+    expect(core.registersHL).to.equal(0x2118);
+    expect(core.FZero).to.equal(false);
+    expect(core.FHalfCarry).to.equal(false);
+    expect(core.FSubtract).to.equal(false);
+
+    // overflow H 8 bits
+    core.registersHL = 0xFF18;
+    core.OPCODE[0x24](core);
+    expect(core.registersHL).to.equal(0x0018);
+    expect(core.FZero).to.equal(true);
+    expect(core.FHalfCarry).to.equal(true);
+    expect(core.FSubtract).to.equal(false);
+  });
+
   it("INC SP", function() {
     core.stackPointer = 18;
     core.OPCODE[0x33](core);
