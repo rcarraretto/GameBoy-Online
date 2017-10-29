@@ -727,9 +727,7 @@ GameBoyCore.prototype.OPCODE = [
 		parentObj.FCarry = !parentObj.FCarry;
 		parentObj.FSubtract = parentObj.FHalfCarry = false;
 	},
-	//LD B, B
-	//#0x40:
-	nop,
+	null,
 	//LD B, C
 	//#0x41:
 	function (parentObj) {
@@ -770,9 +768,7 @@ GameBoyCore.prototype.OPCODE = [
 	function (parentObj) {
 		parentObj.registerC = parentObj.registerB;
 	},
-	//LD C, C
-	//#0x49:
-	nop,
+	null,
 	//LD C, D
 	//#0x4A:
 	function (parentObj) {
@@ -813,9 +809,7 @@ GameBoyCore.prototype.OPCODE = [
 	function (parentObj) {
 		parentObj.registerD = parentObj.registerC;
 	},
-	//LD D, D
-	//#0x52:
-	nop,
+	null,
 	//LD D, E
 	//#0x53:
 	function (parentObj) {
@@ -856,9 +850,7 @@ GameBoyCore.prototype.OPCODE = [
 	function (parentObj) {
 		parentObj.registerE = parentObj.registerD;
 	},
-	//LD E, E
-	//#0x5B:
-	nop,
+	null,
 	//LD E, H
 	//#0x5C:
 	function (parentObj) {
@@ -899,9 +891,7 @@ GameBoyCore.prototype.OPCODE = [
 	function (parentObj) {
 		parentObj.registersHL = (parentObj.registerE << 8) | (parentObj.registersHL & 0xFF);
 	},
-	//LD H, H
-	//#0x64:
-	nop,
+	null,
 	//LD H, L
 	//#0x65:
 	function (parentObj) {
@@ -942,9 +932,7 @@ GameBoyCore.prototype.OPCODE = [
 	function (parentObj) {
 		parentObj.registersHL = (parentObj.registersHL & 0xFF00) | (parentObj.registersHL >> 8);
 	},
-	//LD L, L
-	//#0x6D:
-	nop,
+	null,
 	//LD L, (HL)
 	//#0x6E:
 	function (parentObj) {
@@ -1044,9 +1032,7 @@ GameBoyCore.prototype.OPCODE = [
 	function (parentObj) {
 		parentObj.registerA = parentObj.memoryReader[parentObj.registersHL](parentObj, parentObj.registersHL);
 	},
-	//LD A, A
-	//#0x7F:
-	nop,
+	null,
 	//ADD A, B
 	//#0x80:
 	function (parentObj) {
@@ -2234,6 +2220,20 @@ GameBoyCore.prototype.OPCODE[0x3B] = function (parentObj) {
 	parentObj.stackPointer = int16.dec(parentObj.stackPointer);
 };
 
+// LD A, A
+GameBoyCore.prototype.OPCODE[0x7F] = nop;
+// LD B, B
+GameBoyCore.prototype.OPCODE[0x40] = nop;
+// LD C, C
+GameBoyCore.prototype.OPCODE[0x49] = nop;
+// LD D, D
+GameBoyCore.prototype.OPCODE[0x52] = nop;
+// LD E, E
+GameBoyCore.prototype.OPCODE[0x5b] = nop;
+// LD H, H
+GameBoyCore.prototype.OPCODE[0x64] = nop;
+// LD L, L
+GameBoyCore.prototype.OPCODE[0x6D] = nop;
 // LD A, n
 GameBoyCore.prototype.OPCODE[0x3E] = ld_reg_n('A');
 // LD B, n
