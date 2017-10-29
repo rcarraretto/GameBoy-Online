@@ -309,6 +309,12 @@ function inc_reg8_op (regName) {
 			parentObj.registersHL = (H << 8) | (parentObj.registersHL & 0xFF);
 			return H;
 		};
+	} else if (regName === 'L') {
+		inc = function (parentObj) {
+			var L = (parentObj.registersHL + 1) & 0xFF;
+			parentObj.registersHL = (parentObj.registersHL & 0xFF00) | L;
+			return L;
+		};
 	} else {
 		inc = function (parentObj) {
 			var regKey = 'register' + regName;
@@ -335,6 +341,12 @@ function dec_reg8_op (regName) {
 			parentObj.registersHL = (H << 8) | (parentObj.registersHL & 0xFF);
 			return H;
 		};
+	} else if (regName === 'L') {
+		dec = function (parentObj) {
+			var L = (parentObj.registersHL - 1) & 0xFF;
+			parentObj.registersHL = (parentObj.registersHL & 0xFF00) | L;
+			return L;
+		}
 	} else {
 		dec = function (parentObj) {
 			var regKey = 'register' + regName;
@@ -615,24 +627,8 @@ GameBoyCore.prototype.OPCODE = [
 		parentObj.registersHL = (parentObj.registersHL + 1) & 0xFFFF;
 	},
 	null,
-	//INC L
-	//#0x2C:
-	function (parentObj) {
-		var L = (parentObj.registersHL + 1) & 0xFF;
-		parentObj.FZero = (L == 0);
-		parentObj.FHalfCarry = ((L & 0xF) == 0);
-		parentObj.FSubtract = false;
-		parentObj.registersHL = (parentObj.registersHL & 0xFF00) | L;
-	},
-	//DEC L
-	//#0x2D:
-	function (parentObj) {
-		var L = (parentObj.registersHL - 1) & 0xFF;
-		parentObj.FZero = (L == 0);
-		parentObj.FHalfCarry = ((L & 0xF) == 0xF);
-		parentObj.FSubtract = true;
-		parentObj.registersHL = (parentObj.registersHL & 0xFF00) | L;
-	},
+	null,
+	null,
 	//LD L, n
 	//#0x2E:
 	function (parentObj) {
@@ -2204,6 +2200,8 @@ GameBoyCore.prototype.OPCODE[0x23] = function (parentObj) {
 };
 // INC H
 GameBoyCore.prototype.OPCODE[0x24] = inc_reg8_op('H');
+// INC L
+GameBoyCore.prototype.OPCODE[0x2C] = inc_reg8_op('L');
 // INC SP
 GameBoyCore.prototype.OPCODE[0x33] = function (parentObj) {
 	parentObj.stackPointer = int16.inc(parentObj.stackPointer);
@@ -2229,6 +2227,8 @@ GameBoyCore.prototype.OPCODE[0x2B] = function (parentObj) {
 };
 // DEC H
 GameBoyCore.prototype.OPCODE[0x25] = dec_reg8_op('H');
+// DEC L
+GameBoyCore.prototype.OPCODE[0x2D] = dec_reg8_op('L');
 // DEC SP
 GameBoyCore.prototype.OPCODE[0x3B] = function (parentObj) {
 	parentObj.stackPointer = int16.dec(parentObj.stackPointer);

@@ -250,6 +250,31 @@ describe("dec", function() {
     expect(core.FSubtract).to.equal(true);
   });
 
+  it("DEC L", function() {
+    core.registersHL = 0x1821;
+    core.OPCODE[0x2D](core);
+    expect(core.registersHL).to.equal(0x1820);
+    expect(core.FZero).to.equal(false);
+    expect(core.FHalfCarry).to.equal(false);
+    expect(core.FSubtract).to.equal(true);
+
+    // underflow
+    core.registersHL = 0x1900;
+    core.OPCODE[0x2D](core);
+    expect(core.registersHL).to.equal(0x19FF);
+    expect(core.FZero).to.equal(false);
+    expect(core.FHalfCarry).to.equal(true);
+    expect(core.FSubtract).to.equal(true);
+
+    // zero flag
+    core.registersHL = 0x1901;
+    core.OPCODE[0x2D](core);
+    expect(core.registersHL).to.equal(0x1900);
+    expect(core.FZero).to.equal(true);
+    expect(core.FHalfCarry).to.equal(false);
+    expect(core.FSubtract).to.equal(true);
+  });
+
   it("DEC SP", function() {
     core.stackPointer = 18;
     core.OPCODE[0x3B](core);
