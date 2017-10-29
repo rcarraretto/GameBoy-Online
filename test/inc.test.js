@@ -214,6 +214,17 @@ describe("inc", function() {
     expect(core.registerD).to.equal(1);
   });
 
+  it("INC HL", function() {
+    core.registersHL = 18;
+    core.OPCODE[0x23](core);
+    expect(core.registersHL).to.equal(19);
+
+    // overflow 16 bits
+    core.registersHL = 0xFFFF;
+    core.OPCODE[0x23](core);
+    expect(core.registersHL).to.equal(0);
+  });
+
   it("INC SP", function() {
     core.stackPointer = 18;
     core.OPCODE[0x33](core);

@@ -524,11 +524,7 @@ GameBoyCore.prototype.OPCODE = [
 		parentObj.memoryWriter[parentObj.registersHL](parentObj, parentObj.registersHL, parentObj.registerA);
 		parentObj.registersHL = (parentObj.registersHL + 1) & 0xFFFF;
 	},
-	//INC HL
-	//#0x23:
-	function (parentObj) {
-		parentObj.registersHL = (parentObj.registersHL + 1) & 0xFFFF;
-	},
+	null,
 	//INC H
 	//#0x24:
 	function (parentObj) {
@@ -2192,6 +2188,10 @@ GameBoyCore.prototype.OPCODE[0x1C] = inc_reg('E');
 GameBoyCore.prototype.OPCODE[0x03] = reg_combo.inc_op('BC');
 // INC DE
 GameBoyCore.prototype.OPCODE[0x13] = reg_combo.inc_op('DE');
+// INC HL
+GameBoyCore.prototype.OPCODE[0x23] = function (parentObj) {
+	parentObj.registersHL = int16.inc(parentObj.registersHL);
+};
 // INC SP
 GameBoyCore.prototype.OPCODE[0x33] = function (parentObj) {
 	parentObj.stackPointer = int16.inc(parentObj.stackPointer);
