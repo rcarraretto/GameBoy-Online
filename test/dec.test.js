@@ -170,7 +170,7 @@ describe("dec", function() {
     expect(core.registerC).to.equal(255);
     expect(core.registerB).to.equal(255);
 
-    // C: 0 to 255
+    // Register C: from 0 to 255
     core.registerB = 255;
     core.registerC = 0;
     core.OPCODE[0x0B](core)
@@ -206,7 +206,7 @@ describe("dec", function() {
     expect(core.registerE).to.equal(255);
     expect(core.registerD).to.equal(255);
 
-    // C: 0 to 255
+    // Register E: from 0 to 255
     core.registerD = 255;
     core.registerE = 0;
     core.OPCODE[0x1B](core)
