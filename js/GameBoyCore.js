@@ -303,7 +303,13 @@ GameBoyCore.prototype.ffxxDump = [	//Dump of the post-BOOT I/O register state (F
 function inc_reg8_op (regName) {
 	var inc;
 
-	if (regName === 'H') {
+	if (regName === '(HL)') {
+		inc = function (parentObj) {
+			var value = (parentObj.memoryRead(parentObj.registersHL) + 1) & 0xFF;
+			parentObj.memoryWrite(parentObj.registersHL, value);
+			return value;
+		};
+	} else if (regName === 'H') {
 		inc = function (parentObj) {
 			var H = ((parentObj.registersHL >> 8) + 1) & 0xFF;
 			parentObj.registersHL = (H << 8) | (parentObj.registersHL & 0xFF);
@@ -335,7 +341,13 @@ function inc_reg8_op (regName) {
 function dec_reg8_op (regName) {
 	var dec;
 
-	if (regName === 'H') {
+	if (regName === '(HL)') {
+		dec = function (parentObj) {
+			var value = (parentObj.memoryRead(parentObj.registersHL) - 1) & 0xFF;
+			parentObj.memoryWrite(parentObj.registersHL, value);
+			return value;
+		};
+	} else if (regName === 'H') {
 		dec = function (parentObj) {
 			var H = ((parentObj.registersHL >> 8) - 1) & 0xFF;
 			parentObj.registersHL = (H << 8) | (parentObj.registersHL & 0xFF);
@@ -665,24 +677,8 @@ GameBoyCore.prototype.OPCODE = [
 		parentObj.registersHL = (parentObj.registersHL - 1) & 0xFFFF;
 	},
 	null,
-	//INC (HL)
-	//#0x34:
-	function (parentObj) {
-		var temp_var = (parentObj.memoryReader[parentObj.registersHL](parentObj, parentObj.registersHL) + 1) & 0xFF;
-		parentObj.FZero = (temp_var == 0);
-		parentObj.FHalfCarry = ((temp_var & 0xF) == 0);
-		parentObj.FSubtract = false;
-		parentObj.memoryWriter[parentObj.registersHL](parentObj, parentObj.registersHL, temp_var);
-	},
-	//DEC (HL)
-	//#0x35:
-	function (parentObj) {
-		var temp_var = (parentObj.memoryReader[parentObj.registersHL](parentObj, parentObj.registersHL) - 1) & 0xFF;
-		parentObj.FZero = (temp_var == 0);
-		parentObj.FHalfCarry = ((temp_var & 0xF) == 0xF);
-		parentObj.FSubtract = true;
-		parentObj.memoryWriter[parentObj.registersHL](parentObj, parentObj.registersHL, temp_var);
-	},
+	null,
+	null,
 	//LD (HL), n
 	//#0x36:
 	function (parentObj) {
@@ -2202,6 +2198,8 @@ GameBoyCore.prototype.OPCODE[0x23] = function (parentObj) {
 GameBoyCore.prototype.OPCODE[0x24] = inc_reg8_op('H');
 // INC L
 GameBoyCore.prototype.OPCODE[0x2C] = inc_reg8_op('L');
+// INC (HL)
+GameBoyCore.prototype.OPCODE[0x34] = inc_reg8_op('(HL)');
 // INC SP
 GameBoyCore.prototype.OPCODE[0x33] = function (parentObj) {
 	parentObj.stackPointer = int16.inc(parentObj.stackPointer);
@@ -2229,6 +2227,8 @@ GameBoyCore.prototype.OPCODE[0x2B] = function (parentObj) {
 GameBoyCore.prototype.OPCODE[0x25] = dec_reg8_op('H');
 // DEC L
 GameBoyCore.prototype.OPCODE[0x2D] = dec_reg8_op('L');
+// DEC (HL)
+GameBoyCore.prototype.OPCODE[0x35] = dec_reg8_op('(HL)');
 // DEC SP
 GameBoyCore.prototype.OPCODE[0x3B] = function (parentObj) {
 	parentObj.stackPointer = int16.dec(parentObj.stackPointer);

@@ -275,6 +275,34 @@ describe("dec", function() {
     expect(core.FSubtract).to.equal(true);
   });
 
+  it("DEC (HL)", function() {
+    core.memory[0xC001] = 0x32;
+    core.registersHL = 0xC001;
+    core.OPCODE[0x35](core);
+    expect(core.memory[0xC001]).to.equal(0x31);
+    expect(core.FZero).to.equal(false);
+    expect(core.FHalfCarry).to.equal(false);
+    expect(core.FSubtract).to.equal(true);
+
+    // underflow 8 bits
+    core.memory[0xC001] = 0x00;
+    core.registersHL = 0xC001;
+    core.OPCODE[0x35](core);
+    expect(core.memory[0xC001]).to.equal(0xFF);
+    expect(core.FZero).to.equal(false);
+    expect(core.FHalfCarry).to.equal(true);
+    expect(core.FSubtract).to.equal(true);
+
+    // zero flag
+    core.memory[0xC001] = 0x01;
+    core.registersHL = 0xC001;
+    core.OPCODE[0x35](core);
+    expect(core.memory[0xC001]).to.equal(0x00);
+    expect(core.FZero).to.equal(true);
+    expect(core.FHalfCarry).to.equal(false);
+    expect(core.FSubtract).to.equal(true);
+  });
+
   it("DEC SP", function() {
     core.stackPointer = 18;
     core.OPCODE[0x3B](core);
