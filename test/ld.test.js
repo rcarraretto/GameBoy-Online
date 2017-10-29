@@ -102,4 +102,28 @@ describe("ld", function() {
     expect(core.registerA).to.equal(0x32);
   });
 
+  it("LD (BC), A", function() {
+    core.registerB = 0xC0;
+    core.registerC = 0x01;
+    core.registerA = 0x32;
+
+    core.OPCODE[0x02](core)
+
+    // this memory segment is "write normal"
+    // 0xC000 < x < 0xE000
+    expect(core.memory[0xC001]).to.equal(0x32);
+  });
+
+  it("LD (DE), A", function() {
+    core.registerD = 0xC0;
+    core.registerE = 0x01;
+    core.registerA = 0x32;
+
+    core.OPCODE[0x12](core)
+
+    // this memory segment is "write normal"
+    // 0xC000 < x < 0xE000
+    expect(core.memory[0xC001]).to.equal(0x32);
+  });
+
 });
