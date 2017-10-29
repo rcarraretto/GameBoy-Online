@@ -214,6 +214,17 @@ describe("dec", function() {
     expect(core.registerD).to.equal(254);
   });
 
+  it("DEC HL", function() {
+    core.registersHL = 18;
+    core.OPCODE[0x2B](core);
+    expect(core.registersHL).to.equal(17);
+
+    // underflow
+    core.registersHL = 0;
+    core.OPCODE[0x2B](core);
+    expect(core.registersHL).to.equal(0xFFFF);
+  });
+
   it("DEC SP", function() {
     core.stackPointer = 18;
     core.OPCODE[0x3B](core);
