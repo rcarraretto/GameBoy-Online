@@ -447,6 +447,50 @@ describe("ld", function() {
 
 
 
+  /* LD L, [reg8] */
+
+  it("LD L, A", function() {
+    core.registersHL = 0xAA32;
+    core.registerA = 0x58;
+    core.OPCODE[0x6F](core);
+    expect(core.registersHL).to.equal(0xAA58);
+    expect(core.registerA).to.equal(0x58);
+  });
+
+  it("LD L, B", function() {
+    core.registersHL = 0xAA32;
+    core.registerB = 0x58;
+    core.OPCODE[0x68](core);
+    expect(core.registersHL).to.equal(0xAA58);
+    expect(core.registerB).to.equal(0x58);
+  });
+
+  it("LD L, C", function() {
+    core.registersHL = 0xAA32;
+    core.registerC = 0x58;
+    core.OPCODE[0x69](core);
+    expect(core.registersHL).to.equal(0xAA58);
+    expect(core.registerC).to.equal(0x58);
+  });
+
+  it("LD L, D", function() {
+    core.registersHL = 0xAA32;
+    core.registerD = 0x58;
+    core.OPCODE[0x6A](core);
+    expect(core.registersHL).to.equal(0xAA58);
+    expect(core.registerD).to.equal(0x58);
+  });
+
+  it("LD L, E", function() {
+    core.registersHL = 0xAA32;
+    core.registerE = 0x58;
+    core.OPCODE[0x6B](core);
+    expect(core.registersHL).to.equal(0xAA58);
+    expect(core.registerE).to.equal(0x58);
+  });
+
+
+
   /* LD [reg8], n */
 
   it("LD A, n", function() {

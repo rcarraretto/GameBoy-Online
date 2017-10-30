@@ -799,26 +799,10 @@ GameBoyCore.prototype.OPCODE = [
 		parentObj.registersHL = (parentObj.memoryReader[parentObj.registersHL](parentObj, parentObj.registersHL) << 8) | (parentObj.registersHL & 0xFF);
 	},
 	null,
-	//LD L, B
-	//#0x68:
-	function (parentObj) {
-		parentObj.registersHL = (parentObj.registersHL & 0xFF00) | parentObj.registerB;
-	},
-	//LD L, C
-	//#0x69:
-	function (parentObj) {
-		parentObj.registersHL = (parentObj.registersHL & 0xFF00) | parentObj.registerC;
-	},
-	//LD L, D
-	//#0x6A:
-	function (parentObj) {
-		parentObj.registersHL = (parentObj.registersHL & 0xFF00) | parentObj.registerD;
-	},
-	//LD L, E
-	//#0x6B:
-	function (parentObj) {
-		parentObj.registersHL = (parentObj.registersHL & 0xFF00) | parentObj.registerE;
-	},
+	null,
+	null,
+	null,
+	null,
 	//LD L, H
 	//#0x6C:
 	function (parentObj) {
@@ -830,11 +814,7 @@ GameBoyCore.prototype.OPCODE = [
 	function (parentObj) {
 		parentObj.registersHL = (parentObj.registersHL & 0xFF00) | parentObj.memoryReader[parentObj.registersHL](parentObj, parentObj.registersHL);
 	},
-	//LD L, A
-	//#0x6F:
-	function (parentObj) {
-		parentObj.registersHL = (parentObj.registersHL & 0xFF00) | parentObj.registerA;
-	},
+	null,
 	//LD (HL), B
 	//#0x70:
 	function (parentObj) {
@@ -2227,6 +2207,29 @@ GameBoyCore.prototype.OPCODE[0x63] = function (parentObj) {
 };
 
 
+
+/* LD L, [reg8] */
+
+// LD L, A
+GameBoyCore.prototype.OPCODE[0x6F] = function (parentObj) {
+	parentObj.registersHL = (parentObj.registersHL & 0xFF00) | parentObj.registerA;
+};
+// LD L, B
+GameBoyCore.prototype.OPCODE[0x68] = function (parentObj) {
+	parentObj.registersHL = (parentObj.registersHL & 0xFF00) | parentObj.registerB;
+};
+// LD L, C
+GameBoyCore.prototype.OPCODE[0x69] = function (parentObj) {
+	parentObj.registersHL = (parentObj.registersHL & 0xFF00) | parentObj.registerC;
+};
+// LD L, D
+GameBoyCore.prototype.OPCODE[0x6A] = function (parentObj) {
+	parentObj.registersHL = (parentObj.registersHL & 0xFF00) | parentObj.registerD;
+};
+// LD L, E
+GameBoyCore.prototype.OPCODE[0x6B] = function (parentObj) {
+	parentObj.registersHL = (parentObj.registersHL & 0xFF00) | parentObj.registerE;
+};
 
 /* LD [reg8], n */
 
