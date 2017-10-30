@@ -740,11 +740,7 @@ GameBoyCore.prototype.OPCODE = [
 	null,
 	null,
 	null,
-	//LD B, L
-	//#0x45:
-	function (parentObj) {
-		parentObj.registerB = parentObj.registersHL & 0xFF;
-	},
+	null,
 	//LD B, (HL)
 	//#0x46:
 	function (parentObj) {
@@ -756,11 +752,7 @@ GameBoyCore.prototype.OPCODE = [
 	null,
 	null,
 	null,
-	//LD C, L
-	//#0x4D:
-	function (parentObj) {
-		parentObj.registerC = parentObj.registersHL & 0xFF;
-	},
+	null,
 	//LD C, (HL)
 	//#0x4E:
 	function (parentObj) {
@@ -772,11 +764,7 @@ GameBoyCore.prototype.OPCODE = [
 	null,
 	null,
 	null,
-	//LD D, L
-	//#0x55:
-	function (parentObj) {
-		parentObj.registerD = parentObj.registersHL & 0xFF;
-	},
+	null,
 	//LD D, (HL)
 	//#0x56:
 	function (parentObj) {
@@ -788,11 +776,7 @@ GameBoyCore.prototype.OPCODE = [
 	null,
 	null,
 	null,
-	//LD E, L
-	//#0x5D:
-	function (parentObj) {
-		parentObj.registerE = parentObj.registersHL & 0xFF;
-	},
+	null,
 	//LD E, (HL)
 	//#0x5E:
 	function (parentObj) {
@@ -910,11 +894,7 @@ GameBoyCore.prototype.OPCODE = [
 	null,
 	null,
 	null,
-	//LD A, L
-	//#0x7D:
-	function (parentObj) {
-		parentObj.registerA = parentObj.registersHL & 0xFF;
-	},
+	null,
 	//LD, A, (HL)
 	//#0x7E:
 	function (parentObj) {
@@ -2181,6 +2161,26 @@ GameBoyCore.prototype.OPCODE[0x54] = function (parentObj) {
 // LD E, H
 GameBoyCore.prototype.OPCODE[0x5C] = function (parentObj) {
 	parentObj.registerE = parentObj.registersHL >> 8;
+};
+// LD A, L
+GameBoyCore.prototype.OPCODE[0x7D] = function (parentObj) {
+	parentObj.registerA = parentObj.registersHL & 0xFF;
+};
+// LD B, L
+GameBoyCore.prototype.OPCODE[0x45] = function (parentObj) {
+	parentObj.registerB = parentObj.registersHL & 0xFF;
+};
+// LD C, L
+GameBoyCore.prototype.OPCODE[0x4D] = function (parentObj) {
+	parentObj.registerC = parentObj.registersHL & 0xFF;
+};
+// LD D, L
+GameBoyCore.prototype.OPCODE[0x55] = function (parentObj) {
+	parentObj.registerD = parentObj.registersHL & 0xFF;
+};
+// LD E, L
+GameBoyCore.prototype.OPCODE[0x5D] = function (parentObj) {
+	parentObj.registerE = parentObj.registersHL & 0xFF;
 };
 // LD H, A
 GameBoyCore.prototype.OPCODE[0x67] = function (parentObj) {
