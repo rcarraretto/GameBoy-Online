@@ -348,6 +348,46 @@ describe("ld", function() {
     expect(core.registersHL).to.equal(0x32AA);
   });
 
+  it("LD H, A", function() {
+    core.registersHL = 0x32AA;
+    core.registerA = 0x58;
+    core.OPCODE[0x67](core);
+    expect(core.registersHL).to.equal(0x58AA);
+    expect(core.registerA).to.equal(0x58);
+  });
+
+  it("LD H, B", function() {
+    core.registersHL = 0x32AA;
+    core.registerB = 0x58;
+    core.OPCODE[0x60](core);
+    expect(core.registersHL).to.equal(0x58AA);
+    expect(core.registerB).to.equal(0x58);
+  });
+
+  it("LD H, C", function() {
+    core.registersHL = 0x32AA;
+    core.registerC = 0x58;
+    core.OPCODE[0x61](core);
+    expect(core.registersHL).to.equal(0x58AA);
+    expect(core.registerC).to.equal(0x58);
+  });
+
+  it("LD H, D", function() {
+    core.registersHL = 0x32AA;
+    core.registerD = 0x58;
+    core.OPCODE[0x62](core);
+    expect(core.registersHL).to.equal(0x58AA);
+    expect(core.registerD).to.equal(0x58);
+  });
+
+  it("LD H, E", function() {
+    core.registersHL = 0x32AA;
+    core.registerE = 0x58;
+    core.OPCODE[0x63](core);
+    expect(core.registersHL).to.equal(0x58AA);
+    expect(core.registerE).to.equal(0x58);
+  });
+
   it("LD A, n", function() {
     core.programCounter = 0x0100;
     core.memory[0x0100] = 0x32;
