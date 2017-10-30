@@ -2088,6 +2088,11 @@ GameBoyCore.prototype.OPCODE[0x3B] = function (parentObj) {
 	parentObj.stackPointer = int16.dec(parentObj.stackPointer);
 };
 
+
+
+
+/* LD [reg8], [reg8] */
+
 // LD A, A
 GameBoyCore.prototype.OPCODE[0x7F] = ld_reg_reg('A', 'A');
 // LD A, B
@@ -2138,10 +2143,18 @@ GameBoyCore.prototype.OPCODE[0x59] = ld_reg_reg('E', 'C');
 GameBoyCore.prototype.OPCODE[0x5A] = ld_reg_reg('E', 'D');
 // LD E, E
 GameBoyCore.prototype.OPCODE[0x5b] = ld_reg_reg('E', 'E');
+
+
+
 // LD H, H
 GameBoyCore.prototype.OPCODE[0x64] = ld_reg_reg('H', 'H');
 // LD L, L
 GameBoyCore.prototype.OPCODE[0x6D] = ld_reg_reg('L', 'L');
+
+
+
+/* LD [reg8], H */
+
 // LD A, H
 GameBoyCore.prototype.OPCODE[0x7C] = function (parentObj) {
 	parentObj.registerA = parentObj.registersHL >> 8;
@@ -2162,6 +2175,11 @@ GameBoyCore.prototype.OPCODE[0x54] = function (parentObj) {
 GameBoyCore.prototype.OPCODE[0x5C] = function (parentObj) {
 	parentObj.registerE = parentObj.registersHL >> 8;
 };
+
+
+
+/* LD [reg8], L */
+
 // LD A, L
 GameBoyCore.prototype.OPCODE[0x7D] = function (parentObj) {
 	parentObj.registerA = parentObj.registersHL & 0xFF;
@@ -2182,6 +2200,11 @@ GameBoyCore.prototype.OPCODE[0x55] = function (parentObj) {
 GameBoyCore.prototype.OPCODE[0x5D] = function (parentObj) {
 	parentObj.registerE = parentObj.registersHL & 0xFF;
 };
+
+
+
+/* LD H, [reg8] */
+
 // LD H, A
 GameBoyCore.prototype.OPCODE[0x67] = function (parentObj) {
 	parentObj.registersHL = (parentObj.registerA << 8) | (parentObj.registersHL & 0xFF);
@@ -2202,6 +2225,11 @@ GameBoyCore.prototype.OPCODE[0x62] = function (parentObj) {
 GameBoyCore.prototype.OPCODE[0x63] = function (parentObj) {
 	parentObj.registersHL = (parentObj.registerE << 8) | (parentObj.registersHL & 0xFF);
 };
+
+
+
+/* LD [reg8], n */
+
 // LD A, n
 GameBoyCore.prototype.OPCODE[0x3E] = ld_reg_n('A');
 // LD B, n
@@ -2216,6 +2244,11 @@ GameBoyCore.prototype.OPCODE[0x1E] = ld_reg_n('E');
 GameBoyCore.prototype.OPCODE[0x01] = ld_reg_nn('BC');
 // LD DE, nn
 GameBoyCore.prototype.OPCODE[0x11] = ld_reg_nn('DE');
+
+
+
+/* LD [reg16], nn */
+
 // LD A, (BC)
 GameBoyCore.prototype.OPCODE[0x0A] = function (parentObj) {
 	parentObj.registerA = reg_combo.read_mem(parentObj, 'BC');
@@ -2224,6 +2257,9 @@ GameBoyCore.prototype.OPCODE[0x0A] = function (parentObj) {
 GameBoyCore.prototype.OPCODE[0x1A] = function (parentObj) {
 	parentObj.registerA = reg_combo.read_mem(parentObj, 'DE');
 };
+
+
+
 // LD (BC), A
 GameBoyCore.prototype.OPCODE[0x02] = function (parentObj) {
 	reg_combo.write_mem(parentObj, 'BC', parentObj.registerA);

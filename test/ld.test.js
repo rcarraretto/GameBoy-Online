@@ -8,6 +8,8 @@ describe("ld", function() {
     core.setupRAM();
   });
 
+  /* LD [reg8], [reg8] */
+
   it("LD A, A", function() {
     var before = _.clone(core);
     core.OPCODE[0x7F](core)
@@ -268,6 +270,8 @@ describe("ld", function() {
     expect(core.programCounter).to.equal(before.programCounter);
   });
 
+
+
   it("LD H, H", function() {
     var before = _.clone(core);
     core.OPCODE[0x64](core)
@@ -307,6 +311,10 @@ describe("ld", function() {
     expect(core.stackPointer).to.equal(before.stackPointer);
     expect(core.programCounter).to.equal(before.programCounter);
   });
+
+
+
+  /* LD [reg8], H */
 
   it("LD A, H", function() {
     core.registerA = 0x18;
@@ -348,6 +356,10 @@ describe("ld", function() {
     expect(core.registersHL).to.equal(0x32AA);
   });
 
+
+
+  /* LD [reg8], L */
+
   it("LD A, L", function() {
     core.registerA = 0x18;
     core.registersHL = 0xAA32;
@@ -388,6 +400,10 @@ describe("ld", function() {
     expect(core.registersHL).to.equal(0xAA32);
   });
 
+
+
+  /* LD H, [reg8] */
+
   it("LD H, A", function() {
     core.registersHL = 0x32AA;
     core.registerA = 0x58;
@@ -427,6 +443,11 @@ describe("ld", function() {
     expect(core.registersHL).to.equal(0x58AA);
     expect(core.registerE).to.equal(0x58);
   });
+
+
+
+
+  /* LD [reg8], n */
 
   it("LD A, n", function() {
     core.programCounter = 0x0100;
@@ -478,6 +499,10 @@ describe("ld", function() {
     expect(core.programCounter).to.equal(0x0101);
   });
 
+
+
+  /* LD [reg16], nn */
+
   it("LD BC, nn", function() {
     core.programCounter = 0x0100;
     core.memory[0x0100] = 0x32;
@@ -501,6 +526,8 @@ describe("ld", function() {
     expect(core.registerD).to.equal(0x33);
     expect(core.programCounter).to.equal(0x0102);
   });
+
+
 
   it("LD A, (BC)", function() {
     core.registerB = 0x02;
