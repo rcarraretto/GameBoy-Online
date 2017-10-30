@@ -739,11 +739,7 @@ GameBoyCore.prototype.OPCODE = [
 	null,
 	null,
 	null,
-	//LD B, H
-	//#0x44:
-	function (parentObj) {
-		parentObj.registerB = parentObj.registersHL >> 8;
-	},
+	null,
 	//LD B, L
 	//#0x45:
 	function (parentObj) {
@@ -759,11 +755,7 @@ GameBoyCore.prototype.OPCODE = [
 	null,
 	null,
 	null,
-	//LD C, H
-	//#0x4C:
-	function (parentObj) {
-		parentObj.registerC = parentObj.registersHL >> 8;
-	},
+	null,
 	//LD C, L
 	//#0x4D:
 	function (parentObj) {
@@ -779,11 +771,7 @@ GameBoyCore.prototype.OPCODE = [
 	null,
 	null,
 	null,
-	//LD D, H
-	//#0x54:
-	function (parentObj) {
-		parentObj.registerD = parentObj.registersHL >> 8;
-	},
+	null,
 	//LD D, L
 	//#0x55:
 	function (parentObj) {
@@ -799,11 +787,7 @@ GameBoyCore.prototype.OPCODE = [
 	null,
 	null,
 	null,
-	//LD E, H
-	//#0x5C:
-	function (parentObj) {
-		parentObj.registerE = parentObj.registersHL >> 8;
-	},
+	null,
 	//LD E, L
 	//#0x5D:
 	function (parentObj) {
@@ -945,11 +929,7 @@ GameBoyCore.prototype.OPCODE = [
 	null,
 	null,
 	null,
-	//LD A, H
-	//#0x7C:
-	function (parentObj) {
-		parentObj.registerA = parentObj.registersHL >> 8;
-	},
+	null,
 	//LD A, L
 	//#0x7D:
 	function (parentObj) {
@@ -2202,6 +2182,26 @@ GameBoyCore.prototype.OPCODE[0x5b] = ld_reg_reg('E', 'E');
 GameBoyCore.prototype.OPCODE[0x64] = ld_reg_reg('H', 'H');
 // LD L, L
 GameBoyCore.prototype.OPCODE[0x6D] = ld_reg_reg('L', 'L');
+// LD A, H
+GameBoyCore.prototype.OPCODE[0x7C] = function (parentObj) {
+	parentObj.registerA = parentObj.registersHL >> 8;
+};
+// LD B, H
+GameBoyCore.prototype.OPCODE[0x44] = function (parentObj) {
+	parentObj.registerB = parentObj.registersHL >> 8;
+};
+// LD C, H
+GameBoyCore.prototype.OPCODE[0x4C] = function (parentObj) {
+	parentObj.registerC = parentObj.registersHL >> 8;
+};
+// LD D, H
+GameBoyCore.prototype.OPCODE[0x54] = function (parentObj) {
+	parentObj.registerD = parentObj.registersHL >> 8;
+};
+// LD E, H
+GameBoyCore.prototype.OPCODE[0x5C] = function (parentObj) {
+	parentObj.registerE = parentObj.registersHL >> 8;
+};
 // LD A, n
 GameBoyCore.prototype.OPCODE[0x3E] = ld_reg_n('A');
 // LD B, n

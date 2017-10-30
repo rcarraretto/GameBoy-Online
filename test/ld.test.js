@@ -308,6 +308,46 @@ describe("ld", function() {
     expect(core.programCounter).to.equal(before.programCounter);
   });
 
+  it("LD A, H", function() {
+    core.registerA = 0x18;
+    core.registersHL = 0x32AA;
+    core.OPCODE[0x7C](core);
+    expect(core.registerA).to.equal(0x32);
+    expect(core.registersHL).to.equal(0x32AA);
+  });
+
+  it("LD B, H", function() {
+    core.registerB = 0x18;
+    core.registersHL = 0x32AA;
+    core.OPCODE[0x44](core);
+    expect(core.registerB).to.equal(0x32);
+    expect(core.registersHL).to.equal(0x32AA);
+  });
+
+  it("LD C, H", function() {
+    core.registerC = 0x18;
+    core.registersHL = 0x32AA;
+    core.OPCODE[0x4C](core);
+    expect(core.registerC).to.equal(0x32);
+    expect(core.registersHL).to.equal(0x32AA);
+  });
+
+  it("LD D, H", function() {
+    core.registerD = 0x18;
+    core.registersHL = 0x32AA;
+    core.OPCODE[0x54](core);
+    expect(core.registerD).to.equal(0x32);
+    expect(core.registersHL).to.equal(0x32AA);
+  });
+
+  it("LD E, H", function() {
+    core.registerE = 0x18;
+    core.registersHL = 0x32AA;
+    core.OPCODE[0x5C](core);
+    expect(core.registerE).to.equal(0x32);
+    expect(core.registersHL).to.equal(0x32AA);
+  });
+
   it("LD A, n", function() {
     core.programCounter = 0x0100;
     core.memory[0x0100] = 0x32;
