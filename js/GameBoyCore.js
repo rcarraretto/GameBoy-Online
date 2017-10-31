@@ -589,12 +589,7 @@ GameBoyCore.prototype.OPCODE = [
 	null,
 	null,
 	null,
-	//LD H, n
-	//#0x26:
-	function (parentObj) {
-		parentObj.registersHL = (parentObj.memoryReader[parentObj.programCounter](parentObj, parentObj.programCounter) << 8) | (parentObj.registersHL & 0xFF);
-		parentObj.programCounter = (parentObj.programCounter + 1) & 0xFFFF;
-	},
+	null,
 	//DAA
 	//#0x27:
 	function (parentObj) {
@@ -2217,6 +2212,11 @@ GameBoyCore.prototype.OPCODE[0x0E] = ld_reg_n('C');
 GameBoyCore.prototype.OPCODE[0x16] = ld_reg_n('D');
 // LD E, n
 GameBoyCore.prototype.OPCODE[0x1E] = ld_reg_n('E');
+// LD H, n
+GameBoyCore.prototype.OPCODE[0x26] = function (parentObj) {
+	parentObj.registersHL = (parentObj.memoryReader[parentObj.programCounter](parentObj, parentObj.programCounter) << 8) | (parentObj.registersHL & 0xFF);
+	parentObj.programCounter = (parentObj.programCounter + 1) & 0xFFFF;
+};
 // LD BC, nn
 GameBoyCore.prototype.OPCODE[0x01] = ld_reg_nn('BC');
 // LD DE, nn

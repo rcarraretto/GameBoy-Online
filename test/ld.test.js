@@ -555,6 +555,17 @@ describe("ld", function() {
     expect(core.programCounter).to.equal(0x0101);
   });
 
+  it("LD H, n", function() {
+    core.registersHL = 0xAABB;
+    core.programCounter = 0x0100;
+    core.memory[0x0100] = 0x32;
+
+    core.OPCODE[0x26](core)
+
+    expect(core.registersHL).to.equal(0x32BB);
+    expect(core.programCounter).to.equal(0x0101);
+  });
+
 
 
 
