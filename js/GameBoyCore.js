@@ -2248,12 +2248,15 @@ GameBoyCore.prototype.OPCODE[0x5E] = function (parentObj) {
 };
 // LD H, (HL)
 GameBoyCore.prototype.OPCODE[0x66] = function (parentObj) {
-	parentObj.registersHL = (parentObj.memoryReader[parentObj.registersHL](parentObj, parentObj.registersHL) << 8) | (parentObj.registersHL & 0xFF);
+	var mem_value = parentObj.memoryRead(parentObj.registersHL);
+	parentObj.registersHL = (mem_value << 8) | (parentObj.registersHL & 0xFF);
 };
 // LD L, (HL)
 GameBoyCore.prototype.OPCODE[0x6E] = function (parentObj) {
-	parentObj.registersHL = (parentObj.registersHL & 0xFF00) | parentObj.memoryReader[parentObj.registersHL](parentObj, parentObj.registersHL);
+	var mem_value = parentObj.memoryRead(parentObj.registersHL);
+	parentObj.registersHL = (parentObj.registersHL & 0xFF00) | mem_value;
 };
+
 
 
 /* LD [reg16], nn */
