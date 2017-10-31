@@ -638,6 +638,86 @@ describe("ld", function() {
 
 
 
+
+  /* LD (HL), [reg8] */
+
+  it("LD (HL), A", function() {
+    core.registersHL = 0xC001;
+    core.registerA = 0x32;
+
+    core.OPCODE[0x77](core);
+
+    // this memory segment is "write normal"
+    // 0xC000 < x < 0xE000
+    expect(core.memory[0xC001]).to.equal(0x32);
+  });
+
+  it("LD (HL), B", function() {
+    core.registersHL = 0xC001;
+    core.registerB = 0x32;
+
+    core.OPCODE[0x70](core);
+
+    // this memory segment is "write normal"
+    // 0xC000 < x < 0xE000
+    expect(core.memory[0xC001]).to.equal(0x32);
+  });
+
+  it("LD (HL), C", function() {
+    core.registersHL = 0xC001;
+    core.registerC = 0x32;
+
+    core.OPCODE[0x71](core);
+
+    // this memory segment is "write normal"
+    // 0xC000 < x < 0xE000
+    expect(core.memory[0xC001]).to.equal(0x32);
+  });
+
+  it("LD (HL), D", function() {
+    core.registersHL = 0xC001;
+    core.registerD = 0x32;
+
+    core.OPCODE[0x72](core);
+
+    // this memory segment is "write normal"
+    // 0xC000 < x < 0xE000
+    expect(core.memory[0xC001]).to.equal(0x32);
+  });
+
+  it("LD (HL), E", function() {
+    core.registersHL = 0xC001;
+    core.registerE = 0x32;
+
+    core.OPCODE[0x73](core);
+
+    // this memory segment is "write normal"
+    // 0xC000 < x < 0xE000
+    expect(core.memory[0xC001]).to.equal(0x32);
+  });
+
+  it("LD (HL), H", function() {
+    core.registersHL = 0xC001;
+
+    core.OPCODE[0x74](core);
+
+    // this memory segment is "write normal"
+    // 0xC000 < x < 0xE000
+    expect(core.memory[0xC001]).to.equal(0xC0);
+  });
+
+  it("LD (HL), L", function() {
+    core.registersHL = 0xC001;
+
+    core.OPCODE[0x75](core);
+
+    // this memory segment is "write normal"
+    // 0xC000 < x < 0xE000
+    expect(core.memory[0xC001]).to.equal(0x01);
+  });
+
+
+
   /* LD [reg16], nn */
 
   it("LD BC, nn", function() {

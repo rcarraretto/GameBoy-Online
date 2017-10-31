@@ -773,36 +773,12 @@ GameBoyCore.prototype.OPCODE = [
 	null,
 	null,
 	null,
-	//LD (HL), B
-	//#0x70:
-	function (parentObj) {
-		parentObj.memoryWriter[parentObj.registersHL](parentObj, parentObj.registersHL, parentObj.registerB);
-	},
-	//LD (HL), C
-	//#0x71:
-	function (parentObj) {
-		parentObj.memoryWriter[parentObj.registersHL](parentObj, parentObj.registersHL, parentObj.registerC);
-	},
-	//LD (HL), D
-	//#0x72:
-	function (parentObj) {
-		parentObj.memoryWriter[parentObj.registersHL](parentObj, parentObj.registersHL, parentObj.registerD);
-	},
-	//LD (HL), E
-	//#0x73:
-	function (parentObj) {
-		parentObj.memoryWriter[parentObj.registersHL](parentObj, parentObj.registersHL, parentObj.registerE);
-	},
-	//LD (HL), H
-	//#0x74:
-	function (parentObj) {
-		parentObj.memoryWriter[parentObj.registersHL](parentObj, parentObj.registersHL, parentObj.registersHL >> 8);
-	},
-	//LD (HL), L
-	//#0x75:
-	function (parentObj) {
-		parentObj.memoryWriter[parentObj.registersHL](parentObj, parentObj.registersHL, parentObj.registersHL & 0xFF);
-	},
+	null,
+	null,
+	null,
+	null,
+	null,
+	null,
 	//HALT
 	//#0x76:
 	function (parentObj) {
@@ -822,11 +798,7 @@ GameBoyCore.prototype.OPCODE = [
 			parentObj.calculateHALTPeriod();
 		}
 	},
-	//LD (HL), A
-	//#0x77:
-	function (parentObj) {
-		parentObj.memoryWriter[parentObj.registersHL](parentObj, parentObj.registersHL, parentObj.registerA);
-	},
+	null,
 	null,
 	null,
 	null,
@@ -2255,6 +2227,39 @@ GameBoyCore.prototype.OPCODE[0x66] = function (parentObj) {
 GameBoyCore.prototype.OPCODE[0x6E] = function (parentObj) {
 	var mem_value = parentObj.memoryRead(parentObj.registersHL);
 	parentObj.registersHL = (parentObj.registersHL & 0xFF00) | mem_value;
+};
+
+
+
+/* LD (HL), [reg8] */
+
+// LD (HL), A
+GameBoyCore.prototype.OPCODE[0x77] = function (parentObj) {
+	parentObj.memoryWriter[parentObj.registersHL](parentObj, parentObj.registersHL, parentObj.registerA);
+};
+// LD (HL), B
+GameBoyCore.prototype.OPCODE[0x70] = function (parentObj) {
+	parentObj.memoryWriter[parentObj.registersHL](parentObj, parentObj.registersHL, parentObj.registerB);
+};
+// LD (HL), C
+GameBoyCore.prototype.OPCODE[0x71] = function (parentObj) {
+	parentObj.memoryWriter[parentObj.registersHL](parentObj, parentObj.registersHL, parentObj.registerC);
+};
+// LD (HL), D
+GameBoyCore.prototype.OPCODE[0x72] = function (parentObj) {
+	parentObj.memoryWriter[parentObj.registersHL](parentObj, parentObj.registersHL, parentObj.registerD);
+};
+// LD (HL), E
+GameBoyCore.prototype.OPCODE[0x73] = function (parentObj) {
+	parentObj.memoryWriter[parentObj.registersHL](parentObj, parentObj.registersHL, parentObj.registerE);
+};
+// LD (HL), H
+GameBoyCore.prototype.OPCODE[0x74] = function (parentObj) {
+	parentObj.memoryWriter[parentObj.registersHL](parentObj, parentObj.registersHL, parentObj.registersHL >> 8);
+};
+// LD (HL), L
+GameBoyCore.prototype.OPCODE[0x75] = function (parentObj) {
+	parentObj.memoryWriter[parentObj.registersHL](parentObj, parentObj.registersHL, parentObj.registersHL & 0xFF);
 };
 
 
