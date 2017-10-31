@@ -1767,12 +1767,7 @@ GameBoyCore.prototype.OPCODE = [
 	function (parentObj) {
 		parentObj.programCounter = parentObj.registersHL;
 	},
-	//LD n, A
-	//#0xEA:
-	function (parentObj) {
-		parentObj.memoryWrite((parentObj.memoryRead((parentObj.programCounter + 1) & 0xFFFF) << 8) | parentObj.memoryReader[parentObj.programCounter](parentObj, parentObj.programCounter), parentObj.registerA);
-		parentObj.programCounter = (parentObj.programCounter + 2) & 0xFFFF;
-	},
+	null,
 	//0xEB - Illegal
 	//#0xEB:
 	function (parentObj) {
@@ -2285,6 +2280,19 @@ GameBoyCore.prototype.OPCODE[0x02] = function (parentObj) {
 GameBoyCore.prototype.OPCODE[0x12] = function (parentObj) {
 	reg_combo.write_mem(parentObj, 'DE', parentObj.registerA);
 };
+
+// LD (nn), A
+GameBoyCore.prototype.OPCODE[0xEA] = function (parentObj) {
+	var low_addr8 = parentObj.memoryRead(parentObj.programCounter);
+	parentObj.programCounter = (parentObj.programCounter + 1) & 0xFFFF;
+
+	var high_addr8 = parentObj.memoryRead(parentObj.programCounter);
+	parentObj.programCounter = (parentObj.programCounter + 1) & 0xFFFF;
+
+	var write_addr16 = (high_addr8 << 8) | low_addr8;
+	parentObj.memoryWrite(write_addr16, parentObj.registerA);
+};
+
 
 GameBoyCore.prototype.CBOPCODE = [
 	//RLC B
