@@ -12,7 +12,7 @@ describe("ld", function() {
 
   it("LD A, A", function() {
     var before = _.clone(core);
-    core.OPCODE[0x7F](core)
+    core.OPCODE[0x7F](core);
 
     expect(core.registerA).to.equal(before.registerA);
     expect(core.registerB).to.equal(before.registerB);
@@ -33,7 +33,7 @@ describe("ld", function() {
   it("LD A, B", function() {
     core.registerA = 0x18;
     core.registerB = 0x32;
-    core.OPCODE[0x78](core)
+    core.OPCODE[0x78](core);
     expect(core.registerA).to.equal(0x32);
     expect(core.registerB).to.equal(0x32);
   });
@@ -41,7 +41,7 @@ describe("ld", function() {
   it("LD A, C", function() {
     core.registerA = 0x18;
     core.registerC = 0x32;
-    core.OPCODE[0x79](core)
+    core.OPCODE[0x79](core);
     expect(core.registerA).to.equal(0x32);
     expect(core.registerC).to.equal(0x32);
   });
@@ -49,7 +49,7 @@ describe("ld", function() {
   it("LD A, D", function() {
     core.registerA = 0x18;
     core.registerD = 0x32;
-    core.OPCODE[0x7A](core)
+    core.OPCODE[0x7A](core);
     expect(core.registerA).to.equal(0x32);
     expect(core.registerD).to.equal(0x32);
   });
@@ -57,7 +57,7 @@ describe("ld", function() {
   it("LD A, E", function() {
     core.registerA = 0x18;
     core.registerE = 0x32;
-    core.OPCODE[0x7B](core)
+    core.OPCODE[0x7B](core);
     expect(core.registerA).to.equal(0x32);
     expect(core.registerE).to.equal(0x32);
   });
@@ -65,14 +65,14 @@ describe("ld", function() {
   it("LD B, A", function() {
     core.registerB = 0x32;
     core.registerA = 0x18;
-    core.OPCODE[0x47](core)
+    core.OPCODE[0x47](core);
     expect(core.registerB).to.equal(0x18);
     expect(core.registerA).to.equal(0x18);
   });
 
   it("LD B, B", function() {
     var before = _.clone(core);
-    core.OPCODE[0x40](core)
+    core.OPCODE[0x40](core);
 
     expect(core.registerA).to.equal(before.registerA);
     expect(core.registerB).to.equal(before.registerB);
@@ -93,7 +93,7 @@ describe("ld", function() {
   it("LD B, C", function() {
     core.registerB = 0x32;
     core.registerC = 0x18;
-    core.OPCODE[0x41](core)
+    core.OPCODE[0x41](core);
     expect(core.registerB).to.equal(0x18);
     expect(core.registerC).to.equal(0x18);
   });
@@ -101,7 +101,7 @@ describe("ld", function() {
   it("LD B, D", function() {
     core.registerB = 0x32;
     core.registerD = 0x18;
-    core.OPCODE[0x42](core)
+    core.OPCODE[0x42](core);
     expect(core.registerB).to.equal(0x18);
     expect(core.registerD).to.equal(0x18);
   });
@@ -109,7 +109,7 @@ describe("ld", function() {
   it("LD B, E", function() {
     core.registerB = 0x32;
     core.registerE = 0x18;
-    core.OPCODE[0x43](core)
+    core.OPCODE[0x43](core);
     expect(core.registerB).to.equal(0x18);
     expect(core.registerE).to.equal(0x18);
   });
@@ -117,7 +117,7 @@ describe("ld", function() {
   it("LD C, A", function() {
     core.registerC = 0x18;
     core.registerA = 0x32;
-    core.OPCODE[0x4F](core)
+    core.OPCODE[0x4F](core);
     expect(core.registerC).to.equal(0x32);
     expect(core.registerA).to.equal(0x32);
   });
@@ -125,14 +125,14 @@ describe("ld", function() {
   it("LD C, B", function() {
     core.registerC = 0x18;
     core.registerB = 0x32;
-    core.OPCODE[0x48](core)
+    core.OPCODE[0x48](core);
     expect(core.registerC).to.equal(0x32);
     expect(core.registerB).to.equal(0x32);
   });
 
   it("LD C, C", function() {
     var before = _.clone(core);
-    core.OPCODE[0x49](core)
+    core.OPCODE[0x49](core);
 
     expect(core.registerA).to.equal(before.registerA);
     expect(core.registerB).to.equal(before.registerB);
@@ -153,7 +153,7 @@ describe("ld", function() {
   it("LD C, D", function() {
     core.registerC = 0x18;
     core.registerD = 0x32;
-    core.OPCODE[0x4A](core)
+    core.OPCODE[0x4A](core);
     expect(core.registerC).to.equal(0x32);
     expect(core.registerD).to.equal(0x32);
   });
@@ -161,7 +161,7 @@ describe("ld", function() {
   it("LD C, E", function() {
     core.registerC = 0x18;
     core.registerE = 0x32;
-    core.OPCODE[0x4B](core)
+    core.OPCODE[0x4B](core);
     expect(core.registerC).to.equal(0x32);
     expect(core.registerE).to.equal(0x32);
   });
@@ -169,7 +169,7 @@ describe("ld", function() {
   it("LD D, A", function() {
     core.registerD = 0x18;
     core.registerA = 0x32;
-    core.OPCODE[0x57](core)
+    core.OPCODE[0x57](core);
     expect(core.registerD).to.equal(0x32);
     expect(core.registerA).to.equal(0x32);
   });
@@ -177,7 +177,7 @@ describe("ld", function() {
   it("LD D, B", function() {
     core.registerD = 0x18;
     core.registerB = 0x32;
-    core.OPCODE[0x50](core)
+    core.OPCODE[0x50](core);
     expect(core.registerD).to.equal(0x32);
     expect(core.registerB).to.equal(0x32);
   });
@@ -185,14 +185,14 @@ describe("ld", function() {
   it("LD D, C", function() {
     core.registerD = 0x18;
     core.registerC = 0x32;
-    core.OPCODE[0x51](core)
+    core.OPCODE[0x51](core);
     expect(core.registerD).to.equal(0x32);
     expect(core.registerC).to.equal(0x32);
   });
 
   it("LD D, D", function() {
     var before = _.clone(core);
-    core.OPCODE[0x52](core)
+    core.OPCODE[0x52](core);
 
     expect(core.registerA).to.equal(before.registerA);
     expect(core.registerB).to.equal(before.registerB);
@@ -213,7 +213,7 @@ describe("ld", function() {
   it("LD D, E", function() {
     core.registerD = 0x18;
     core.registerE = 0x32;
-    core.OPCODE[0x53](core)
+    core.OPCODE[0x53](core);
     expect(core.registerD).to.equal(0x32);
     expect(core.registerE).to.equal(0x32);
   });
@@ -221,7 +221,7 @@ describe("ld", function() {
   it("LD E, A", function() {
     core.registerE = 0x18;
     core.registerA = 0x32;
-    core.OPCODE[0x5F](core)
+    core.OPCODE[0x5F](core);
     expect(core.registerA).to.equal(0x32);
     expect(core.registerE).to.equal(0x32);
   });
@@ -229,7 +229,7 @@ describe("ld", function() {
   it("LD E, B", function() {
     core.registerE = 0x18;
     core.registerB = 0x32;
-    core.OPCODE[0x58](core)
+    core.OPCODE[0x58](core);
     expect(core.registerB).to.equal(0x32);
     expect(core.registerE).to.equal(0x32);
   });
@@ -237,7 +237,7 @@ describe("ld", function() {
   it("LD E, C", function() {
     core.registerE = 0x18;
     core.registerC = 0x32;
-    core.OPCODE[0x59](core)
+    core.OPCODE[0x59](core);
     expect(core.registerC).to.equal(0x32);
     expect(core.registerE).to.equal(0x32);
   });
@@ -245,14 +245,14 @@ describe("ld", function() {
   it("LD E, D", function() {
     core.registerE = 0x18;
     core.registerD = 0x32;
-    core.OPCODE[0x5A](core)
+    core.OPCODE[0x5A](core);
     expect(core.registerD).to.equal(0x32);
     expect(core.registerE).to.equal(0x32);
   });
 
   it("LD E, E", function() {
     var before = _.clone(core);
-    core.OPCODE[0x5B](core)
+    core.OPCODE[0x5B](core);
 
     expect(core.registerA).to.equal(before.registerA);
     expect(core.registerB).to.equal(before.registerB);
@@ -274,7 +274,7 @@ describe("ld", function() {
 
   it("LD H, H", function() {
     var before = _.clone(core);
-    core.OPCODE[0x64](core)
+    core.OPCODE[0x64](core);
 
     expect(core.registerA).to.equal(before.registerA);
     expect(core.registerB).to.equal(before.registerB);
@@ -294,13 +294,13 @@ describe("ld", function() {
 
   it("LD H, L", function() {
     core.registersHL = 0x1832;
-    core.OPCODE[0x65](core)
+    core.OPCODE[0x65](core);
     expect(core.registersHL).to.equal(0x3232);
   });
 
   it("LD L, L", function() {
     var before = _.clone(core);
-    core.OPCODE[0x6D](core)
+    core.OPCODE[0x6D](core);
 
     expect(core.registerA).to.equal(before.registerA);
     expect(core.registerB).to.equal(before.registerB);
@@ -320,7 +320,7 @@ describe("ld", function() {
 
   it("LD L, H", function() {
     core.registersHL = 0x1832;
-    core.OPCODE[0x6C](core)
+    core.OPCODE[0x6C](core);
     expect(core.registersHL).to.equal(0x1818);
   });
 
@@ -509,7 +509,7 @@ describe("ld", function() {
     core.programCounter = 0x0100;
     core.memory[0x0100] = 0x32;
 
-    core.OPCODE[0x3E](core)
+    core.OPCODE[0x3E](core);
 
     expect(core.registerA).to.equal(0x32);
     expect(core.programCounter).to.equal(0x0101);
@@ -519,7 +519,7 @@ describe("ld", function() {
     core.programCounter = 0x0100;
     core.memory[0x0100] = 0x32;
 
-    core.OPCODE[0x06](core)
+    core.OPCODE[0x06](core);
 
     expect(core.registerB).to.equal(0x32);
     expect(core.programCounter).to.equal(0x0101);
@@ -529,7 +529,7 @@ describe("ld", function() {
     core.programCounter = 0x0100;
     core.memory[0x0100] = 0x32;
 
-    core.OPCODE[0x0E](core)
+    core.OPCODE[0x0E](core);
 
     expect(core.registerC).to.equal(0x32);
     expect(core.programCounter).to.equal(0x0101);
@@ -539,7 +539,7 @@ describe("ld", function() {
     core.programCounter = 0x0100;
     core.memory[0x0100] = 0x32;
 
-    core.OPCODE[0x16](core)
+    core.OPCODE[0x16](core);
 
     expect(core.registerD).to.equal(0x32);
     expect(core.programCounter).to.equal(0x0101);
@@ -549,7 +549,7 @@ describe("ld", function() {
     core.programCounter = 0x0100;
     core.memory[0x0100] = 0x32;
 
-    core.OPCODE[0x1E](core)
+    core.OPCODE[0x1E](core);
 
     expect(core.registerE).to.equal(0x32);
     expect(core.programCounter).to.equal(0x0101);
@@ -560,7 +560,7 @@ describe("ld", function() {
     core.programCounter = 0x0100;
     core.memory[0x0100] = 0x32;
 
-    core.OPCODE[0x26](core)
+    core.OPCODE[0x26](core);
 
     expect(core.registersHL).to.equal(0x32BB);
     expect(core.programCounter).to.equal(0x0101);
@@ -571,7 +571,7 @@ describe("ld", function() {
     core.programCounter = 0x0100;
     core.memory[0x0100] = 0x32;
 
-    core.OPCODE[0x2E](core)
+    core.OPCODE[0x2E](core);
 
     expect(core.registersHL).to.equal(0xAA32);
     expect(core.programCounter).to.equal(0x0101);
@@ -586,7 +586,7 @@ describe("ld", function() {
     core.registerA = 0x94;
     core.registersHL = 0x0100;
     core.memory[0x0100] = 0x32;
-    core.OPCODE[0x7E](core)
+    core.OPCODE[0x7E](core);
     expect(core.registerA).to.equal(0x32);
   });
 
@@ -594,7 +594,7 @@ describe("ld", function() {
     core.registerB = 0x94;
     core.registersHL = 0x0100;
     core.memory[0x0100] = 0x32;
-    core.OPCODE[0x46](core)
+    core.OPCODE[0x46](core);
     expect(core.registerB).to.equal(0x32);
   });
 
@@ -602,7 +602,7 @@ describe("ld", function() {
     core.registerC = 0x94;
     core.registersHL = 0x0100;
     core.memory[0x0100] = 0x32;
-    core.OPCODE[0x4E](core)
+    core.OPCODE[0x4E](core);
     expect(core.registerC).to.equal(0x32);
   });
 
@@ -610,7 +610,7 @@ describe("ld", function() {
     core.registerD = 0x94;
     core.registersHL = 0x0100;
     core.memory[0x0100] = 0x32;
-    core.OPCODE[0x56](core)
+    core.OPCODE[0x56](core);
     expect(core.registerD).to.equal(0x32);
   });
 
@@ -618,21 +618,21 @@ describe("ld", function() {
     core.registerE = 0x94;
     core.registersHL = 0x0100;
     core.memory[0x0100] = 0x32;
-    core.OPCODE[0x5E](core)
+    core.OPCODE[0x5E](core);
     expect(core.registerE).to.equal(0x32);
   });
 
   it("LD H, (HL)", function() {
     core.registersHL = 0x01AB;
     core.memory[0x01AB] = 0x32;
-    core.OPCODE[0x66](core)
+    core.OPCODE[0x66](core);
     expect(core.registersHL).to.equal(0x32AB);
   });
 
   it("LD L, (HL)", function() {
     core.registersHL = 0x01AB;
     core.memory[0x01AB] = 0x32;
-    core.OPCODE[0x6E](core)
+    core.OPCODE[0x6E](core);
     expect(core.registersHL).to.equal(0x0132);
   });
 
@@ -645,7 +645,7 @@ describe("ld", function() {
     core.memory[0x0100] = 0x32;
     core.memory[0x0101] = 0x33;
 
-    core.OPCODE[0x01](core)
+    core.OPCODE[0x01](core);
 
     expect(core.registerC).to.equal(0x32);
     expect(core.registerB).to.equal(0x33);
@@ -657,7 +657,7 @@ describe("ld", function() {
     core.memory[0x0100] = 0x32;
     core.memory[0x0101] = 0x33;
 
-    core.OPCODE[0x11](core)
+    core.OPCODE[0x11](core);
 
     expect(core.registerE).to.equal(0x32);
     expect(core.registerD).to.equal(0x33);
@@ -671,7 +671,7 @@ describe("ld", function() {
     core.registerC = 0xAB;
     core.memory[0x02AB] = 0x32;
 
-    core.OPCODE[0x0A](core)
+    core.OPCODE[0x0A](core);
 
     expect(core.registerA).to.equal(0x32);
   });
@@ -681,7 +681,7 @@ describe("ld", function() {
     core.registerE = 0xAB;
     core.memory[0x02AB] = 0x32;
 
-    core.OPCODE[0x1A](core)
+    core.OPCODE[0x1A](core);
 
     expect(core.registerA).to.equal(0x32);
   });
@@ -691,7 +691,7 @@ describe("ld", function() {
     core.registerC = 0x01;
     core.registerA = 0x32;
 
-    core.OPCODE[0x02](core)
+    core.OPCODE[0x02](core);
 
     // this memory segment is "write normal"
     // 0xC000 < x < 0xE000
@@ -703,7 +703,7 @@ describe("ld", function() {
     core.registerE = 0x01;
     core.registerA = 0x32;
 
-    core.OPCODE[0x12](core)
+    core.OPCODE[0x12](core);
 
     // this memory segment is "write normal"
     // 0xC000 < x < 0xE000
