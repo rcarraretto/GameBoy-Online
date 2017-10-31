@@ -292,6 +292,12 @@ describe("ld", function() {
     expect(core.programCounter).to.equal(before.programCounter);
   });
 
+  it("LD H, L", function() {
+    core.registersHL = 0x1832;
+    core.OPCODE[0x65](core)
+    expect(core.registersHL).to.equal(0x3232);
+  });
+
   it("LD L, L", function() {
     var before = _.clone(core);
     core.OPCODE[0x6D](core)
@@ -310,6 +316,12 @@ describe("ld", function() {
 
     expect(core.stackPointer).to.equal(before.stackPointer);
     expect(core.programCounter).to.equal(before.programCounter);
+  });
+
+  it("LD L, H", function() {
+    core.registersHL = 0x1832;
+    core.OPCODE[0x6C](core)
+    expect(core.registersHL).to.equal(0x1818);
   });
 
 
