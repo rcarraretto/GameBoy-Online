@@ -545,6 +545,51 @@ describe("ld", function() {
 
 
 
+
+  /* LD [reg8], (HL) */
+
+  it("LD A, (HL)", function() {
+    core.registerA = 0x94;
+    core.registersHL = 0x0100;
+    core.memory[0x0100] = 0x32;
+    core.OPCODE[0x7E](core)
+    expect(core.registerA).to.equal(0x32);
+  });
+
+  it("LD B, (HL)", function() {
+    core.registerB = 0x94;
+    core.registersHL = 0x0100;
+    core.memory[0x0100] = 0x32;
+    core.OPCODE[0x46](core)
+    expect(core.registerB).to.equal(0x32);
+  });
+
+  it("LD C, (HL)", function() {
+    core.registerC = 0x94;
+    core.registersHL = 0x0100;
+    core.memory[0x0100] = 0x32;
+    core.OPCODE[0x4E](core)
+    expect(core.registerC).to.equal(0x32);
+  });
+
+  it("LD D, (HL)", function() {
+    core.registerD = 0x94;
+    core.registersHL = 0x0100;
+    core.memory[0x0100] = 0x32;
+    core.OPCODE[0x56](core)
+    expect(core.registerD).to.equal(0x32);
+  });
+
+  it("LD E, (HL)", function() {
+    core.registerE = 0x94;
+    core.registersHL = 0x0100;
+    core.memory[0x0100] = 0x32;
+    core.OPCODE[0x5E](core)
+    expect(core.registerE).to.equal(0x32);
+  });
+
+
+
   /* LD [reg16], nn */
 
   it("LD BC, nn", function() {

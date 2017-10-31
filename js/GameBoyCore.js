@@ -741,11 +741,6 @@ GameBoyCore.prototype.OPCODE = [
 	null,
 	null,
 	null,
-	//LD B, (HL)
-	//#0x46:
-	function (parentObj) {
-		parentObj.registerB = parentObj.memoryReader[parentObj.registersHL](parentObj, parentObj.registersHL);
-	},
 	null,
 	null,
 	null,
@@ -753,11 +748,6 @@ GameBoyCore.prototype.OPCODE = [
 	null,
 	null,
 	null,
-	//LD C, (HL)
-	//#0x4E:
-	function (parentObj) {
-		parentObj.registerC = parentObj.memoryReader[parentObj.registersHL](parentObj, parentObj.registersHL);
-	},
 	null,
 	null,
 	null,
@@ -765,11 +755,6 @@ GameBoyCore.prototype.OPCODE = [
 	null,
 	null,
 	null,
-	//LD D, (HL)
-	//#0x56:
-	function (parentObj) {
-		parentObj.registerD = parentObj.memoryReader[parentObj.registersHL](parentObj, parentObj.registersHL);
-	},
 	null,
 	null,
 	null,
@@ -777,11 +762,10 @@ GameBoyCore.prototype.OPCODE = [
 	null,
 	null,
 	null,
-	//LD E, (HL)
-	//#0x5E:
-	function (parentObj) {
-		parentObj.registerE = parentObj.memoryReader[parentObj.registersHL](parentObj, parentObj.registersHL);
-	},
+	null,
+	null,
+	null,
+	null,
 	null,
 	null,
 	null,
@@ -875,11 +859,7 @@ GameBoyCore.prototype.OPCODE = [
 	null,
 	null,
 	null,
-	//LD, A, (HL)
-	//#0x7E:
-	function (parentObj) {
-		parentObj.registerA = parentObj.memoryReader[parentObj.registersHL](parentObj, parentObj.registersHL);
-	},
+	null,
 	null,
 	//ADD A, B
 	//#0x80:
@@ -2231,6 +2211,8 @@ GameBoyCore.prototype.OPCODE[0x6B] = function (parentObj) {
 	parentObj.registersHL = (parentObj.registersHL & 0xFF00) | parentObj.registerE;
 };
 
+
+
 /* LD [reg8], n */
 
 // LD A, n
@@ -2247,6 +2229,31 @@ GameBoyCore.prototype.OPCODE[0x1E] = ld_reg_n('E');
 GameBoyCore.prototype.OPCODE[0x01] = ld_reg_nn('BC');
 // LD DE, nn
 GameBoyCore.prototype.OPCODE[0x11] = ld_reg_nn('DE');
+
+
+
+/* LD [reg8], (HL) */
+
+// LD A, (HL)
+GameBoyCore.prototype.OPCODE[0x7E] = function (parentObj) {
+	parentObj.registerA = parentObj.memoryReader[parentObj.registersHL](parentObj, parentObj.registersHL);
+};
+// LD B, (HL)
+GameBoyCore.prototype.OPCODE[0x46] = function (parentObj) {
+	parentObj.registerB = parentObj.memoryReader[parentObj.registersHL](parentObj, parentObj.registersHL);
+};
+// LD C, (HL)
+GameBoyCore.prototype.OPCODE[0x4E] = function (parentObj) {
+	parentObj.registerC = parentObj.memoryReader[parentObj.registersHL](parentObj, parentObj.registersHL);
+};
+// LD D, (HL)
+GameBoyCore.prototype.OPCODE[0x56] = function (parentObj) {
+	parentObj.registerD = parentObj.memoryReader[parentObj.registersHL](parentObj, parentObj.registersHL);
+};
+// LD E, (HL)
+GameBoyCore.prototype.OPCODE[0x5E] = function (parentObj) {
+	parentObj.registerE = parentObj.memoryReader[parentObj.registersHL](parentObj, parentObj.registersHL);
+};
 
 
 
