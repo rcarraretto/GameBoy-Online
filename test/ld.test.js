@@ -600,6 +600,13 @@ describe("ld", function() {
     expect(core.registerE).to.equal(0x32);
   });
 
+  it("LD H, (HL)", function() {
+    core.registersHL = 0x01AB;
+    core.memory[0x01AB] = 0x32;
+    core.OPCODE[0x66](core)
+    expect(core.registersHL).to.equal(0x32AB);
+  });
+
 
 
   /* LD [reg16], nn */
