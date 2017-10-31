@@ -744,6 +744,17 @@ describe("ld", function() {
     expect(core.programCounter).to.equal(0x0102);
   });
 
+  it("LD HL, nn", function() {
+    core.programCounter = 0x0100;
+    core.memory[0x0100] = 0x32;
+    core.memory[0x0101] = 0x33;
+
+    core.OPCODE[0x21](core);
+
+    expect(core.registersHL).to.equal(0x3332);
+    expect(core.programCounter).to.equal(0x0102);
+  });
+
 
 
   it("LD A, (BC)", function() {
