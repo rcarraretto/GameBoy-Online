@@ -660,12 +660,7 @@ GameBoyCore.prototype.OPCODE = [
 			parentObj.programCounter = (parentObj.programCounter + 1) & 0xFFFF;
 		}
 	},
-	//LD SP, nn
-	//#0x31:
-	function (parentObj) {
-		parentObj.stackPointer = (parentObj.memoryRead((parentObj.programCounter + 1) & 0xFFFF) << 8) | parentObj.memoryReader[parentObj.programCounter](parentObj, parentObj.programCounter);
-		parentObj.programCounter = (parentObj.programCounter + 2) & 0xFFFF;
-	},
+	null,
 	//LDD (HL), A
 	//#0x32:
 	function (parentObj) {
@@ -2185,6 +2180,10 @@ GameBoyCore.prototype.OPCODE[0x11] = ld_reg_nn('DE');
 GameBoyCore.prototype.OPCODE[0x21] = function (parentObj) {
 	parentObj.registersHL = (parentObj.memoryRead((parentObj.programCounter + 1) & 0xFFFF) << 8) | parentObj.memoryReader[parentObj.programCounter](parentObj, parentObj.programCounter);
 	parentObj.programCounter = (parentObj.programCounter + 2) & 0xFFFF;
+};
+// LD SP, nn
+GameBoyCore.prototype.OPCODE[0x31] = function (parentObj) {
+	parentObj.stackPointer = read_word_operand(parentObj);
 };
 
 
