@@ -272,6 +272,16 @@ describe("ld", function() {
 
 
 
+  it("LD SP, HL", function() {
+    core.registersHL = 0xABCD;
+    core.stackPointer = 0x0000;
+    core.OPCODE[0xF9](core);
+    expect(core.registersHL).to.equal(0xABCD);
+    expect(core.stackPointer).to.equal(0xABCD);
+  });
+
+
+
   it("LD H, H", function() {
     var before = _.clone(core);
     core.OPCODE[0x64](core);

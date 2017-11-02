@@ -1866,11 +1866,7 @@ GameBoyCore.prototype.OPCODE = [
 		parentObj.FHalfCarry = ((temp_var & 0x10) == 0x10);
 		parentObj.FZero = parentObj.FSubtract = false;
 	},
-	//LD SP, HL
-	//#0xF9:
-	function (parentObj) {
-		parentObj.stackPointer = parentObj.registersHL;
-	},
+	null,
 	null,
 	//EI
 	//#0xFB:
@@ -2028,6 +2024,10 @@ GameBoyCore.prototype.OPCODE[0x5A] = ld_reg_reg('E', 'D');
 // LD E, E
 GameBoyCore.prototype.OPCODE[0x5b] = ld_reg_reg('E', 'E');
 
+// LD SP, HL
+GameBoyCore.prototype.OPCODE[0xF9] = function (parentObj) {
+	parentObj.stackPointer = parentObj.registersHL;
+};
 
 
 // LD H, H
