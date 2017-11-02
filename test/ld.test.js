@@ -817,4 +817,20 @@ describe("ld", function() {
     expect(core.programCounter).to.equal(0x0102);
   });
 
+  it("LD A, (nn)", function() {
+    core.registerA = 0xAB;
+    core.programCounter = 0x0100;
+    core.memory[0x0100] = 0x01;
+    core.memory[0x0101] = 0xC0;
+    core.memory[0xC001] = 0x32;
+
+    core.OPCODE[0xFA](core);
+
+    // this memory segment is "write normal"
+    // 0xC000 < x < 0xE000
+    expect(core.registerA).to.equal(0x32);
+    expect(core.memory[0xC001]).to.equal(0x32);
+    expect(core.programCounter).to.equal(0x0102);
+  });
+
 });

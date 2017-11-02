@@ -1878,12 +1878,7 @@ GameBoyCore.prototype.OPCODE = [
 	function (parentObj) {
 		parentObj.stackPointer = parentObj.registersHL;
 	},
-	//LD A, (nn)
-	//#0xFA:
-	function (parentObj) {
-		parentObj.registerA = parentObj.memoryRead((parentObj.memoryRead((parentObj.programCounter + 1) & 0xFFFF) << 8) | parentObj.memoryReader[parentObj.programCounter](parentObj, parentObj.programCounter));
-		parentObj.programCounter = (parentObj.programCounter + 2) & 0xFFFF;
-	},
+	null,
 	//EI
 	//#0xFB:
 	function (parentObj) {
@@ -2289,9 +2284,21 @@ GameBoyCore.prototype.OPCODE[0xEA] = function (parentObj) {
 	var high_addr8 = parentObj.memoryRead(parentObj.programCounter);
 	parentObj.programCounter = (parentObj.programCounter + 1) & 0xFFFF;
 
-	var write_addr16 = (high_addr8 << 8) | low_addr8;
-	parentObj.memoryWrite(write_addr16, parentObj.registerA);
+	var addr16 = (high_addr8 << 8) | low_addr8;
+	parentObj.memoryWrite(addr16, parentObj.registerA);
 };
+// LD A, (nn)
+GameBoyCore.prototype.OPCODE[0xFA] = function (parentObj) {
+	var low_addr8 = parentObj.memoryRead(parentObj.programCounter);
+	parentObj.programCounter = (parentObj.programCounter + 1) & 0xFFFF;
+
+	var high_addr8 = parentObj.memoryRead(parentObj.programCounter);
+	parentObj.programCounter = (parentObj.programCounter + 1) & 0xFFFF;
+
+	var addr16 = (high_addr8 << 8) | low_addr8;
+	parentObj.registerA = parentObj.memoryRead(addr16);
+};
+
 
 
 GameBoyCore.prototype.CBOPCODE = [
