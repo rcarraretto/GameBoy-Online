@@ -1418,14 +1418,7 @@ GameBoyCore.prototype.OPCODE = [
 			parentObj.programCounter = (parentObj.programCounter + 2) & 0xFFFF;
 		}
 	},
-	//PUSH BC
-	//#0xC5:
-	function (parentObj) {
-		parentObj.stackPointer = (parentObj.stackPointer - 1) & 0xFFFF;
-		parentObj.memoryWriter[parentObj.stackPointer](parentObj, parentObj.stackPointer, parentObj.registerB);
-		parentObj.stackPointer = (parentObj.stackPointer - 1) & 0xFFFF;
-		parentObj.memoryWriter[parentObj.stackPointer](parentObj, parentObj.stackPointer, parentObj.registerC);
-	},
+	null,
 	//ADD, n
 	//#0xC6:
 	function (parentObj) {
@@ -1582,14 +1575,7 @@ GameBoyCore.prototype.OPCODE = [
 			parentObj.programCounter = (parentObj.programCounter + 2) & 0xFFFF;
 		}
 	},
-	//PUSH DE
-	//#0xD5:
-	function (parentObj) {
-		parentObj.stackPointer = (parentObj.stackPointer - 1) & 0xFFFF;
-		parentObj.memoryWriter[parentObj.stackPointer](parentObj, parentObj.stackPointer, parentObj.registerD);
-		parentObj.stackPointer = (parentObj.stackPointer - 1) & 0xFFFF;
-		parentObj.memoryWriter[parentObj.stackPointer](parentObj, parentObj.stackPointer, parentObj.registerE);
-	},
+	null,
 	//SUB A, n
 	//#0xD6:
 	function (parentObj) {
@@ -1717,14 +1703,7 @@ GameBoyCore.prototype.OPCODE = [
 		cout("Illegal op code 0xE4 called, pausing emulation.", 2);
 		pause();
 	},
-	//PUSH HL
-	//#0xE5:
-	function (parentObj) {
-		parentObj.stackPointer = (parentObj.stackPointer - 1) & 0xFFFF;
-		parentObj.memoryWriter[parentObj.stackPointer](parentObj, parentObj.stackPointer, parentObj.registersHL >> 8);
-		parentObj.stackPointer = (parentObj.stackPointer - 1) & 0xFFFF;
-		parentObj.memoryWriter[parentObj.stackPointer](parentObj, parentObj.stackPointer, parentObj.registersHL & 0xFF);
-	},
+	null,
 	//AND n
 	//#0xE6:
 	function (parentObj) {
@@ -2298,6 +2277,28 @@ GameBoyCore.prototype.OPCODE[0x08] = function (parentObj) {
 GameBoyCore.prototype.OPCODE[0xFA] = function (parentObj) {
 	var addr16 = read_word_operand(parentObj);
 	parentObj.registerA = parentObj.memoryRead(addr16);
+};
+
+// PUSH BC
+GameBoyCore.prototype.OPCODE[0xC5] = function (parentObj) {
+	parentObj.stackPointer = (parentObj.stackPointer - 1) & 0xFFFF;
+	parentObj.memoryWriter[parentObj.stackPointer](parentObj, parentObj.stackPointer, parentObj.registerB);
+	parentObj.stackPointer = (parentObj.stackPointer - 1) & 0xFFFF;
+	parentObj.memoryWriter[parentObj.stackPointer](parentObj, parentObj.stackPointer, parentObj.registerC);
+};
+// PUSH DE
+GameBoyCore.prototype.OPCODE[0xD5] = function (parentObj) {
+	parentObj.stackPointer = (parentObj.stackPointer - 1) & 0xFFFF;
+	parentObj.memoryWriter[parentObj.stackPointer](parentObj, parentObj.stackPointer, parentObj.registerD);
+	parentObj.stackPointer = (parentObj.stackPointer - 1) & 0xFFFF;
+	parentObj.memoryWriter[parentObj.stackPointer](parentObj, parentObj.stackPointer, parentObj.registerE);
+};
+// PUSH HL
+GameBoyCore.prototype.OPCODE[0xE5] = function (parentObj) {
+	parentObj.stackPointer = (parentObj.stackPointer - 1) & 0xFFFF;
+	parentObj.memoryWriter[parentObj.stackPointer](parentObj, parentObj.stackPointer, parentObj.registersHL >> 8);
+	parentObj.stackPointer = (parentObj.stackPointer - 1) & 0xFFFF;
+	parentObj.memoryWriter[parentObj.stackPointer](parentObj, parentObj.stackPointer, parentObj.registersHL & 0xFF);
 };
 
 
