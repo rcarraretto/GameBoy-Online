@@ -1764,17 +1764,7 @@ GameBoyCore.prototype.OPCODE = [
 		parentObj.registerA = parentObj.memoryHighRead(parentObj.memoryReader[parentObj.programCounter](parentObj, parentObj.programCounter));
 		parentObj.programCounter = (parentObj.programCounter + 1) & 0xFFFF;
 	},
-	//POP AF
-	//#0xF1:
-	function (parentObj) {
-		var temp_var = parentObj.memoryReader[parentObj.stackPointer](parentObj, parentObj.stackPointer);
-		parentObj.FZero = (temp_var > 0x7F);
-		parentObj.FSubtract = ((temp_var & 0x40) == 0x40);
-		parentObj.FHalfCarry = ((temp_var & 0x20) == 0x20);
-		parentObj.FCarry = ((temp_var & 0x10) == 0x10);
-		parentObj.registerA = parentObj.memoryRead((parentObj.stackPointer + 1) & 0xFFFF);
-		parentObj.stackPointer = (parentObj.stackPointer + 2) & 0xFFFF;
-	},
+	null,
 	//LD A, (0xFF00 + C)
 	//#0xF2:
 	function (parentObj) {
@@ -1792,14 +1782,7 @@ GameBoyCore.prototype.OPCODE = [
 		cout("Illegal op code 0xF4 called, pausing emulation.", 2);
 		pause();
 	},
-	//PUSH AF
-	//#0xF5:
-	function (parentObj) {
-		parentObj.stackPointer = (parentObj.stackPointer - 1) & 0xFFFF;
-		parentObj.memoryWriter[parentObj.stackPointer](parentObj, parentObj.stackPointer, parentObj.registerA);
-		parentObj.stackPointer = (parentObj.stackPointer - 1) & 0xFFFF;
-		parentObj.memoryWriter[parentObj.stackPointer](parentObj, parentObj.stackPointer, ((parentObj.FZero) ? 0x80 : 0) | ((parentObj.FSubtract) ? 0x40 : 0) | ((parentObj.FHalfCarry) ? 0x20 : 0) | ((parentObj.FCarry) ? 0x10 : 0));
-	},
+	null,
 	//OR n
 	//#0xF6:
 	function (parentObj) {
@@ -2298,6 +2281,27 @@ GameBoyCore.prototype.OPCODE[0xD1] = function (parentObj) {
 // POP HL
 GameBoyCore.prototype.OPCODE[0xE1] = function (parentObj) {
 	parentObj.registersHL = (parentObj.memoryRead((parentObj.stackPointer + 1) & 0xFFFF) << 8) | parentObj.memoryReader[parentObj.stackPointer](parentObj, parentObj.stackPointer);
+	parentObj.stackPointer = (parentObj.stackPointer + 2) & 0xFFFF;
+};
+// PUSH AF
+GameBoyCore.prototype.OPCODE[0xF5] = function (parentObj) {
+	parentObj.stackPointer = (parentObj.stackPointer - 1) & 0xFFFF;
+	parentObj.memoryWriter[parentObj.stackPointer](parentObj, parentObj.stackPointer, parentObj.registerA);
+	parentObj.stackPointer = (parentObj.stackPointer - 1) & 0xFFFF;
+	var flags = (parentObj.FZero ? 0x80 : 0) |
+		(parentObj.FSubtract ? 0x40 : 0) |
+		(parentObj.FHalfCarry ? 0x20 : 0) |
+		(parentObj.FCarry ? 0x10 : 0);
+	parentObj.memoryWriter[parentObj.stackPointer](parentObj, parentObj.stackPointer, flags);
+};
+// POP AF
+GameBoyCore.prototype.OPCODE[0xF1] = function (parentObj) {
+	var temp_var = parentObj.memoryReader[parentObj.stackPointer](parentObj, parentObj.stackPointer);
+	parentObj.FZero = (temp_var > 0x7F);
+	parentObj.FSubtract = ((temp_var & 0x40) == 0x40);
+	parentObj.FHalfCarry = ((temp_var & 0x20) == 0x20);
+	parentObj.FCarry = ((temp_var & 0x10) == 0x10);
+	parentObj.registerA = parentObj.memoryRead((parentObj.stackPointer + 1) & 0xFFFF);
 	parentObj.stackPointer = (parentObj.stackPointer + 2) & 0xFFFF;
 };
 

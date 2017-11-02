@@ -79,4 +79,184 @@ describe("push / pop", function() {
     expect(core.registersHL).to.equal(0xAABB);
   });
 
+  it("PUSH AF - all flags unset", function() {
+    core.registerA = 0xAA;
+    core.stackPointer = 0xC099;
+    core.FZero = false;
+    core.FSubtract = false;
+    core.FHalfCarry = false;
+    core.FCarry = false;
+
+    core.OPCODE[0xF5](core);
+
+    expect(core.stackPointer).to.equal(0xC097);
+    expect(core.memory[0xC097]).to.equal(0x00);
+    expect(core.memory[0xC098]).to.equal(0xAA);
+  });
+
+  it("PUSH AF - flag zero", function() {
+    core.registerA = 0xAA;
+    core.stackPointer = 0xC099;
+    core.FZero = true;
+    core.FSubtract = false;
+    core.FHalfCarry = false;
+    core.FCarry = false;
+
+    core.OPCODE[0xF5](core);
+
+    expect(core.stackPointer).to.equal(0xC097);
+    expect(core.memory[0xC097]).to.equal(0x80);
+    expect(core.memory[0xC098]).to.equal(0xAA);
+  });
+
+  it("PUSH AF - flag subtract", function() {
+    core.registerA = 0xAA;
+    core.stackPointer = 0xC099;
+    core.FZero = false;
+    core.FSubtract = true;
+    core.FHalfCarry = false;
+    core.FCarry = false;
+
+    core.OPCODE[0xF5](core);
+
+    expect(core.stackPointer).to.equal(0xC097);
+    expect(core.memory[0xC097]).to.equal(0x40);
+    expect(core.memory[0xC098]).to.equal(0xAA);
+  });
+
+  it("PUSH AF - flag half carry", function() {
+    core.registerA = 0xAA;
+    core.stackPointer = 0xC099;
+    core.FZero = false;
+    core.FSubtract = false;
+    core.FHalfCarry = true;
+    core.FCarry = false;
+
+    core.OPCODE[0xF5](core);
+
+    expect(core.stackPointer).to.equal(0xC097);
+    expect(core.memory[0xC097]).to.equal(0x20);
+    expect(core.memory[0xC098]).to.equal(0xAA);
+  });
+
+  it("PUSH AF - flag carry", function() {
+    core.registerA = 0xAA;
+    core.stackPointer = 0xC099;
+    core.FZero = false;
+    core.FSubtract = false;
+    core.FHalfCarry = false;
+    core.FCarry = true;
+
+    core.OPCODE[0xF5](core);
+
+    expect(core.stackPointer).to.equal(0xC097);
+    expect(core.memory[0xC097]).to.equal(0x10);
+    expect(core.memory[0xC098]).to.equal(0xAA);
+  });
+
+  it("PUSH AF - all flags set", function() {
+    core.registerA = 0xAA;
+    core.stackPointer = 0xC099;
+    core.FZero = true;
+    core.FSubtract = true;
+    core.FHalfCarry = true;
+    core.FCarry = true;
+
+    core.OPCODE[0xF5](core);
+
+    expect(core.stackPointer).to.equal(0xC097);
+    expect(core.memory[0xC097]).to.equal(0xF0);
+    expect(core.memory[0xC098]).to.equal(0xAA);
+  });
+
+  it("POP AF - all flags unset", function() {
+    core.stackPointer = 0xC097;
+    core.memory[0xC097] = 0x00;
+    core.memory[0xC098] = 0xAA;
+
+    core.OPCODE[0xF1](core);
+
+    expect(core.stackPointer).to.equal(0xC099);
+    expect(core.FZero).to.equal(false);
+    expect(core.FSubtract).to.equal(false);
+    expect(core.FHalfCarry).to.equal(false);
+    expect(core.FCarry).to.equal(false);
+    expect(core.registerA).to.equal(0xAA);
+  });
+
+  it("POP AF - flag zero", function() {
+    core.stackPointer = 0xC097;
+    core.memory[0xC097] = 0x80;
+    core.memory[0xC098] = 0xAA;
+
+    core.OPCODE[0xF1](core);
+
+    expect(core.stackPointer).to.equal(0xC099);
+    expect(core.FZero).to.equal(true);
+    expect(core.FSubtract).to.equal(false);
+    expect(core.FHalfCarry).to.equal(false);
+    expect(core.FCarry).to.equal(false);
+    expect(core.registerA).to.equal(0xAA);
+  });
+
+  it("POP AF - flag subtract", function() {
+    core.stackPointer = 0xC097;
+    core.memory[0xC097] = 0x40;
+    core.memory[0xC098] = 0xAA;
+
+    core.OPCODE[0xF1](core);
+
+    expect(core.stackPointer).to.equal(0xC099);
+    expect(core.FZero).to.equal(false);
+    expect(core.FSubtract).to.equal(true);
+    expect(core.FHalfCarry).to.equal(false);
+    expect(core.FCarry).to.equal(false);
+    expect(core.registerA).to.equal(0xAA);
+  });
+
+  it("POP AF - flag half carry", function() {
+    core.stackPointer = 0xC097;
+    core.memory[0xC097] = 0x20;
+    core.memory[0xC098] = 0xAA;
+
+    core.OPCODE[0xF1](core);
+
+    expect(core.stackPointer).to.equal(0xC099);
+    expect(core.FZero).to.equal(false);
+    expect(core.FSubtract).to.equal(false);
+    expect(core.FHalfCarry).to.equal(true);
+    expect(core.FCarry).to.equal(false);
+    expect(core.registerA).to.equal(0xAA);
+  });
+
+  it("POP AF - flag carry", function() {
+    core.stackPointer = 0xC097;
+    core.memory[0xC097] = 0x10;
+    core.memory[0xC098] = 0xAA;
+
+    core.OPCODE[0xF1](core);
+
+    expect(core.stackPointer).to.equal(0xC099);
+    expect(core.FZero).to.equal(false);
+    expect(core.FSubtract).to.equal(false);
+    expect(core.FHalfCarry).to.equal(false);
+    expect(core.FCarry).to.equal(true);
+    expect(core.registerA).to.equal(0xAA);
+  });
+
+  it("POP AF - all flags set", function() {
+    core.stackPointer = 0xC097;
+    core.memory[0xC097] = 0xF0;
+    core.memory[0xC098] = 0xAA;
+
+    core.OPCODE[0xF1](core);
+
+    expect(core.stackPointer).to.equal(0xC099);
+    expect(core.FZero).to.equal(true);
+    expect(core.FSubtract).to.equal(true);
+    expect(core.FHalfCarry).to.equal(true);
+    expect(core.FCarry).to.equal(true);
+    expect(core.registerA).to.equal(0xAA);
+  });
+
 });
