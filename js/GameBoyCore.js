@@ -2178,8 +2178,7 @@ GameBoyCore.prototype.OPCODE[0x01] = ld_reg_nn('BC');
 GameBoyCore.prototype.OPCODE[0x11] = ld_reg_nn('DE');
 // LD HL, nn
 GameBoyCore.prototype.OPCODE[0x21] = function (parentObj) {
-	parentObj.registersHL = (parentObj.memoryRead((parentObj.programCounter + 1) & 0xFFFF) << 8) | parentObj.memoryReader[parentObj.programCounter](parentObj, parentObj.programCounter);
-	parentObj.programCounter = (parentObj.programCounter + 2) & 0xFFFF;
+	parentObj.registersHL = read_word_operand(parentObj);
 };
 // LD SP, nn
 GameBoyCore.prototype.OPCODE[0x31] = function (parentObj) {
