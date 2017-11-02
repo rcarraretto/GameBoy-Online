@@ -44,4 +44,39 @@ describe("push / pop", function() {
     expect(core.memory[0xC098]).to.equal(0xAA);
   });
 
+  it("POP BC", function() {
+    core.stackPointer = 0xC097;
+    core.memory[0xC097] = 0xCC;
+    core.memory[0xC098] = 0xBB;
+
+    core.OPCODE[0xC1](core);
+
+    expect(core.stackPointer).to.equal(0xC099);
+    expect(core.registerC).to.equal(0xCC);
+    expect(core.registerB).to.equal(0xBB);
+  });
+
+  it("POP DE", function() {
+    core.stackPointer = 0xC097;
+    core.memory[0xC097] = 0xEE;
+    core.memory[0xC098] = 0xDD;
+
+    core.OPCODE[0xD1](core);
+
+    expect(core.stackPointer).to.equal(0xC099);
+    expect(core.registerD).to.equal(0xDD);
+    expect(core.registerE).to.equal(0xEE);
+  });
+
+  it("POP HL", function() {
+    core.stackPointer = 0xC097;
+    core.memory[0xC097] = 0xBB;
+    core.memory[0xC098] = 0xAA;
+
+    core.OPCODE[0xE1](core);
+
+    expect(core.stackPointer).to.equal(0xC099);
+    expect(core.registersHL).to.equal(0xAABB);
+  });
+
 });
