@@ -670,12 +670,7 @@ GameBoyCore.prototype.OPCODE = [
 	null,
 	null,
 	null,
-	//LD (HL), n
-	//#0x36:
-	function (parentObj) {
-		parentObj.memoryWriter[parentObj.registersHL](parentObj, parentObj.registersHL, parentObj.memoryReader[parentObj.programCounter](parentObj, parentObj.programCounter));
-		parentObj.programCounter = (parentObj.programCounter + 1) & 0xFFFF;
-	},
+	null,
 	//SCF
 	//#0x37:
 	function (parentObj) {
@@ -2251,6 +2246,13 @@ GameBoyCore.prototype.OPCODE[0x74] = function (parentObj) {
 // LD (HL), L
 GameBoyCore.prototype.OPCODE[0x75] = function (parentObj) {
 	parentObj.memoryWriter[parentObj.registersHL](parentObj, parentObj.registersHL, parentObj.registersHL & 0xFF);
+};
+
+// LD (HL), n
+GameBoyCore.prototype.OPCODE[0x36] = function (parentObj) {
+	var value = parentObj.memoryRead(parentObj.programCounter);
+	parentObj.programCounter = (parentObj.programCounter + 1) & 0xFFFF;
+	parentObj.memoryWrite(parentObj.registersHL, value);
 };
 
 
