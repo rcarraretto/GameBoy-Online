@@ -181,4 +181,19 @@ describe("add", function() {
     expect(core.FSubtract).to.equal(false);
   });
 
+  it("ADD A, (HL): 128 + 240", function() {
+    core.registerA = 0x80;
+    core.registersHL = 0x0100;
+    core.memory[0x0100] = 0xF0;
+
+    core.OPCODE[0x86](core);
+
+    expect(core.registersHL).to.equal(0x0100);
+    expect(core.registerA).to.equal(0x70);
+    expect(core.FHalfCarry).to.equal(false);
+    expect(core.FCarry).to.equal(true);
+    expect(core.FZero).to.equal(false);
+    expect(core.FSubtract).to.equal(false);
+  });
+
 });
