@@ -795,46 +795,10 @@ GameBoyCore.prototype.OPCODE = [
 	null,
 	null,
 	null,
-	//ADD A, B
-	//#0x80:
-	function (parentObj) {
-		var dirtySum = parentObj.registerA + parentObj.registerB;
-		parentObj.FHalfCarry = ((dirtySum & 0xF) < (parentObj.registerA & 0xF));
-		parentObj.FCarry = (dirtySum > 0xFF);
-		parentObj.registerA = dirtySum & 0xFF;
-		parentObj.FZero = (parentObj.registerA == 0);
-		parentObj.FSubtract = false;
-	},
-	//ADD A, C
-	//#0x81:
-	function (parentObj) {
-		var dirtySum = parentObj.registerA + parentObj.registerC;
-		parentObj.FHalfCarry = ((dirtySum & 0xF) < (parentObj.registerA & 0xF));
-		parentObj.FCarry = (dirtySum > 0xFF);
-		parentObj.registerA = dirtySum & 0xFF;
-		parentObj.FZero = (parentObj.registerA == 0);
-		parentObj.FSubtract = false;
-	},
-	//ADD A, D
-	//#0x82:
-	function (parentObj) {
-		var dirtySum = parentObj.registerA + parentObj.registerD;
-		parentObj.FHalfCarry = ((dirtySum & 0xF) < (parentObj.registerA & 0xF));
-		parentObj.FCarry = (dirtySum > 0xFF);
-		parentObj.registerA = dirtySum & 0xFF;
-		parentObj.FZero = (parentObj.registerA == 0);
-		parentObj.FSubtract = false;
-	},
-	//ADD A, E
-	//#0x83:
-	function (parentObj) {
-		var dirtySum = parentObj.registerA + parentObj.registerE;
-		parentObj.FHalfCarry = ((dirtySum & 0xF) < (parentObj.registerA & 0xF));
-		parentObj.FCarry = (dirtySum > 0xFF);
-		parentObj.registerA = dirtySum & 0xFF;
-		parentObj.FZero = (parentObj.registerA == 0);
-		parentObj.FSubtract = false;
-	},
+	null,
+	null,
+	null,
+	null,
 	//ADD A, H
 	//#0x84:
 	function (parentObj) {
@@ -865,15 +829,7 @@ GameBoyCore.prototype.OPCODE = [
 		parentObj.FZero = (parentObj.registerA == 0);
 		parentObj.FSubtract = false;
 	},
-	//ADD A, A
-	//#0x87:
-	function (parentObj) {
-		parentObj.FHalfCarry = ((parentObj.registerA & 0x8) == 0x8);
-		parentObj.FCarry = (parentObj.registerA > 0x7F);
-		parentObj.registerA = (parentObj.registerA << 1) & 0xFF;
-		parentObj.FZero = (parentObj.registerA == 0);
-		parentObj.FSubtract = false;
-	},
+	null,
 	//ADC A, B
 	//#0x88:
 	function (parentObj) {
@@ -2306,6 +2262,50 @@ GameBoyCore.prototype.OPCODE[0xF1] = function (parentObj) {
 };
 
 
+// ADD A, A
+GameBoyCore.prototype.OPCODE[0x87] = function (parentObj) {
+	parentObj.FHalfCarry = ((parentObj.registerA & 0x8) == 0x8);
+	parentObj.FCarry = (parentObj.registerA > 0x7F);
+	parentObj.registerA = (parentObj.registerA << 1) & 0xFF;
+	parentObj.FZero = (parentObj.registerA == 0);
+	parentObj.FSubtract = false;
+};
+// ADD A, B
+GameBoyCore.prototype.OPCODE[0x80] = function (parentObj) {
+	var dirtySum = parentObj.registerA + parentObj.registerB;
+	parentObj.FHalfCarry = ((dirtySum & 0xF) < (parentObj.registerA & 0xF));
+	parentObj.FCarry = (dirtySum > 0xFF);
+	parentObj.registerA = dirtySum & 0xFF;
+	parentObj.FZero = (parentObj.registerA == 0);
+	parentObj.FSubtract = false;
+};
+// ADD A, C
+GameBoyCore.prototype.OPCODE[0x81] = function (parentObj) {
+	var dirtySum = parentObj.registerA + parentObj.registerC;
+	parentObj.FHalfCarry = ((dirtySum & 0xF) < (parentObj.registerA & 0xF));
+	parentObj.FCarry = (dirtySum > 0xFF);
+	parentObj.registerA = dirtySum & 0xFF;
+	parentObj.FZero = (parentObj.registerA == 0);
+	parentObj.FSubtract = false;
+};
+// ADD A, D
+GameBoyCore.prototype.OPCODE[0x82] = function (parentObj) {
+	var dirtySum = parentObj.registerA + parentObj.registerD;
+	parentObj.FHalfCarry = ((dirtySum & 0xF) < (parentObj.registerA & 0xF));
+	parentObj.FCarry = (dirtySum > 0xFF);
+	parentObj.registerA = dirtySum & 0xFF;
+	parentObj.FZero = (parentObj.registerA == 0);
+	parentObj.FSubtract = false;
+};
+// ADD A, E
+GameBoyCore.prototype.OPCODE[0x83] = function (parentObj) {
+	var dirtySum = parentObj.registerA + parentObj.registerE;
+	parentObj.FHalfCarry = ((dirtySum & 0xF) < (parentObj.registerA & 0xF));
+	parentObj.FCarry = (dirtySum > 0xFF);
+	parentObj.registerA = dirtySum & 0xFF;
+	parentObj.FZero = (parentObj.registerA == 0);
+	parentObj.FSubtract = false;
+};
 
 GameBoyCore.prototype.CBOPCODE = [
 	//RLC B
