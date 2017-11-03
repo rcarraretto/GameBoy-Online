@@ -153,4 +153,32 @@ describe("add", function() {
     expect(core.FSubtract).to.equal(false);
   });
 
+  it("ADD A, H: 128 + 240", function() {
+    core.registerA = 0x80;
+    core.registersHL = 0xF000;
+
+    core.OPCODE[0x84](core);
+
+    expect(core.registersHL).to.equal(0xF000);
+    expect(core.registerA).to.equal(0x70);
+    expect(core.FHalfCarry).to.equal(false);
+    expect(core.FCarry).to.equal(true);
+    expect(core.FZero).to.equal(false);
+    expect(core.FSubtract).to.equal(false);
+  });
+
+  it("ADD A, L: 128 + 240", function() {
+    core.registerA = 0x80;
+    core.registersHL = 0x00F0;
+
+    core.OPCODE[0x85](core);
+
+    expect(core.registersHL).to.equal(0x00F0);
+    expect(core.registerA).to.equal(0x70);
+    expect(core.FHalfCarry).to.equal(false);
+    expect(core.FCarry).to.equal(true);
+    expect(core.FZero).to.equal(false);
+    expect(core.FSubtract).to.equal(false);
+  });
+
 });

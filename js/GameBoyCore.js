@@ -799,26 +799,8 @@ GameBoyCore.prototype.OPCODE = [
 	null,
 	null,
 	null,
-	//ADD A, H
-	//#0x84:
-	function (parentObj) {
-		var dirtySum = parentObj.registerA + (parentObj.registersHL >> 8);
-		parentObj.FHalfCarry = ((dirtySum & 0xF) < (parentObj.registerA & 0xF));
-		parentObj.FCarry = (dirtySum > 0xFF);
-		parentObj.registerA = dirtySum & 0xFF;
-		parentObj.FZero = (parentObj.registerA == 0);
-		parentObj.FSubtract = false;
-	},
-	//ADD A, L
-	//#0x85:
-	function (parentObj) {
-		var dirtySum = parentObj.registerA + (parentObj.registersHL & 0xFF);
-		parentObj.FHalfCarry = ((dirtySum & 0xF) < (parentObj.registerA & 0xF));
-		parentObj.FCarry = (dirtySum > 0xFF);
-		parentObj.registerA = dirtySum & 0xFF;
-		parentObj.FZero = (parentObj.registerA == 0);
-		parentObj.FSubtract = false;
-	},
+	null,
+	null,
 	//ADD A, (HL)
 	//#0x86:
 	function (parentObj) {
@@ -2262,9 +2244,24 @@ GameBoyCore.prototype.OPCODE[0xF1] = function (parentObj) {
 };
 
 function op_add_regA_reg8 (reg_name) {
-	var reg_key = 'register' + reg_name;
+	var get_reg;
+
+	if (reg_name === 'H') {
+		get_reg = function (parentObj) {
+			return parentObj.registersHL >> 8;
+		};
+	} else if (reg_name === 'L') {
+		get_reg = function (parentObj) {
+			return parentObj.registersHL & 0xFF;
+		};
+	} else {
+		get_reg = function (parentObj) {
+			return parentObj['register' + reg_name];
+		};
+	}
+
 	return function (parentObj) {
-		var dirty_sum = parentObj.registerA + parentObj[reg_key];
+		var dirty_sum = parentObj.registerA + get_reg(parentObj);
 		parentObj.FHalfCarry = ((dirty_sum & 0xF) < (parentObj.registerA & 0xF));
 		parentObj.FCarry = (dirty_sum > 0xFF);
 		parentObj.registerA = dirty_sum & 0xFF;
@@ -2283,6 +2280,10 @@ GameBoyCore.prototype.OPCODE[0x81] = op_add_regA_reg8('C');
 GameBoyCore.prototype.OPCODE[0x82] = op_add_regA_reg8('D');
 // ADD A, E
 GameBoyCore.prototype.OPCODE[0x83] = op_add_regA_reg8('E');
+// ADD A, H
+GameBoyCore.prototype.OPCODE[0x84] = op_add_regA_reg8('H');
+// ADD A, L
+GameBoyCore.prototype.OPCODE[0x85] = op_add_regA_reg8('L');
 
 
 GameBoyCore.prototype.CBOPCODE = [
