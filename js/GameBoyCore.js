@@ -310,14 +310,6 @@ function read_word_operand (parentObj) {
 	return (high_byte << 8) | low_byte;
 };
 
-function ld_reg_reg(dst_reg_name, src_reg_name) {
-	var dst_reg = 'register' + dst_reg_name;
-	var src_reg = 'register' + src_reg_name
-	return function (parentObj) {
-		parentObj[dst_reg] = parentObj[src_reg];
-	};
-}
-
 var reg_combo = {
 
 	inc_op: function (reg_name) {
@@ -1787,6 +1779,13 @@ GameBoyCore.prototype.OPCODE[0x3B] = function (parentObj) {
 
 
 /* LD [reg8], [reg8] */
+function ld_reg_reg(dst_reg_name, src_reg_name) {
+	var dst_reg = 'register' + dst_reg_name;
+	var src_reg = 'register' + src_reg_name
+	return function (parentObj) {
+		parentObj[dst_reg] = parentObj[src_reg];
+	};
+}
 
 // LD A, A
 GameBoyCore.prototype.OPCODE[0x7F] = ld_reg_reg('A', 'A');
