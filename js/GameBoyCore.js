@@ -2259,28 +2259,28 @@ GameBoyCore.prototype.OPCODE[0x85] = op_add_regA('L');
 // ADD A, (HL)
 GameBoyCore.prototype.OPCODE[0x86] = op_add_regA('(HL)');
 
-// ADD HL, BC
-GameBoyCore.prototype.OPCODE[0x09] = function (parentObj) {
-	var dirty_sum = parentObj.registersHL + ((parentObj.registerB << 8) | parentObj.registerC);
+/* [ADD HL, n] */
+function add_hl(parentObj, dirty_sum) {
 	parentObj.FHalfCarry = ((parentObj.registersHL & 0xFFF) > (dirty_sum & 0xFFF));
 	parentObj.FCarry = (dirty_sum > 0xFFFF);
 	parentObj.registersHL = dirty_sum & 0xFFFF;
 	parentObj.FSubtract = false;
+}
+
+// ADD HL, BC
+GameBoyCore.prototype.OPCODE[0x09] = function (parentObj) {
+	var dirty_sum = parentObj.registersHL + ((parentObj.registerB << 8) | parentObj.registerC);
+	add_hl(parentObj, dirty_sum);
 };
 // ADD HL, DE
 GameBoyCore.prototype.OPCODE[0x19] = function (parentObj) {
 	var dirty_sum = parentObj.registersHL + ((parentObj.registerD << 8) | parentObj.registerE);
-	parentObj.FHalfCarry = ((parentObj.registersHL & 0xFFF) > (dirty_sum & 0xFFF));
-	parentObj.FCarry = (dirty_sum > 0xFFFF);
-	parentObj.registersHL = dirty_sum & 0xFFFF;
-	parentObj.FSubtract = false;
+	add_hl(parentObj, dirty_sum);
 };
 // ADD HL, HL
 GameBoyCore.prototype.OPCODE[0x29] = function (parentObj) {
-	parentObj.FHalfCarry = ((parentObj.registersHL & 0xFFF) > 0x7FF);
-	parentObj.FCarry = (parentObj.registersHL > 0x7FFF);
-	parentObj.registersHL = (parentObj.registersHL << 1) & 0xFFFF;
-	parentObj.FSubtract = false;
+	var dirty_sum = (parentObj.registersHL << 1);
+	add_hl(parentObj, dirty_sum);
 };
 
 GameBoyCore.prototype.CBOPCODE = [
