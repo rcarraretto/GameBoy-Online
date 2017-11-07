@@ -196,4 +196,77 @@ describe("add", function() {
     expect(core.FSubtract).to.equal(false);
   });
 
+
+  /* ADD HL, [reg16] */
+
+  it("ADD HL, BC: 0 + 0", function() {
+    core.registersHL = 0x0000;
+    core.registerB = 0x00;
+    core.registerC = 0x00;
+    core.FZero = false;
+
+    core.OPCODE[0x09](core);
+
+    expect(core.registersHL).to.equal(0x0000);
+    expect(core.FHalfCarry).to.equal(false);
+    expect(core.FCarry).to.equal(false);
+    expect(core.FSubtract).to.equal(false);
+    // zero flag not affected
+    expect(core.FZero).to.equal(false);
+  });
+
+  it("ADD HL, BC: 0x1002 + 0x0A02", function() {
+    core.registersHL = 0x1002;
+    core.registerB = 0x0A;
+    core.registerC = 0x02;
+
+    core.OPCODE[0x09](core);
+
+    expect(core.registersHL).to.equal(0x1A04);
+    expect(core.FHalfCarry).to.equal(false);
+    expect(core.FCarry).to.equal(false);
+    expect(core.FSubtract).to.equal(false);
+  });
+
+  it("ADD HL, BC: 0x00FF + 0x0001 (no half carry)", function() {
+    core.registersHL = 0x00FF;
+    core.registerB = 0x00;
+    core.registerC = 0x01;
+
+    core.OPCODE[0x09](core);
+
+    expect(core.registersHL).to.equal(0x0100);
+    expect(core.FHalfCarry).to.equal(false);
+    expect(core.FCarry).to.equal(false);
+    expect(core.FSubtract).to.equal(false);
+  });
+
+  it("ADD HL, BC: 0x0FFF + 0x0001 (half carry)", function() {
+    core.registersHL = 0x0FFF;
+    core.registerB = 0x00;
+    core.registerC = 0x01;
+
+    core.OPCODE[0x09](core);
+
+    expect(core.registersHL).to.equal(0x1000);
+    // Half Carry set if carry from bit 11
+    expect(core.FHalfCarry).to.equal(true);
+    expect(core.FCarry).to.equal(false);
+    expect(core.FSubtract).to.equal(false);
+  });
+
+  it("ADD HL, BC: 0xFFFF + 0x0001 (carry)", function() {
+    core.registersHL = 0xFFFF;
+    core.registerB = 0x00;
+    core.registerC = 0x01;
+
+    core.OPCODE[0x09](core);
+
+    expect(core.registersHL).to.equal(0x0000);
+    expect(core.FHalfCarry).to.equal(true);
+    // Carry set if carry from bit 15
+    expect(core.FCarry).to.equal(true);
+    expect(core.FSubtract).to.equal(false);
+  });
+
 });
