@@ -479,15 +479,7 @@ GameBoyCore.prototype.OPCODE = [
 		parentObj.FZero = parentObj.FSubtract = parentObj.FHalfCarry = false;
 	},
 	null,
-	//ADD HL, BC
-	//#0x09:
-	function (parentObj) {
-		var dirtySum = parentObj.registersHL + ((parentObj.registerB << 8) | parentObj.registerC);
-		parentObj.FHalfCarry = ((parentObj.registersHL & 0xFFF) > (dirtySum & 0xFFF));
-		parentObj.FCarry = (dirtySum > 0xFFFF);
-		parentObj.registersHL = dirtySum & 0xFFFF;
-		parentObj.FSubtract = false;
-	},
+	null,
 	null,
 	null,
 	null,
@@ -544,15 +536,7 @@ GameBoyCore.prototype.OPCODE = [
 	function (parentObj) {
 		parentObj.programCounter = (parentObj.programCounter + ((parentObj.memoryReader[parentObj.programCounter](parentObj, parentObj.programCounter) << 24) >> 24) + 1) & 0xFFFF;
 	},
-	//ADD HL, DE
-	//#0x19:
-	function (parentObj) {
-		var dirtySum = parentObj.registersHL + ((parentObj.registerD << 8) | parentObj.registerE);
-		parentObj.FHalfCarry = ((parentObj.registersHL & 0xFFF) > (dirtySum & 0xFFF));
-		parentObj.FCarry = (dirtySum > 0xFFFF);
-		parentObj.registersHL = dirtySum & 0xFFFF;
-		parentObj.FSubtract = false;
-	},
+	null,
 	null,
 	null,
 	null,
@@ -2282,6 +2266,22 @@ GameBoyCore.prototype.OPCODE[0x85] = op_add_regA('L');
 // ADD A, (HL)
 GameBoyCore.prototype.OPCODE[0x86] = op_add_regA('(HL)');
 
+// ADD HL, BC
+GameBoyCore.prototype.OPCODE[0x09] = function (parentObj) {
+	var dirty_sum = parentObj.registersHL + ((parentObj.registerB << 8) | parentObj.registerC);
+	parentObj.FHalfCarry = ((parentObj.registersHL & 0xFFF) > (dirty_sum & 0xFFF));
+	parentObj.FCarry = (dirty_sum > 0xFFFF);
+	parentObj.registersHL = dirty_sum & 0xFFFF;
+	parentObj.FSubtract = false;
+};
+// ADD HL, DE
+GameBoyCore.prototype.OPCODE[0x19] = function (parentObj) {
+	var dirty_sum = parentObj.registersHL + ((parentObj.registerD << 8) | parentObj.registerE);
+	parentObj.FHalfCarry = ((parentObj.registersHL & 0xFFF) > (dirty_sum & 0xFFF));
+	parentObj.FCarry = (dirty_sum > 0xFFFF);
+	parentObj.registersHL = dirty_sum & 0xFFFF;
+	parentObj.FSubtract = false;
+};
 
 GameBoyCore.prototype.CBOPCODE = [
 	//RLC B
