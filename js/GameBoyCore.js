@@ -609,14 +609,7 @@ GameBoyCore.prototype.OPCODE = [
 			parentObj.programCounter = (parentObj.programCounter + 1) & 0xFFFF;
 		}
 	},
-	//ADD HL, HL
-	//#0x29:
-	function (parentObj) {
-		parentObj.FHalfCarry = ((parentObj.registersHL & 0xFFF) > 0x7FF);
-		parentObj.FCarry = (parentObj.registersHL > 0x7FFF);
-		parentObj.registersHL = (parentObj.registersHL << 1) & 0xFFFF;
-		parentObj.FSubtract = false;
-	},
+	null,
 	//LDI A, (HL)
 	//#0x2A:
 	function (parentObj) {
@@ -2280,6 +2273,13 @@ GameBoyCore.prototype.OPCODE[0x19] = function (parentObj) {
 	parentObj.FHalfCarry = ((parentObj.registersHL & 0xFFF) > (dirty_sum & 0xFFF));
 	parentObj.FCarry = (dirty_sum > 0xFFFF);
 	parentObj.registersHL = dirty_sum & 0xFFFF;
+	parentObj.FSubtract = false;
+};
+// ADD HL, HL
+GameBoyCore.prototype.OPCODE[0x29] = function (parentObj) {
+	parentObj.FHalfCarry = ((parentObj.registersHL & 0xFFF) > 0x7FF);
+	parentObj.FCarry = (parentObj.registersHL > 0x7FFF);
+	parentObj.registersHL = (parentObj.registersHL << 1) & 0xFFFF;
 	parentObj.FSubtract = false;
 };
 

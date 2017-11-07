@@ -340,4 +340,52 @@ describe("add", function() {
     expect(core.FSubtract).to.equal(false);
   });
 
+
+  it("ADD HL, HL: 0 + 0", function() {
+    core.registersHL = 0x0000;
+    core.FZero = false;
+
+    core.OPCODE[0x29](core);
+
+    expect(core.registersHL).to.equal(0x0000);
+    expect(core.FHalfCarry).to.equal(false);
+    expect(core.FCarry).to.equal(false);
+    expect(core.FSubtract).to.equal(false);
+    // zero flag not affected
+    expect(core.FZero).to.equal(false);
+  });
+
+  it("ADD HL, HL: 0x0080 + 0x0080 (no half carry)", function() {
+    core.registersHL = 0x0080;
+
+    core.OPCODE[0x29](core);
+
+    expect(core.registersHL).to.equal(0x0100);
+    expect(core.FHalfCarry).to.equal(false);
+    expect(core.FCarry).to.equal(false);
+    expect(core.FSubtract).to.equal(false);
+  });
+
+  it("ADD HL, HL: 0x0800 + 0x0800 (half carry)", function() {
+    core.registersHL = 0x0800;
+
+    core.OPCODE[0x29](core);
+
+    expect(core.registersHL).to.equal(0x1000);
+    expect(core.FHalfCarry).to.equal(true);
+    expect(core.FCarry).to.equal(false);
+    expect(core.FSubtract).to.equal(false);
+  });
+
+  it("ADD HL, HL: 0x8000 + 0x8000 (carry)", function() {
+    core.registersHL = 0x8000;
+
+    core.OPCODE[0x29](core);
+
+    expect(core.registersHL).to.equal(0x0000);
+    expect(core.FHalfCarry).to.equal(false);
+    expect(core.FCarry).to.equal(true);
+    expect(core.FSubtract).to.equal(false);
+  });
+
 });
