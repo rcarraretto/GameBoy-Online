@@ -343,9 +343,9 @@ var reg_combo = {
 function nop (parentObj) {
 }
 
-function ld_reg_n (regName) {
+function ld_reg_n (reg_name) {
 	return function(parentObj) {
-		parentObj['register' + regName] = parentObj.memoryRead(parentObj.programCounter);
+		parentObj['register' + reg_name] = parentObj.memoryRead(parentObj.programCounter);
 		parentObj.programCounter = (parentObj.programCounter + 1) & 0xFFFF;
 	};
 }
@@ -1656,16 +1656,11 @@ function update_flags_inc8 (parentObj, value) {
 	parentObj.FSubtract = false;
 }
 
-function inc_reg8_op (regName) {
-	var inc = function (parentObj) {
-		var regKey = 'register' + regName;
+function inc_reg8_op (reg_name) {
+	return function (parentObj) {
+		var regKey = 'register' + reg_name;
 		var value = (parentObj[regKey] + 1) & 0xFF;
 		parentObj[regKey] = value;
-		return value;
-	};
-
-	return function (parentObj) {
-		var value = inc(parentObj);
 		update_flags_inc8(parentObj, value);
 	};
 }
@@ -1718,16 +1713,11 @@ function update_flags_dec8 (parentObj, value) {
 	parentObj.FSubtract = true;
 }
 
-function dec_reg8_op (regName) {
-	var dec = function (parentObj) {
-		var regKey = 'register' + regName;
+function dec_reg8_op (reg_name) {
+	return function (parentObj) {
+		var regKey = 'register' + reg_name;
 		var value = (parentObj[regKey] - 1) & 0xFF;
 		parentObj[regKey] = value;
-		return value;
-	};
-
-	return function (parentObj) {
-		var value = dec(parentObj);
 		update_flags_dec8(parentObj, value);
 	};
 }
