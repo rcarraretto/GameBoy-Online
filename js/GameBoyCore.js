@@ -422,17 +422,6 @@ var reg_combo = {
 		parentObj[reg_high] = (value >> 8) & 0xFF;
 		parentObj[reg_low] = value & 0xFF;
 	},
-
-	read_mem: function (parentObj, reg_name) {
-		var address = reg_combo.get(parentObj, reg_name);
-		return parentObj.memoryRead(address);
-	},
-
-	write_mem: function (parentObj, reg_name, value) {
-		var address = reg_combo.get(parentObj, reg_name);
-		parentObj.memoryWrite(address, value);
-	},
-
 };
 
 function nop (parentObj) {
@@ -2095,22 +2084,28 @@ GameBoyCore.prototype.OPCODE[0x36] = function (parentObj) {
 
 // LD A, (BC)
 GameBoyCore.prototype.OPCODE[0x0A] = function (parentObj) {
-	parentObj.registerA = reg_combo.read_mem(parentObj, 'BC');
+	var address = reg_combo.get(parentObj, 'BC');
+	parentObj.registerA = parentObj.memoryRead(address);
 };
 // LD A, (DE)
 GameBoyCore.prototype.OPCODE[0x1A] = function (parentObj) {
-	parentObj.registerA = reg_combo.read_mem(parentObj, 'DE');
+	var address = reg_combo.get(parentObj, 'DE');
+	parentObj.registerA = parentObj.memoryRead(address);
 };
 
 
 
 // LD (BC), A
 GameBoyCore.prototype.OPCODE[0x02] = function (parentObj) {
-	reg_combo.write_mem(parentObj, 'BC', parentObj.registerA);
+	var address = reg_combo.get(parentObj, 'BC');
+	var value = parentObj.registerA;
+	parentObj.memoryWrite(address, value);
 };
 // LD (DE), A
 GameBoyCore.prototype.OPCODE[0x12] = function (parentObj) {
-	reg_combo.write_mem(parentObj, 'DE', parentObj.registerA);
+	var address = reg_combo.get(parentObj, 'DE');
+	var value = parentObj.registerA;
+	parentObj.memoryWrite(address, value);
 };
 
 // LD (nn), A
