@@ -2180,34 +2180,20 @@ GameBoyCore.prototype.OPCODE[0xF1] = function (parentObj) {
 	parentObj.stackPointer = (parentObj.stackPointer + 2) & 0xFFFF;
 };
 
+/* ADD */
+function add_a (parentObj, value) {
+	var dirty_sum = parentObj.registerA + value;
+	parentObj.FHalfCarry = ((dirty_sum & 0xF) < (parentObj.registerA & 0xF));
+	parentObj.FCarry = (dirty_sum > 0xFF);
+	parentObj.registerA = dirty_sum & 0xFF;
+	parentObj.FZero = (parentObj.registerA == 0);
+	parentObj.FSubtract = false;
+}
+
 function op_add_regA (reg_name) {
-	var get_value;
-
-	if (reg_name === '(HL)') {
-		get_value = function (parentObj) {
-			return parentObj.memoryRead(parentObj.registersHL);
-		};
-	} else if (reg_name === 'H') {
-		get_value = function (parentObj) {
-			return parentObj.registersHL >> 8;
-		};
-	} else if (reg_name === 'L') {
-		get_value = function (parentObj) {
-			return parentObj.registersHL & 0xFF;
-		};
-	} else {
-		get_value = function (parentObj) {
-			return parentObj['register' + reg_name];
-		};
-	}
-
 	return function (parentObj) {
-		var dirty_sum = parentObj.registerA + get_value(parentObj);
-		parentObj.FHalfCarry = ((dirty_sum & 0xF) < (parentObj.registerA & 0xF));
-		parentObj.FCarry = (dirty_sum > 0xFF);
-		parentObj.registerA = dirty_sum & 0xFF;
-		parentObj.FZero = (parentObj.registerA == 0);
-		parentObj.FSubtract = false;
+		var value = parentObj['register' + reg_name];
+		add_a(parentObj, value);
 	};
 };
 
@@ -2222,11 +2208,20 @@ GameBoyCore.prototype.OPCODE[0x82] = op_add_regA('D');
 // ADD A, E
 GameBoyCore.prototype.OPCODE[0x83] = op_add_regA('E');
 // ADD A, H
-GameBoyCore.prototype.OPCODE[0x84] = op_add_regA('H');
+GameBoyCore.prototype.OPCODE[0x84] = function (parentObj) {
+	var value = parentObj.registersHL >> 8;
+	add_a(parentObj, value);
+};
 // ADD A, L
-GameBoyCore.prototype.OPCODE[0x85] = op_add_regA('L');
+GameBoyCore.prototype.OPCODE[0x85] = function (parentObj) {
+	var value = parentObj.registersHL & 0xFF;
+	add_a(parentObj, value);
+};
 // ADD A, (HL)
-GameBoyCore.prototype.OPCODE[0x86] = op_add_regA('(HL)');
+GameBoyCore.prototype.OPCODE[0x86] = function (parentObj) {
+	var value = parentObj.memoryRead(parentObj.registersHL);
+	add_a(parentObj, value);
+};
 
 /* [ADD HL, n] */
 function add_hl(parentObj, dirty_sum) {
