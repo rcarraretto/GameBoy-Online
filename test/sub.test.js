@@ -7,6 +7,19 @@ describe("sub", function() {
     core.setupRAM();
   });
 
+  it("SUB A, A", function() {
+    core.registerA = 0x01;
+
+    core.OPCODE[0x97](core);
+
+    expect(core.registerA).to.equal(0x00);
+    expect(core.FHalfCarry).to.equal(false);
+    expect(core.FCarry).to.equal(false);
+    expect(core.FZero).to.equal(true);
+    expect(core.FSubtract).to.equal(true);
+  });
+
+
   it("SUB A, B: 1 - 1 (zero flag)", function() {
     core.registerA = 0x01;
     core.registerB = 0x01;
