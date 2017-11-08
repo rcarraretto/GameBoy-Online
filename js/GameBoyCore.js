@@ -2127,8 +2127,8 @@ GameBoyCore.prototype.OPCODE[0xF1] = function (parentObj) {
 	parentObj.stackPointer = (parentObj.stackPointer + 2) & 0xFFFF;
 };
 
-/* ADD */
-function add_a (parentObj, value) {
+/* [ADD A, n] */
+function add_A_n (parentObj, value) {
 	var dirty_sum = parentObj.registerA + value;
 	parentObj.FHalfCarry = ((dirty_sum & 0xF) < (parentObj.registerA & 0xF));
 	parentObj.FCarry = (dirty_sum > 0xFF);
@@ -2136,38 +2136,40 @@ function add_a (parentObj, value) {
 	parentObj.FZero = (parentObj.registerA == 0);
 	parentObj.FSubtract = false;
 }
-
-function op_add_regA (reg_name) {
-	return function (parentObj) {
-		var value = parentObj['register' + reg_name];
-		add_a(parentObj, value);
-	};
-};
-
 // ADD A, A
-GameBoyCore.prototype.OPCODE[0x87] = op_add_regA('A');
+GameBoyCore.prototype.OPCODE[0x87] = function (parentObj) {
+	add_A_n(parentObj, parentObj.registerA);
+};
 // ADD A, B
-GameBoyCore.prototype.OPCODE[0x80] = op_add_regA('B');
+GameBoyCore.prototype.OPCODE[0x80] = function (parentObj) {
+	add_A_n(parentObj, parentObj.registerB);
+};
 // ADD A, C
-GameBoyCore.prototype.OPCODE[0x81] = op_add_regA('C');
+GameBoyCore.prototype.OPCODE[0x81] = function (parentObj) {
+	add_A_n(parentObj, parentObj.registerC);
+};
 // ADD A, D
-GameBoyCore.prototype.OPCODE[0x82] = op_add_regA('D');
+GameBoyCore.prototype.OPCODE[0x82] = function (parentObj) {
+	add_A_n(parentObj, parentObj.registerD);
+};
 // ADD A, E
-GameBoyCore.prototype.OPCODE[0x83] = op_add_regA('E');
+GameBoyCore.prototype.OPCODE[0x83] = function (parentObj) {
+	add_A_n(parentObj, parentObj.registerE);
+};
 // ADD A, H
 GameBoyCore.prototype.OPCODE[0x84] = function (parentObj) {
 	var value = parentObj.registersHL >> 8;
-	add_a(parentObj, value);
+	add_A_n(parentObj, value);
 };
 // ADD A, L
 GameBoyCore.prototype.OPCODE[0x85] = function (parentObj) {
 	var value = parentObj.registersHL & 0xFF;
-	add_a(parentObj, value);
+	add_A_n(parentObj, value);
 };
 // ADD A, (HL)
 GameBoyCore.prototype.OPCODE[0x86] = function (parentObj) {
 	var value = parentObj.memoryRead(parentObj.registersHL);
-	add_a(parentObj, value);
+	add_A_n(parentObj, value);
 };
 
 /* [ADD HL, n] */
@@ -2199,8 +2201,8 @@ GameBoyCore.prototype.OPCODE[0x39] = function (parentObj) {
 	add_hl(parentObj, dirty_sum);
 };
 
-/* [SUB n] */
-function sub_n (parentObj, value) {
+/* [SUB A, n] */
+function sub_A_n (parentObj, value) {
 	var dirty_sum = parentObj.registerA - value;
 	parentObj.FHalfCarry = ((parentObj.registerA & 0xF) < (dirty_sum & 0xF));
 	parentObj.FCarry = (dirty_sum < 0);
@@ -2210,23 +2212,23 @@ function sub_n (parentObj, value) {
 }
 // SUB A, A
 GameBoyCore.prototype.OPCODE[0x97] = function (parentObj) {
-	sub_n(parentObj, parentObj.registerA);
+	sub_A_n(parentObj, parentObj.registerA);
 };
 // SUB A, B
 GameBoyCore.prototype.OPCODE[0x90] = function (parentObj) {
-	sub_n(parentObj, parentObj.registerB);
+	sub_A_n(parentObj, parentObj.registerB);
 };
 // SUB A, C
 GameBoyCore.prototype.OPCODE[0x91] = function (parentObj) {
-	sub_n(parentObj, parentObj.registerC);
+	sub_A_n(parentObj, parentObj.registerC);
 };
 // SUB A, D
 GameBoyCore.prototype.OPCODE[0x92] = function (parentObj) {
-	sub_n(parentObj, parentObj.registerD);
+	sub_A_n(parentObj, parentObj.registerD);
 };
 // SUB A, E
 GameBoyCore.prototype.OPCODE[0x93] = function (parentObj) {
-	sub_n(parentObj, parentObj.registerE);
+	sub_A_n(parentObj, parentObj.registerE);
 };
 
 GameBoyCore.prototype.CBOPCODE = [
