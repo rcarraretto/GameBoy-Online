@@ -2200,48 +2200,33 @@ GameBoyCore.prototype.OPCODE[0x39] = function (parentObj) {
 };
 
 /* [SUB n] */
+function sub_n (parentObj, value) {
+	var dirty_sum = parentObj.registerA - value;
+	parentObj.FHalfCarry = ((parentObj.registerA & 0xF) < (dirty_sum & 0xF));
+	parentObj.FCarry = (dirty_sum < 0);
+	parentObj.registerA = dirty_sum & 0xFF;
+	parentObj.FZero = (dirty_sum == 0);
+	parentObj.FSubtract = true;
+}
 // SUB A, A
 GameBoyCore.prototype.OPCODE[0x97] = function (parentObj) {
-	//number - same number == 0
-	parentObj.registerA = 0;
-	parentObj.FHalfCarry = parentObj.FCarry = false;
-	parentObj.FZero = parentObj.FSubtract = true;
+	sub_n(parentObj, parentObj.registerA);
 };
 // SUB A, B
 GameBoyCore.prototype.OPCODE[0x90] = function (parentObj) {
-	var dirtySum = parentObj.registerA - parentObj.registerB;
-	parentObj.FHalfCarry = ((parentObj.registerA & 0xF) < (dirtySum & 0xF));
-	parentObj.FCarry = (dirtySum < 0);
-	parentObj.registerA = dirtySum & 0xFF;
-	parentObj.FZero = (dirtySum == 0);
-	parentObj.FSubtract = true;
+	sub_n(parentObj, parentObj.registerB);
 };
 // SUB A, C
 GameBoyCore.prototype.OPCODE[0x91] = function (parentObj) {
-	var dirtySum = parentObj.registerA - parentObj.registerC;
-	parentObj.FHalfCarry = ((parentObj.registerA & 0xF) < (dirtySum & 0xF));
-	parentObj.FCarry = (dirtySum < 0);
-	parentObj.registerA = dirtySum & 0xFF;
-	parentObj.FZero = (dirtySum == 0);
-	parentObj.FSubtract = true;
+	sub_n(parentObj, parentObj.registerC);
 };
 // SUB A, D
 GameBoyCore.prototype.OPCODE[0x92] = function (parentObj) {
-	var dirtySum = parentObj.registerA - parentObj.registerD;
-	parentObj.FHalfCarry = ((parentObj.registerA & 0xF) < (dirtySum & 0xF));
-	parentObj.FCarry = (dirtySum < 0);
-	parentObj.registerA = dirtySum & 0xFF;
-	parentObj.FZero = (dirtySum == 0);
-	parentObj.FSubtract = true;
+	sub_n(parentObj, parentObj.registerD);
 };
 // SUB A, E
 GameBoyCore.prototype.OPCODE[0x93] = function (parentObj) {
-	var dirtySum = parentObj.registerA - parentObj.registerE;
-	parentObj.FHalfCarry = ((parentObj.registerA & 0xF) < (dirtySum & 0xF));
-	parentObj.FCarry = (dirtySum < 0);
-	parentObj.registerA = dirtySum & 0xFF;
-	parentObj.FZero = (dirtySum == 0);
-	parentObj.FSubtract = true;
+	sub_n(parentObj, parentObj.registerE);
 };
 
 GameBoyCore.prototype.CBOPCODE = [
