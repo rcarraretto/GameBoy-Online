@@ -49,4 +49,47 @@ describe("sub", function() {
     expect(core.FSubtract).to.equal(true);
   });
 
+
+  it("SUB A, C: 1 - 1 (zero flag)", function() {
+    core.registerA = 0x01;
+    core.registerC = 0x01;
+
+    core.OPCODE[0x91](core);
+
+    expect(core.registerA).to.equal(0x00);
+    expect(core.registerC).to.equal(0x01);
+    expect(core.FHalfCarry).to.equal(false);
+    expect(core.FCarry).to.equal(false);
+    expect(core.FZero).to.equal(true);
+    expect(core.FSubtract).to.equal(true);
+  });
+
+  it("SUB A, C: 0x10 - 0x01 (half carry)", function() {
+    core.registerA = 0x10;
+    core.registerC = 0x01;
+
+    core.OPCODE[0x91](core);
+
+    expect(core.registerA).to.equal(0x0F);
+    expect(core.registerC).to.equal(0x01);
+    expect(core.FHalfCarry).to.equal(true);
+    expect(core.FCarry).to.equal(false);
+    expect(core.FZero).to.equal(false);
+    expect(core.FSubtract).to.equal(true);
+  });
+
+  it("SUB A, C: 0x01 - 0x02 (carry)", function() {
+    core.registerA = 0x01;
+    core.registerC = 0x02;
+
+    core.OPCODE[0x91](core);
+
+    expect(core.registerA).to.equal(0xFF);
+    expect(core.registerC).to.equal(0x02);
+    expect(core.FHalfCarry).to.equal(true);
+    expect(core.FCarry).to.equal(true);
+    expect(core.FZero).to.equal(false);
+    expect(core.FSubtract).to.equal(true);
+  });
+
 });

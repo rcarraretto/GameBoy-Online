@@ -753,16 +753,7 @@ GameBoyCore.prototype.OPCODE = [
 		parentObj.FSubtract = false;
 	},
 	null,
-	//SUB A, C
-	//#0x91:
-	function (parentObj) {
-		var dirtySum = parentObj.registerA - parentObj.registerC;
-		parentObj.FHalfCarry = ((parentObj.registerA & 0xF) < (dirtySum & 0xF));
-		parentObj.FCarry = (dirtySum < 0);
-		parentObj.registerA = dirtySum & 0xFF;
-		parentObj.FZero = (dirtySum == 0);
-		parentObj.FSubtract = true;
-	},
+	null,
 	//SUB A, D
 	//#0x92:
 	function (parentObj) {
@@ -2236,6 +2227,15 @@ GameBoyCore.prototype.OPCODE[0x39] = function (parentObj) {
 // SUB A, B
 GameBoyCore.prototype.OPCODE[0x90] = function (parentObj) {
 	var dirtySum = parentObj.registerA - parentObj.registerB;
+	parentObj.FHalfCarry = ((parentObj.registerA & 0xF) < (dirtySum & 0xF));
+	parentObj.FCarry = (dirtySum < 0);
+	parentObj.registerA = dirtySum & 0xFF;
+	parentObj.FZero = (dirtySum == 0);
+	parentObj.FSubtract = true;
+};
+// SUB A, C
+GameBoyCore.prototype.OPCODE[0x91] = function (parentObj) {
+	var dirtySum = parentObj.registerA - parentObj.registerC;
 	parentObj.FHalfCarry = ((parentObj.registerA & 0xF) < (dirtySum & 0xF));
 	parentObj.FCarry = (dirtySum < 0);
 	parentObj.registerA = dirtySum & 0xFF;
