@@ -1,9 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US">
+<html lang="en-US">
     <head>
-        <style type="text/css">@import url(&quot;GameBoy.css&quot;);</style>
-        <script type="text/javascript" src="main.js"/>
+        <link rel="stylesheet" href="GameBoy.css">
+        <script type="text/javascript" src="main.js"></script>
         <title>GameBoy Online</title>
     </head>
     <body>
@@ -15,13 +14,13 @@
                 <span id="GameBoy_about_menu">About</span>
             </div>
             <div id="gfx">
-                <canvas id="mainCanvas"/>
+                <canvas id="mainCanvas"></canvas>
                 <span id="title">GameBoy</span>
                 <span id="port_title">Online</span>
             </div>
         </div>
         <div id="terminal" class="window">
-            <div id="terminal_output"/>
+            <div id="terminal_output"></div>
             <div class="button_rack">
                 <button id="terminal_clear_button" class="left">Clear Messages</button>
                 <button id="terminal_close_button" class="right">Close Terminal</button>
@@ -41,63 +40,63 @@
             <div id="toggle_settings">
                 <div class="setting">
                     <span>Enable Sound:</span>
-                    <input type="checkbox" checked="checked" id="enable_sound"/>
+                    <input type="checkbox" checked="checked" id="enable_sound">
                 </div>
                 <div class="setting">
                     <span>GB mode has priority over GBC mode:</span>
-                    <input type="checkbox" id="disable_colors"/>
+                    <input type="checkbox" id="disable_colors">
                 </div>
                 <div class="setting">
                     <span>Use the BIOS ROM:</span>
-                    <input type="checkbox" checked="checked" id="enable_gbc_bios"/>
+                    <input type="checkbox" checked="checked" id="enable_gbc_bios">
                 </div>
                 <div class="setting">
                     <span>Override ROM only cartridge typing to MBC1:</span>
-                    <input type="checkbox" checked="checked" id="rom_only_override"/>
+                    <input type="checkbox" checked="checked" id="rom_only_override">
                 </div>
                 <div class="setting">
                     <span>Always allow reading and writing to the MBC banks:</span>
-                    <input type="checkbox" checked="checked" id="mbc_enable_override"/>
+                    <input type="checkbox" checked="checked" id="mbc_enable_override">
                 </div>
                 <div class="setting">
                     <span>Colorize Classic GameBoy Palettes:</span>
-                    <input type="checkbox" checked="checked" id="enable_colorization"/>
+                    <input type="checkbox" checked="checked" id="enable_colorization">
                 </div>
                 <div class="setting">
                     <span>Minimal view on fullscreen:</span>
-                    <input type="checkbox" checked="checked" id="do_minimal"/>
+                    <input type="checkbox" checked="checked" id="do_minimal">
                 </div>
                 <div class="setting">
                     <span>Resize canvas directly in JavaScript:</span>
-                    <input type="checkbox" id="software_resizing"/>
+                    <input type="checkbox" id="software_resizing">
                 </div>
                 <div class="setting">
                     <span>Disallow typed arrays to be used:</span>
-                    <input type="checkbox" id="typed_arrays_disallow"/>
+                    <input type="checkbox" id="typed_arrays_disallow">
                 </div>
                 <div class="setting">
                     <span>Use the DMG boot ROM instead of CGB:</span>
-                    <input type="checkbox" id="gb_boot_rom_utilized"/>
+                    <input type="checkbox" id="gb_boot_rom_utilized">
                 </div>
                 <div class="setting">
                     <span>Smooth upon resizing canvas:</span>
-                    <input type="checkbox" checked="checked" id="resize_smoothing"/>
+                    <input type="checkbox" checked="checked" id="resize_smoothing">
                 </div>
                 <div class="setting">
                     <span>Enable Channel 1 Audio:</span>
-                    <input type="checkbox" checked="checked" id="channel1"/>
+                    <input type="checkbox" checked="checked" id="channel1">
                 </div>
                 <div class="setting">
                     <span>Enable Channel 2 Audio:</span>
-                    <input type="checkbox" checked="checked" id="channel2"/>
+                    <input type="checkbox" checked="checked" id="channel2">
                 </div>
                 <div class="setting">
                     <span>Enable Channel 3 Audio:</span>
-                    <input type="checkbox" checked="checked" id="channel3"/>
+                    <input type="checkbox" checked="checked" id="channel3">
                 </div>
                 <div class="setting">
                     <span>Enable Channel 4 Audio:</span>
-                    <input type="checkbox" checked="checked" id="channel4"/>
+                    <input type="checkbox" checked="checked" id="channel4">
                 </div>
             </div>
             <div class="button_rack">
@@ -122,7 +121,7 @@
         </div>
         <div id="input_select" class="window">
             <form>
-                <input type="file" id="local_file_open"/>
+                <input type="file" id="local_file_open">
             </form>
             <div class="button_rack">
                 <button id="input_select_close_button" class="center">Close File Input</button>
@@ -130,7 +129,7 @@
         </div>
         <div id="save_importer" class="window">
             <form>
-                <input type="file" id="save_open"/>
+                <input type="file" id="save_open">
             </form>
             <div class="button_rack">
                 <button id="save_importer_close_button" class="center">Close Save Importer</button>
@@ -138,7 +137,7 @@
         </div>
         <div class="window" id="local_storage_listing">
             <div id="storageListingMasterContainer" class="storageList">
-                <div id="storageListingMasterContainerSub"/>
+                <div id="storageListingMasterContainerSub"></div>
             </div>
             <div id="download_all_storage">
                 <a href="about:blank" id="download_local_storage_dba">Export all saved data.</a>
@@ -150,7 +149,7 @@
         </div>
         <div class="window" id="local_storage_popup">
             <div id="storagePopupMasterParent" class="storageList">
-                <div id="storagePopupMasterContainer"/>
+                <div id="storagePopupMasterContainer"></div>
             </div>
             <div class="button_rack">
                 <button id="local_storage_popup_close_button" class="center">Close Storage Popup</button>
@@ -158,7 +157,7 @@
         </div>
         <div class="window" id="freeze_listing">
             <div id="freezeListingMasterContainer" class="storageList">
-                <div id="freezeListingMasterContainerSub"/>
+                <div id="freezeListingMasterContainerSub"></div>
             </div>
             <div class="button_rack">
                 <button id="freeze_list_refresh_button" class="left">Refresh List</button>
@@ -187,7 +186,7 @@
             <li id="view_fullscreen">Fullscreen Mode</li>
         </ul>
         <div id="fullscreenContainer">
-            <canvas id="fullscreen" class="maximum"/>
+            <canvas id="fullscreen" class="maximum"></canvas>
         </div>
     </body>
 </html>
