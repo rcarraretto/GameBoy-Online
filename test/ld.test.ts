@@ -1,6 +1,8 @@
+import { expect } from 'chai';
+import { GameBoyCore } from '../src/GameBoyCore';
+import * as _ from 'lodash';
+
 describe("ld", function() {
-  var GameBoyCore = require('../src/GameBoyCore');
-  var _ = require('lodash');
   var core;
 
   beforeEach(function() {

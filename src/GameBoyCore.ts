@@ -1,8 +1,7 @@
-"use strict";
-
 const { cout } = require('./terminal');
 const settings = require('./settings');
 const XAudioServer = require('./XAudioServer');
+const ResizeC = require('./resize');
 
  /*
   JavaScript GameBoy Color Emulator
@@ -15,11 +14,12 @@ const XAudioServer = require('./XAudioServer');
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-function GameBoyCore(canvas, ROMImage) {
+export function GameBoyCore(canvas = null, ROMImage = null, pause = null) {
 	//Params, etc...
 	this.canvas = canvas;						//Canvas DOM object for drawing out the graphics to.
 	this.drawContext = null;					// LCD Context
 	this.ROMImage = ROMImage;					//The game's ROM.
+	this.pause = pause;
 	//CPU Registers and Flags:
 	this.registerA = 0x01; 						//Register A (Accumulator)
 	this.FZero = true; 							//Register F  - Result was zero
@@ -90,7 +90,7 @@ function GameBoyCore(canvas, ROMImage) {
 	this.mode0TriggerSTAT = false;				//Should we trigger an interrupt if in mode 0?
 	this.LCDisOn = false;						//Is the emulated LCD controller on?
 	this.LINECONTROL = [];						//Array of functions to handle each scan line we do (onscreen + offscreen)
-	this.DISPLAYOFFCONTROL = [function (parentObj) {
+	this.DISPLAYOFFCONTROL = [function (_parentObj) {
 		//Array of line 0 function to handle the LCD controller when it's off (Do nothing!).
 	}];
 	this.LCDCONTROL = null;						//Pointer to either LINECONTROL or DISPLAYOFFCONTROL.
@@ -344,7 +344,7 @@ var reg_combo = {
 	},
 };
 
-function nop (parentObj) {
+function nop (_parentObj) {
 }
 
 function ld_reg_n (reg_name) {
@@ -354,7 +354,7 @@ function ld_reg_n (reg_name) {
 	};
 }
 
-function ld_reg_nn (regNames, parentObj) {
+function ld_reg_nn (regNames) {
 	var ld_reg0 = ld_reg_n(regNames[0]);
 	var ld_reg1 = ld_reg_n(regNames[1]);
 	return function(parentObj) {
@@ -1297,9 +1297,9 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//0xD3 - Illegal
 	//#0xD3:
-	function (parentObj) {
+	function (_parentObj) {
 		cout("Illegal op code 0xD3 called, pausing emulation.", 2);
-		pause();
+		this.pause();
 	},
 	//CALL !FC, nn
 	//#0xD4:
@@ -1369,9 +1369,9 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//0xDB - Illegal
 	//#0xDB:
-	function (parentObj) {
+	function (_parentObj) {
 		cout("Illegal op code 0xDB called, pausing emulation.", 2);
-		pause();
+		this.pause();
 	},
 	//CALL FC, nn
 	//#0xDC:
@@ -1392,9 +1392,9 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//0xDD - Illegal
 	//#0xDD:
-	function (parentObj) {
+	function (_parentObj) {
 		cout("Illegal op code 0xDD called, pausing emulation.", 2);
-		pause();
+		this.pause();
 	},
 	//SBC A, n
 	//#0xDE:
@@ -1431,15 +1431,15 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//0xE3 - Illegal
 	//#0xE3:
-	function (parentObj) {
+	function (_parentObj) {
 		cout("Illegal op code 0xE3 called, pausing emulation.", 2);
-		pause();
+		this.pause();
 	},
 	//0xE4 - Illegal
 	//#0xE4:
-	function (parentObj) {
+	function (_parentObj) {
 		cout("Illegal op code 0xE4 called, pausing emulation.", 2);
-		pause();
+		this.pause();
 	},
 	null,
 	//AND n
@@ -1480,21 +1480,21 @@ GameBoyCore.prototype.OPCODE = [
 	null,
 	//0xEB - Illegal
 	//#0xEB:
-	function (parentObj) {
+	function (_parentObj) {
 		cout("Illegal op code 0xEB called, pausing emulation.", 2);
-		pause();
+		this.pause();
 	},
 	//0xEC - Illegal
 	//#0xEC:
-	function (parentObj) {
+	function (_parentObj) {
 		cout("Illegal op code 0xEC called, pausing emulation.", 2);
-		pause();
+		this.pause();
 	},
 	//0xED - Illegal
 	//#0xED:
-	function (parentObj) {
+	function (_parentObj) {
 		cout("Illegal op code 0xED called, pausing emulation.", 2);
-		pause();
+		this.pause();
 	},
 	//XOR n
 	//#0xEE:
@@ -1533,9 +1533,9 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//0xF4 - Illegal
 	//#0xF4:
-	function (parentObj) {
+	function (_parentObj) {
 		cout("Illegal op code 0xF4 called, pausing emulation.", 2);
-		pause();
+		this.pause();
 	},
 	null,
 	//OR n
@@ -1576,15 +1576,15 @@ GameBoyCore.prototype.OPCODE = [
 	},
 	//0xFC - Illegal
 	//#0xFC:
-	function (parentObj) {
+	function (_parentObj) {
 		cout("Illegal op code 0xFC called, pausing emulation.", 2);
-		pause();
+		this.pause();
 	},
 	//0xFD - Illegal
 	//#0xFD:
-	function (parentObj) {
+	function (_parentObj) {
 		cout("Illegal op code 0xFD called, pausing emulation.", 2);
-		pause();
+		this.pause();
 	},
 	//CP n
 	//#0xFE:
@@ -4828,7 +4828,7 @@ GameBoyCore.prototype.interpretCartridge = function () {
 		default:
 			MBCType = "Unknown";
 			cout("Cartridge type is unknown.", 2);
-			pause();
+			this.pause();
 	}
 	cout("Cartridge Type: " + MBCType + ".", 0);
 	// ROM and RAM banks
@@ -4990,7 +4990,7 @@ GameBoyCore.prototype.recomputeDimension = function () {
 	//Cache some dimension info:
 	this.onscreenWidth = this.canvas.width;
 	this.onscreenHeight = this.canvas.height;
-	if (window && window.mozRequestAnimationFrame || (navigator.userAgent.toLowerCase().indexOf("gecko") != -1 && navigator.userAgent.toLowerCase().indexOf("like gecko") == -1)) {
+	if (navigator.userAgent.toLowerCase().indexOf("gecko") != -1 && navigator.userAgent.toLowerCase().indexOf("like gecko") == -1) {
 		//Firefox slowness hack:
 		this.canvas.width = this.onscreenWidth = (!settings[12]) ? 160 : this.canvas.width;
 		this.canvas.height = this.onscreenHeight = (!settings[12]) ? 144 : this.canvas.height;
@@ -5796,7 +5796,7 @@ GameBoyCore.prototype.run = function () {
 		}
 		else {		//We can only get here if there was an internal error, but the loop was restarted.
 			cout("Iterator restarted a faulted core.", 2);
-			pause();
+			this.pause();
 		}
 	}
 }
@@ -6370,13 +6370,7 @@ GameBoyCore.prototype.resizeFrameBuffer = function () {
 
 GameBoyCore.prototype.compileResizeFrameBufferFunction = function () {
 	if (this.offscreenRGBCount > 0) {
-		var parentObj = this;
-		this.resizer = new Resize(160, 144, this.offscreenWidth, this.offscreenHeight, false, settings[13], false, function (buffer) {
-			if ((buffer.length / 3 * 4) == parentObj.offscreenRGBCount) {
-				parentObj.processDraw(buffer);
-			}
-			parentObj.resizePathClear = true;
-		});
+		this.resizer = new ResizeC(160, 144, this.offscreenWidth, this.offscreenHeight, false, settings[13]);
 	}
 }
 
@@ -7145,7 +7139,7 @@ GameBoyCore.prototype.SpriteGBLayerRender = function (scanlineToRender) {
 		}
 		if (this.gfxSpriteNormalHeight) {
 			//Draw the visible sprites:
-			for (var length = this.findLowestSpriteDrawable(lineAdjusted, 0x7); spriteCount < length; ++spriteCount) {
+			for (var length = this.findLowestSpriteDrawable(lineAdjusted, 0x7) as number; spriteCount < length; ++spriteCount) {
 				OAMAddress = this.OAMAddressCache[spriteCount];
 				yoffset = (lineAdjusted - this.memory[OAMAddress]) << 3;
 				attrCode = this.memory[OAMAddress | 3];
@@ -7176,7 +7170,7 @@ GameBoyCore.prototype.SpriteGBLayerRender = function (scanlineToRender) {
 		}
 		else {
 			//Draw the visible sprites:
-			for (var length = this.findLowestSpriteDrawable(lineAdjusted, 0xF); spriteCount < length; ++spriteCount) {
+			for (var length = this.findLowestSpriteDrawable(lineAdjusted, 0xF) as number; spriteCount < length; ++spriteCount) {
 				OAMAddress = this.OAMAddressCache[spriteCount];
 				yoffset = (lineAdjusted - this.memory[OAMAddress]) << 3;
 				attrCode = this.memory[OAMAddress | 3];
@@ -7580,7 +7574,7 @@ GameBoyCore.prototype.calculateHALTPeriod = function () {
 		}
 	}
 	else {
-		var currentClocks = this.remainingClocks;
+		var currentClocks = this.remainingClocks as number;
 	}
 	var maxClocks = (this.CPUCyclesTotal - this.emulatorTicks) << this.doubleSpeedShifter;
 	if (currentClocks >= 0) {
@@ -7673,25 +7667,25 @@ GameBoyCore.prototype.memoryReadJumpCompile = function () {
 			switch (index) {
 				case 0xFF00:
 					//JOYPAD:
-					this.memoryHighReader[0] = this.memoryReader[0xFF00] = function (parentObj, address) {
+					this.memoryHighReader[0] = this.memoryReader[0xFF00] = function (parentObj, _address) {
 						return 0xC0 | parentObj.memory[0xFF00];	//Top nibble returns as set.
 					}
 					break;
 				case 0xFF01:
 					//SB
-					this.memoryHighReader[0x01] = this.memoryReader[0xFF01] = function (parentObj, address) {
+					this.memoryHighReader[0x01] = this.memoryReader[0xFF01] = function (parentObj, _address) {
 						return (parentObj.memory[0xFF02] < 0x80) ? parentObj.memory[0xFF01] : 0xFF;
 					}
 					break;
 				case 0xFF02:
 					//SC
 					if (this.cGBC) {
-						this.memoryHighReader[0x02] = this.memoryReader[0xFF02] = function (parentObj, address) {
+						this.memoryHighReader[0x02] = this.memoryReader[0xFF02] = function (parentObj, _address) {
 							return ((parentObj.serialTimer <= 0) ? 0x7C : 0xFC) | parentObj.memory[0xFF02];
 						}
 					}
 					else {
-						this.memoryHighReader[0x02] = this.memoryReader[0xFF02] = function (parentObj, address) {
+						this.memoryHighReader[0x02] = this.memoryReader[0xFF02] = function (parentObj, _address) {
 							return ((parentObj.serialTimer <= 0) ? 0x7E : 0xFE) | parentObj.memory[0xFF02];
 						}
 					}
@@ -7701,7 +7695,7 @@ GameBoyCore.prototype.memoryReadJumpCompile = function () {
 					break;
 				case 0xFF04:
 					//DIV
-					this.memoryHighReader[0x04] = this.memoryReader[0xFF04] = function (parentObj, address) {
+					this.memoryHighReader[0x04] = this.memoryReader[0xFF04] = function (parentObj, _address) {
 						parentObj.memory[0xFF04] = (parentObj.memory[0xFF04] + (parentObj.DIVTicks >> 8)) & 0xFF;
 						parentObj.DIVTicks &= 0xFF;
 						return parentObj.memory[0xFF04];
@@ -7714,7 +7708,7 @@ GameBoyCore.prototype.memoryReadJumpCompile = function () {
 					this.memoryReader[index] = this.memoryReadNormal;
 					break;
 				case 0xFF07:
-					this.memoryHighReader[0x07] = this.memoryReader[0xFF07] = function (parentObj, address) {
+					this.memoryHighReader[0x07] = this.memoryReader[0xFF07] = function (parentObj, _address) {
 						return 0xF8 | parentObj.memory[0xFF07];
 					}
 					break;
@@ -7729,17 +7723,17 @@ GameBoyCore.prototype.memoryReadJumpCompile = function () {
 					break;
 				case 0xFF0F:
 					//IF
-					this.memoryHighReader[0x0F] = this.memoryReader[0xFF0F] = function (parentObj, address) {
+					this.memoryHighReader[0x0F] = this.memoryReader[0xFF0F] = function (parentObj, _address) {
 						return 0xE0 | parentObj.interruptsRequested;
 					}
 					break;
 				case 0xFF10:
-					this.memoryHighReader[0x10] = this.memoryReader[0xFF10] = function (parentObj, address) {
+					this.memoryHighReader[0x10] = this.memoryReader[0xFF10] = function (parentObj, _address) {
 						return 0x80 | parentObj.memory[0xFF10];
 					}
 					break;
 				case 0xFF11:
-					this.memoryHighReader[0x11] = this.memoryReader[0xFF11] = function (parentObj, address) {
+					this.memoryHighReader[0x11] = this.memoryReader[0xFF11] = function (parentObj, _address) {
 						return 0x3F | parentObj.memory[0xFF11];
 					}
 					break;
@@ -7751,7 +7745,7 @@ GameBoyCore.prototype.memoryReadJumpCompile = function () {
 					this.memoryHighReader[0x13] = this.memoryReader[0xFF13] = this.memoryReadBAD;
 					break;
 				case 0xFF14:
-					this.memoryHighReader[0x14] = this.memoryReader[0xFF14] = function (parentObj, address) {
+					this.memoryHighReader[0x14] = this.memoryReader[0xFF14] = function (parentObj, _address) {
 						return 0xBF | parentObj.memory[0xFF14];
 					}
 					break;
@@ -7760,7 +7754,7 @@ GameBoyCore.prototype.memoryReadJumpCompile = function () {
 					this.memoryReader[0xFF15] = this.memoryReadBAD;
 					break;
 				case 0xFF16:
-					this.memoryHighReader[0x16] = this.memoryReader[0xFF16] = function (parentObj, address) {
+					this.memoryHighReader[0x16] = this.memoryReader[0xFF16] = function (parentObj, _address) {
 						return 0x3F | parentObj.memory[0xFF16];
 					}
 					break;
@@ -7772,12 +7766,12 @@ GameBoyCore.prototype.memoryReadJumpCompile = function () {
 					this.memoryHighReader[0x18] = this.memoryReader[0xFF18] = this.memoryReadBAD;
 					break;
 				case 0xFF19:
-					this.memoryHighReader[0x19] = this.memoryReader[0xFF19] = function (parentObj, address) {
+					this.memoryHighReader[0x19] = this.memoryReader[0xFF19] = function (parentObj, _address) {
 						return 0xBF | parentObj.memory[0xFF19];
 					}
 					break;
 				case 0xFF1A:
-					this.memoryHighReader[0x1A] = this.memoryReader[0xFF1A] = function (parentObj, address) {
+					this.memoryHighReader[0x1A] = this.memoryReader[0xFF1A] = function (parentObj, _address) {
 						return 0x7F | parentObj.memory[0xFF1A];
 					}
 					break;
@@ -7785,7 +7779,7 @@ GameBoyCore.prototype.memoryReadJumpCompile = function () {
 					this.memoryHighReader[0x1B] = this.memoryReader[0xFF1B] = this.memoryReadBAD;
 					break;
 				case 0xFF1C:
-					this.memoryHighReader[0x1C] = this.memoryReader[0xFF1C] = function (parentObj, address) {
+					this.memoryHighReader[0x1C] = this.memoryReader[0xFF1C] = function (parentObj, _address) {
 						return 0x9F | parentObj.memory[0xFF1C];
 					}
 					break;
@@ -7793,7 +7787,7 @@ GameBoyCore.prototype.memoryReadJumpCompile = function () {
 					this.memoryHighReader[0x1D] = this.memoryReader[0xFF1D] = this.memoryReadBAD;
 					break;
 				case 0xFF1E:
-					this.memoryHighReader[0x1E] = this.memoryReader[0xFF1E] = function (parentObj, address) {
+					this.memoryHighReader[0x1E] = this.memoryReader[0xFF1E] = function (parentObj, _address) {
 						return 0xBF | parentObj.memory[0xFF1E];
 					}
 					break;
@@ -7807,7 +7801,7 @@ GameBoyCore.prototype.memoryReadJumpCompile = function () {
 					this.memoryReader[index] = this.memoryReadNormal;
 					break;
 				case 0xFF23:
-					this.memoryHighReader[0x23] = this.memoryReader[0xFF23] = function (parentObj, address) {
+					this.memoryHighReader[0x23] = this.memoryReader[0xFF23] = function (parentObj, _address) {
 						return 0xBF | parentObj.memory[0xFF23];
 					}
 					break;
@@ -7817,7 +7811,7 @@ GameBoyCore.prototype.memoryReadJumpCompile = function () {
 					this.memoryReader[index] = this.memoryReadNormal;
 					break;
 				case 0xFF26:
-					this.memoryHighReader[0x26] = this.memoryReader[0xFF26] = function (parentObj, address) {
+					this.memoryHighReader[0x26] = this.memoryReader[0xFF26] = function (parentObj, _address) {
 						parentObj.audioJIT();
 						return 0x70 | parentObj.memory[0xFF26];
 					}
@@ -7861,22 +7855,22 @@ GameBoyCore.prototype.memoryReadJumpCompile = function () {
 					this.memoryReader[0xFF40] = this.memoryReadNormal;
 					break;
 				case 0xFF41:
-					this.memoryHighReader[0x41] = this.memoryReader[0xFF41] = function (parentObj, address) {
+					this.memoryHighReader[0x41] = this.memoryReader[0xFF41] = function (parentObj, _address) {
 						return 0x80 | parentObj.memory[0xFF41] | parentObj.modeSTAT;
 					}
 					break;
 				case 0xFF42:
-					this.memoryHighReader[0x42] = this.memoryReader[0xFF42] = function (parentObj, address) {
+					this.memoryHighReader[0x42] = this.memoryReader[0xFF42] = function (parentObj, _address) {
 						return parentObj.backgroundY;
 					}
 					break;
 				case 0xFF43:
-					this.memoryHighReader[0x43] = this.memoryReader[0xFF43] = function (parentObj, address) {
+					this.memoryHighReader[0x43] = this.memoryReader[0xFF43] = function (parentObj, _address) {
 						return parentObj.backgroundX;
 					}
 					break;
 				case 0xFF44:
-					this.memoryHighReader[0x44] = this.memoryReader[0xFF44] = function (parentObj, address) {
+					this.memoryHighReader[0x44] = this.memoryReader[0xFF44] = function (parentObj, _address) {
 						return ((parentObj.LCDisOn) ? parentObj.memory[0xFF44] : 0);
 					}
 					break;
@@ -7890,7 +7884,7 @@ GameBoyCore.prototype.memoryReadJumpCompile = function () {
 					break;
 				case 0xFF4A:
 					//WY
-					this.memoryHighReader[0x4A] = this.memoryReader[0xFF4A] = function (parentObj, address) {
+					this.memoryHighReader[0x4A] = this.memoryReader[0xFF4A] = function (parentObj, _address) {
 						return parentObj.windowY;
 					}
 					break;
@@ -7909,7 +7903,7 @@ GameBoyCore.prototype.memoryReadJumpCompile = function () {
 					this.memoryHighReader[0x4E] = this.memoryReader[0xFF4E] = this.memoryReadBAD;
 					break;
 				case 0xFF4F:
-					this.memoryHighReader[0x4F] = this.memoryReader[0xFF4F] = function (parentObj, address) {
+					this.memoryHighReader[0x4F] = this.memoryReader[0xFF4F] = function (parentObj, _address) {
 						return parentObj.currVRAMBank;
 					}
 					break;
@@ -7923,7 +7917,7 @@ GameBoyCore.prototype.memoryReadJumpCompile = function () {
 					break;
 				case 0xFF55:
 					if (this.cGBC) {
-						this.memoryHighReader[0x55] = this.memoryReader[0xFF55] = function (parentObj, address) {
+						this.memoryHighReader[0x55] = this.memoryReader[0xFF55] = function (parentObj, _address) {
 							if (!parentObj.LCDisOn && parentObj.hdmaRunning) {	//Undocumented behavior alert: HDMA becomes GDMA when LCD is off (Worms Armageddon Fix).
 								//DMA
 								parentObj.DMAWrite((parentObj.memory[0xFF55] & 0x7F) + 1);
@@ -7940,7 +7934,7 @@ GameBoyCore.prototype.memoryReadJumpCompile = function () {
 					break;
 				case 0xFF56:
 					if (this.cGBC) {
-						this.memoryHighReader[0x56] = this.memoryReader[0xFF56] = function (parentObj, address) {
+						this.memoryHighReader[0x56] = this.memoryReader[0xFF56] = function (parentObj, _address) {
 							//Return IR "not connected" status:
 							return 0x3C | ((parentObj.memory[0xFF56] >= 0xC0) ? (0x2 | (parentObj.memory[0xFF56] & 0xC1)) : (parentObj.memory[0xFF56] & 0xC3));
 						}
@@ -7978,7 +7972,7 @@ GameBoyCore.prototype.memoryReadJumpCompile = function () {
 					break;
 				case 0xFF6C:
 					if (this.cGBC) {
-						this.memoryHighReader[0x6C] = this.memoryReader[0xFF6C] = function (parentObj, address) {
+						this.memoryHighReader[0x6C] = this.memoryReader[0xFF6C] = function (parentObj, _address) {
 							return 0xFE | parentObj.memory[0xFF6C];
 						}
 					}
@@ -7994,7 +7988,7 @@ GameBoyCore.prototype.memoryReadJumpCompile = function () {
 				case 0xFF70:
 					if (this.cGBC) {
 						//SVBK
-						this.memoryHighReader[0x70] = this.memoryReader[0xFF70] = function (parentObj, address) {
+						this.memoryHighReader[0x70] = this.memoryReader[0xFF70] = function (parentObj, _address) {
 							return 0x40 | parentObj.memory[0xFF70];
 						}
 					}
@@ -8018,20 +8012,20 @@ GameBoyCore.prototype.memoryReadJumpCompile = function () {
 					}
 					break;
 				case 0xFF75:
-					this.memoryHighReader[0x75] = this.memoryReader[0xFF75] = function (parentObj, address) {
+					this.memoryHighReader[0x75] = this.memoryReader[0xFF75] = function (parentObj, _address) {
 						return 0x8F | parentObj.memory[0xFF75];
 					}
 					break;
                 case 0xFF76:
                     //Undocumented realtime PCM amplitude readback:
-                    this.memoryHighReader[0x76] = this.memoryReader[0xFF76] = function (parentObj, address) {
+                    this.memoryHighReader[0x76] = this.memoryReader[0xFF76] = function (parentObj, _address) {
                         parentObj.audioJIT();
                         return (parentObj.channel2envelopeVolume << 4) | parentObj.channel1envelopeVolume;
                     }
                     break;
                 case 0xFF77:
                     //Undocumented realtime PCM amplitude readback:
-                    this.memoryHighReader[0x77] = this.memoryReader[0xFF77] = function (parentObj, address) {
+                    this.memoryHighReader[0x77] = this.memoryReader[0xFF77] = function (parentObj, _address) {
                         parentObj.audioJIT();
                         return (parentObj.channel4envelopeVolume << 4) | parentObj.channel3envelopeVolume;
                     }
@@ -8048,7 +8042,7 @@ GameBoyCore.prototype.memoryReadJumpCompile = function () {
 					break;
 				case 0xFFFF:
 					//IE
-					this.memoryHighReader[0xFF] = this.memoryReader[0xFFFF] = function (parentObj, address) {
+					this.memoryHighReader[0xFF] = this.memoryReader[0xFFFF] = function (parentObj, _address) {
 						return parentObj.interruptsEnabled;
 					}
 					break;
@@ -8161,7 +8155,7 @@ GameBoyCore.prototype.memoryReadECHONormal = function (parentObj, address) {
 	return parentObj.memory[address - 0x2000];
 }
 
-GameBoyCore.prototype.memoryReadBAD = function (parentObj, address) {
+GameBoyCore.prototype.memoryReadBAD = function (_parentObj, _address) {
 	return 0xFF;
 }
 
@@ -8360,18 +8354,18 @@ GameBoyCore.prototype.memoryWriteJumpCompile = function () {
 	this.registerWriteJumpCompile();				//Compile the I/O write functions separately...
 }
 
-GameBoyCore.prototype.MBCWriteEnable = function (parentObj, address, data) {
+GameBoyCore.prototype.MBCWriteEnable = function (parentObj, _address, data) {
 	//MBC RAM Bank Enable/Disable:
 	parentObj.MBCRAMBanksEnabled = ((data & 0x0F) == 0x0A);	//If lower nibble is 0x0A, then enable, otherwise disable.
 }
 
-GameBoyCore.prototype.MBC1WriteROMBank = function (parentObj, address, data) {
+GameBoyCore.prototype.MBC1WriteROMBank = function (parentObj, _address, data) {
 	//MBC1 ROM bank switching:
 	parentObj.ROMBank1offs = (parentObj.ROMBank1offs & 0x60) | (data & 0x1F);
 	parentObj.setCurrentMBC1ROMBank();
 }
 
-GameBoyCore.prototype.MBC1WriteRAMBank = function (parentObj, address, data) {
+GameBoyCore.prototype.MBC1WriteRAMBank = function (parentObj, _address, data) {
 	//MBC1 RAM bank switching
 	if (parentObj.MBC1Mode) {
 		//4/32 Mode
@@ -8385,7 +8379,7 @@ GameBoyCore.prototype.MBC1WriteRAMBank = function (parentObj, address, data) {
 	}
 }
 
-GameBoyCore.prototype.MBC1WriteType = function (parentObj, address, data) {
+GameBoyCore.prototype.MBC1WriteType = function (parentObj, _address, data) {
 	//MBC1 mode setting:
 	parentObj.MBC1Mode = ((data & 0x1) == 0x1);
 	if (parentObj.MBC1Mode) {
@@ -8398,19 +8392,19 @@ GameBoyCore.prototype.MBC1WriteType = function (parentObj, address, data) {
 	}
 }
 
-GameBoyCore.prototype.MBC2WriteROMBank = function (parentObj, address, data) {
+GameBoyCore.prototype.MBC2WriteROMBank = function (parentObj, _address, data) {
 	//MBC2 ROM bank switching:
 	parentObj.ROMBank1offs = data & 0x0F;
 	parentObj.setCurrentMBC2AND3ROMBank();
 }
 
-GameBoyCore.prototype.MBC3WriteROMBank = function (parentObj, address, data) {
+GameBoyCore.prototype.MBC3WriteROMBank = function (parentObj, _address, data) {
 	//MBC3 ROM bank switching:
 	parentObj.ROMBank1offs = data & 0x7F;
 	parentObj.setCurrentMBC2AND3ROMBank();
 }
 
-GameBoyCore.prototype.MBC3WriteRAMBank = function (parentObj, address, data) {
+GameBoyCore.prototype.MBC3WriteRAMBank = function (parentObj, _address, data) {
 	parentObj.currMBCRAMBank = data;
 	if (data < 4) {
 		//MBC3 RAM bank switching
@@ -8418,7 +8412,7 @@ GameBoyCore.prototype.MBC3WriteRAMBank = function (parentObj, address, data) {
 	}
 }
 
-GameBoyCore.prototype.MBC3WriteRTCLatch = function (parentObj, address, data) {
+GameBoyCore.prototype.MBC3WriteRTCLatch = function (parentObj, _address, data) {
 	if (data == 0) {
 		parentObj.RTCisLatched = false;
 	}
@@ -8433,38 +8427,38 @@ GameBoyCore.prototype.MBC3WriteRTCLatch = function (parentObj, address, data) {
 	}
 }
 
-GameBoyCore.prototype.MBC5WriteROMBankLow = function (parentObj, address, data) {
+GameBoyCore.prototype.MBC5WriteROMBankLow = function (parentObj, _address, data) {
 	//MBC5 ROM bank switching:
 	parentObj.ROMBank1offs = (parentObj.ROMBank1offs & 0x100) | data;
 	parentObj.setCurrentMBC5ROMBank();
 }
 
-GameBoyCore.prototype.MBC5WriteROMBankHigh = function (parentObj, address, data) {
+GameBoyCore.prototype.MBC5WriteROMBankHigh = function (parentObj, _address, data) {
 	//MBC5 ROM bank switching (by least significant bit):
 	parentObj.ROMBank1offs  = ((data & 0x01) << 8) | (parentObj.ROMBank1offs & 0xFF);
 	parentObj.setCurrentMBC5ROMBank();
 }
 
-GameBoyCore.prototype.MBC5WriteRAMBank = function (parentObj, address, data) {
+GameBoyCore.prototype.MBC5WriteRAMBank = function (parentObj, _address, data) {
 	//MBC5 RAM bank switching
 	parentObj.currMBCRAMBank = data & 0xF;
 	parentObj.currMBCRAMBankPosition = (parentObj.currMBCRAMBank << 13) - 0xA000;
 }
 
-GameBoyCore.prototype.RUMBLEWriteRAMBank = function (parentObj, address, data) {
+GameBoyCore.prototype.RUMBLEWriteRAMBank = function (parentObj, _address, data) {
 	//MBC5 RAM bank switching
 	//Like MBC5, but bit 3 of the lower nibble is used for rumbling and bit 2 is ignored.
 	parentObj.currMBCRAMBank = data & 0x03;
 	parentObj.currMBCRAMBankPosition = (parentObj.currMBCRAMBank << 13) - 0xA000;
 }
 
-GameBoyCore.prototype.HuC3WriteRAMBank = function (parentObj, address, data) {
+GameBoyCore.prototype.HuC3WriteRAMBank = function (parentObj, _address, data) {
 	//HuC3 RAM bank switching
 	parentObj.currMBCRAMBank = data & 0x03;
 	parentObj.currMBCRAMBankPosition = (parentObj.currMBCRAMBank << 13) - 0xA000;
 }
 
-GameBoyCore.prototype.cartIgnoreWrite = function (parentObj, address, data) {
+GameBoyCore.prototype.cartIgnoreWrite = function (_parentObj, _address, _data) {
 	//We might have encountered illegal RAM writing or such, so just do nothing...
 }
 
@@ -8736,11 +8730,11 @@ GameBoyCore.prototype.DMAWrite = function (tilesToTransfer) {
 GameBoyCore.prototype.registerWriteJumpCompile = function () {
 	//I/O Registers (GB + GBC):
 	//JoyPad
-	this.memoryHighWriter[0] = this.memoryWriter[0xFF00] = function (parentObj, address, data) {
+	this.memoryHighWriter[0] = this.memoryWriter[0xFF00] = function (parentObj, _address, data) {
 		parentObj.memory[0xFF00] = (data & 0x30) | ((((data & 0x20) == 0) ? (parentObj.JoyPad >> 4) : 0xF) & (((data & 0x10) == 0) ? (parentObj.JoyPad & 0xF) : 0xF));
 	}
 	//SB (Serial Transfer Data)
-	this.memoryHighWriter[0x1] = this.memoryWriter[0xFF01] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x1] = this.memoryWriter[0xFF01] = function (parentObj, _address, data) {
 		if (parentObj.memory[0xFF02] < 0x80) {	//Cannot write while a serial transfer is active.
 			parentObj.memory[0xFF01] = data;
 		}
@@ -8751,20 +8745,20 @@ GameBoyCore.prototype.registerWriteJumpCompile = function () {
 	//Unmapped I/O:
 	this.memoryHighWriter[0x3] = this.memoryWriter[0xFF03] = this.cartIgnoreWrite;
 	//DIV
-	this.memoryHighWriter[0x4] = this.memoryWriter[0xFF04] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x4] = this.memoryWriter[0xFF04] = function (parentObj, _address, _data) {
 		parentObj.DIVTicks &= 0xFF;	//Update DIV for realignment.
 		parentObj.memory[0xFF04] = 0;
 	}
 	//TIMA
-	this.memoryHighWriter[0x5] = this.memoryWriter[0xFF05] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x5] = this.memoryWriter[0xFF05] = function (parentObj, _address, data) {
 		parentObj.memory[0xFF05] = data;
 	}
 	//TMA
-	this.memoryHighWriter[0x6] = this.memoryWriter[0xFF06] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x6] = this.memoryWriter[0xFF06] = function (parentObj, _address, data) {
 		parentObj.memory[0xFF06] = data;
 	}
 	//TAC
-	this.memoryHighWriter[0x7] = this.memoryWriter[0xFF07] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x7] = this.memoryWriter[0xFF07] = function (parentObj, _address, data) {
 		parentObj.memory[0xFF07] = data & 0x07;
 		parentObj.TIMAEnabled = (data & 0x04) == 0x04;
 		parentObj.TACClocker = Math.pow(4, ((data & 0x3) != 0) ? (data & 0x3) : 4) << 2;	//TODO: Find a way to not make a conditional in here...
@@ -8778,12 +8772,12 @@ GameBoyCore.prototype.registerWriteJumpCompile = function () {
 	this.memoryHighWriter[0xD] = this.memoryWriter[0xFF0D] = this.cartIgnoreWrite;
 	this.memoryHighWriter[0xE] = this.memoryWriter[0xFF0E] = this.cartIgnoreWrite;
 	//IF (Interrupt Request)
-	this.memoryHighWriter[0xF] = this.memoryWriter[0xFF0F] = function (parentObj, address, data) {
+	this.memoryHighWriter[0xF] = this.memoryWriter[0xFF0F] = function (parentObj, _address, data) {
 		parentObj.interruptsRequested = data;
 		parentObj.checkIRQMatching();
 	}
 	//NR10:
-	this.memoryHighWriter[0x10] = this.memoryWriter[0xFF10] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x10] = this.memoryWriter[0xFF10] = function (parentObj, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			if (parentObj.channel1decreaseSweep && (data & 0x08) == 0) {
@@ -8799,7 +8793,7 @@ GameBoyCore.prototype.registerWriteJumpCompile = function () {
 		}
 	}
 	//NR11:
-	this.memoryHighWriter[0x11] = this.memoryWriter[0xFF11] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x11] = this.memoryWriter[0xFF11] = function (parentObj, _address, data) {
 		if (parentObj.soundMasterEnabled || !parentObj.cGBC) {
 			if (parentObj.soundMasterEnabled) {
 				parentObj.audioJIT();
@@ -8814,7 +8808,7 @@ GameBoyCore.prototype.registerWriteJumpCompile = function () {
 		}
 	}
 	//NR12:
-	this.memoryHighWriter[0x12] = this.memoryWriter[0xFF12] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x12] = this.memoryWriter[0xFF12] = function (parentObj, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			if (parentObj.channel1Enabled && parentObj.channel1envelopeSweeps == 0) {
@@ -8841,7 +8835,7 @@ GameBoyCore.prototype.registerWriteJumpCompile = function () {
 		}
 	}
 	//NR13:
-	this.memoryHighWriter[0x13] = this.memoryWriter[0xFF13] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x13] = this.memoryWriter[0xFF13] = function (parentObj, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			parentObj.channel1frequency = (parentObj.channel1frequency & 0x700) | data;
@@ -8849,7 +8843,7 @@ GameBoyCore.prototype.registerWriteJumpCompile = function () {
 		}
 	}
 	//NR14:
-	this.memoryHighWriter[0x14] = this.memoryWriter[0xFF14] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x14] = this.memoryWriter[0xFF14] = function (parentObj, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			parentObj.channel1consecutive = ((data & 0x40) == 0x0);
@@ -8889,7 +8883,7 @@ GameBoyCore.prototype.registerWriteJumpCompile = function () {
 	//NR20 (Unused I/O):
 	this.memoryHighWriter[0x15] = this.memoryWriter[0xFF15] = this.cartIgnoreWrite;
 	//NR21:
-	this.memoryHighWriter[0x16] = this.memoryWriter[0xFF16] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x16] = this.memoryWriter[0xFF16] = function (parentObj, _address, data) {
 		if (parentObj.soundMasterEnabled || !parentObj.cGBC) {
 			if (parentObj.soundMasterEnabled) {
 				parentObj.audioJIT();
@@ -8904,7 +8898,7 @@ GameBoyCore.prototype.registerWriteJumpCompile = function () {
 		}
 	}
 	//NR22:
-	this.memoryHighWriter[0x17] = this.memoryWriter[0xFF17] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x17] = this.memoryWriter[0xFF17] = function (parentObj, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			if (parentObj.channel2Enabled && parentObj.channel2envelopeSweeps == 0) {
@@ -8931,7 +8925,7 @@ GameBoyCore.prototype.registerWriteJumpCompile = function () {
 		}
 	}
 	//NR23:
-	this.memoryHighWriter[0x18] = this.memoryWriter[0xFF18] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x18] = this.memoryWriter[0xFF18] = function (parentObj, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			parentObj.channel2frequency = (parentObj.channel2frequency & 0x700) | data;
@@ -8939,7 +8933,7 @@ GameBoyCore.prototype.registerWriteJumpCompile = function () {
 		}
 	}
 	//NR24:
-	this.memoryHighWriter[0x19] = this.memoryWriter[0xFF19] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x19] = this.memoryWriter[0xFF19] = function (parentObj, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			if (data > 0x7F) {
@@ -8963,7 +8957,7 @@ GameBoyCore.prototype.registerWriteJumpCompile = function () {
 		}
 	}
 	//NR30:
-	this.memoryHighWriter[0x1A] = this.memoryWriter[0xFF1A] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x1A] = this.memoryWriter[0xFF1A] = function (parentObj, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			if (!parentObj.channel3canPlay && data >= 0x80) {
@@ -8979,7 +8973,7 @@ GameBoyCore.prototype.registerWriteJumpCompile = function () {
 		}
 	}
 	//NR31:
-	this.memoryHighWriter[0x1B] = this.memoryWriter[0xFF1B] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x1B] = this.memoryWriter[0xFF1B] = function (parentObj, _address, data) {
 		if (parentObj.soundMasterEnabled || !parentObj.cGBC) {
 			if (parentObj.soundMasterEnabled) {
 				parentObj.audioJIT();
@@ -8989,7 +8983,7 @@ GameBoyCore.prototype.registerWriteJumpCompile = function () {
 		}
 	}
 	//NR32:
-	this.memoryHighWriter[0x1C] = this.memoryWriter[0xFF1C] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x1C] = this.memoryWriter[0xFF1C] = function (parentObj, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			data &= 0x60;
@@ -8998,7 +8992,7 @@ GameBoyCore.prototype.registerWriteJumpCompile = function () {
 		}
 	}
 	//NR33:
-	this.memoryHighWriter[0x1D] = this.memoryWriter[0xFF1D] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x1D] = this.memoryWriter[0xFF1D] = function (parentObj, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			parentObj.channel3frequency = (parentObj.channel3frequency & 0x700) | data;
@@ -9006,7 +9000,7 @@ GameBoyCore.prototype.registerWriteJumpCompile = function () {
 		}
 	}
 	//NR34:
-	this.memoryHighWriter[0x1E] = this.memoryWriter[0xFF1E] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x1E] = this.memoryWriter[0xFF1E] = function (parentObj, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			if (data > 0x7F) {
@@ -9028,7 +9022,7 @@ GameBoyCore.prototype.registerWriteJumpCompile = function () {
 	//NR40 (Unused I/O):
 	this.memoryHighWriter[0x1F] = this.memoryWriter[0xFF1F] = this.cartIgnoreWrite;
 	//NR41:
-	this.memoryHighWriter[0x20] = this.memoryWriter[0xFF20] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x20] = this.memoryWriter[0xFF20] = function (parentObj, _address, data) {
 		if (parentObj.soundMasterEnabled || !parentObj.cGBC) {
 			if (parentObj.soundMasterEnabled) {
 				parentObj.audioJIT();
@@ -9038,7 +9032,7 @@ GameBoyCore.prototype.registerWriteJumpCompile = function () {
 		}
 	}
 	//NR42:
-	this.memoryHighWriter[0x21] = this.memoryWriter[0xFF21] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x21] = this.memoryWriter[0xFF21] = function (parentObj, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			if (parentObj.channel4Enabled && parentObj.channel4envelopeSweeps == 0) {
@@ -9066,7 +9060,7 @@ GameBoyCore.prototype.registerWriteJumpCompile = function () {
 		}
 	}
 	//NR43:
-	this.memoryHighWriter[0x22] = this.memoryWriter[0xFF22] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x22] = this.memoryWriter[0xFF22] = function (parentObj, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			parentObj.channel4FrequencyPeriod = Math.max((data & 0x7) << 4, 8) << (data >> 4);
@@ -9083,7 +9077,7 @@ GameBoyCore.prototype.registerWriteJumpCompile = function () {
 		}
 	}
 	//NR44:
-	this.memoryHighWriter[0x23] = this.memoryWriter[0xFF23] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x23] = this.memoryWriter[0xFF23] = function (parentObj, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			parentObj.memory[0xFF23] = data;
@@ -9104,7 +9098,7 @@ GameBoyCore.prototype.registerWriteJumpCompile = function () {
 		}
 	}
 	//NR50:
-	this.memoryHighWriter[0x24] = this.memoryWriter[0xFF24] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x24] = this.memoryWriter[0xFF24] = function (parentObj, _address, data) {
 		if (parentObj.soundMasterEnabled && parentObj.memory[0xFF24] != data) {
 			parentObj.audioJIT();
 			parentObj.memory[0xFF24] = data;
@@ -9114,7 +9108,7 @@ GameBoyCore.prototype.registerWriteJumpCompile = function () {
 		}
 	}
 	//NR51:
-	this.memoryHighWriter[0x25] = this.memoryWriter[0xFF25] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x25] = this.memoryWriter[0xFF25] = function (parentObj, _address, data) {
 		if (parentObj.soundMasterEnabled && parentObj.memory[0xFF25] != data) {
 			parentObj.audioJIT();
 			parentObj.memory[0xFF25] = data;
@@ -9133,7 +9127,7 @@ GameBoyCore.prototype.registerWriteJumpCompile = function () {
 		}
 	}
 	//NR52:
-	this.memoryHighWriter[0x26] = this.memoryWriter[0xFF26] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x26] = this.memoryWriter[0xFF26] = function (parentObj, _address, data) {
 		parentObj.audioJIT();
 		if (!parentObj.soundMasterEnabled && data > 0x7F) {
 			parentObj.memory[0xFF26] = 0x80;
@@ -9160,70 +9154,70 @@ GameBoyCore.prototype.registerWriteJumpCompile = function () {
 	this.memoryHighWriter[0x2E] = this.memoryWriter[0xFF2E] = this.cartIgnoreWrite;
 	this.memoryHighWriter[0x2F] = this.memoryWriter[0xFF2F] = this.cartIgnoreWrite;
 	//WAVE PCM RAM:
-	this.memoryHighWriter[0x30] = this.memoryWriter[0xFF30] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x30] = this.memoryWriter[0xFF30] = function (parentObj, _address, data) {
 		parentObj.channel3WriteRAM(0, data);
 	}
-	this.memoryHighWriter[0x31] = this.memoryWriter[0xFF31] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x31] = this.memoryWriter[0xFF31] = function (parentObj, _address, data) {
 		parentObj.channel3WriteRAM(0x1, data);
 	}
-	this.memoryHighWriter[0x32] = this.memoryWriter[0xFF32] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x32] = this.memoryWriter[0xFF32] = function (parentObj, _address, data) {
 		parentObj.channel3WriteRAM(0x2, data);
 	}
-	this.memoryHighWriter[0x33] = this.memoryWriter[0xFF33] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x33] = this.memoryWriter[0xFF33] = function (parentObj, _address, data) {
 		parentObj.channel3WriteRAM(0x3, data);
 	}
-	this.memoryHighWriter[0x34] = this.memoryWriter[0xFF34] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x34] = this.memoryWriter[0xFF34] = function (parentObj, _address, data) {
 		parentObj.channel3WriteRAM(0x4, data);
 	}
-	this.memoryHighWriter[0x35] = this.memoryWriter[0xFF35] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x35] = this.memoryWriter[0xFF35] = function (parentObj, _address, data) {
 		parentObj.channel3WriteRAM(0x5, data);
 	}
-	this.memoryHighWriter[0x36] = this.memoryWriter[0xFF36] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x36] = this.memoryWriter[0xFF36] = function (parentObj, _address, data) {
 		parentObj.channel3WriteRAM(0x6, data);
 	}
-	this.memoryHighWriter[0x37] = this.memoryWriter[0xFF37] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x37] = this.memoryWriter[0xFF37] = function (parentObj, _address, data) {
 		parentObj.channel3WriteRAM(0x7, data);
 	}
-	this.memoryHighWriter[0x38] = this.memoryWriter[0xFF38] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x38] = this.memoryWriter[0xFF38] = function (parentObj, _address, data) {
 		parentObj.channel3WriteRAM(0x8, data);
 	}
-	this.memoryHighWriter[0x39] = this.memoryWriter[0xFF39] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x39] = this.memoryWriter[0xFF39] = function (parentObj, _address, data) {
 		parentObj.channel3WriteRAM(0x9, data);
 	}
-	this.memoryHighWriter[0x3A] = this.memoryWriter[0xFF3A] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x3A] = this.memoryWriter[0xFF3A] = function (parentObj, _address, data) {
 		parentObj.channel3WriteRAM(0xA, data);
 	}
-	this.memoryHighWriter[0x3B] = this.memoryWriter[0xFF3B] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x3B] = this.memoryWriter[0xFF3B] = function (parentObj, _address, data) {
 		parentObj.channel3WriteRAM(0xB, data);
 	}
-	this.memoryHighWriter[0x3C] = this.memoryWriter[0xFF3C] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x3C] = this.memoryWriter[0xFF3C] = function (parentObj, _address, data) {
 		parentObj.channel3WriteRAM(0xC, data);
 	}
-	this.memoryHighWriter[0x3D] = this.memoryWriter[0xFF3D] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x3D] = this.memoryWriter[0xFF3D] = function (parentObj, _address, data) {
 		parentObj.channel3WriteRAM(0xD, data);
 	}
-	this.memoryHighWriter[0x3E] = this.memoryWriter[0xFF3E] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x3E] = this.memoryWriter[0xFF3E] = function (parentObj, _address, data) {
 		parentObj.channel3WriteRAM(0xE, data);
 	}
-	this.memoryHighWriter[0x3F] = this.memoryWriter[0xFF3F] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x3F] = this.memoryWriter[0xFF3F] = function (parentObj, _address, data) {
 		parentObj.channel3WriteRAM(0xF, data);
 	}
 	//SCY
-	this.memoryHighWriter[0x42] = this.memoryWriter[0xFF42] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x42] = this.memoryWriter[0xFF42] = function (parentObj, _address, data) {
 		if (parentObj.backgroundY != data) {
 			parentObj.midScanLineJIT();
 			parentObj.backgroundY = data;
 		}
 	}
 	//SCX
-	this.memoryHighWriter[0x43] = this.memoryWriter[0xFF43] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x43] = this.memoryWriter[0xFF43] = function (parentObj, _address, data) {
 		if (parentObj.backgroundX != data) {
 			parentObj.midScanLineJIT();
 			parentObj.backgroundX = data;
 		}
 	}
 	//LY
-	this.memoryHighWriter[0x44] = this.memoryWriter[0xFF44] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x44] = this.memoryWriter[0xFF44] = function (parentObj, _address, _data) {
 		//Read Only:
 		if (parentObj.LCDisOn) {
 			//Gambatte says to do this:
@@ -9233,7 +9227,7 @@ GameBoyCore.prototype.registerWriteJumpCompile = function () {
 		}
 	}
 	//LYC
-	this.memoryHighWriter[0x45] = this.memoryWriter[0xFF45] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x45] = this.memoryWriter[0xFF45] = function (parentObj, _address, data) {
 		if (parentObj.memory[0xFF45] != data) {
 			parentObj.memory[0xFF45] = data;
 			if (parentObj.LCDisOn) {
@@ -9242,33 +9236,33 @@ GameBoyCore.prototype.registerWriteJumpCompile = function () {
 		}
 	}
 	//WY
-	this.memoryHighWriter[0x4A] = this.memoryWriter[0xFF4A] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x4A] = this.memoryWriter[0xFF4A] = function (parentObj, _address, data) {
 		if (parentObj.windowY != data) {
 			parentObj.midScanLineJIT();
 			parentObj.windowY = data;
 		}
 	}
 	//WX
-	this.memoryHighWriter[0x4B] = this.memoryWriter[0xFF4B] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x4B] = this.memoryWriter[0xFF4B] = function (parentObj, _address, data) {
 		if (parentObj.memory[0xFF4B] != data) {
 			parentObj.midScanLineJIT();
 			parentObj.memory[0xFF4B] = data;
 			parentObj.windowX = data - 7;
 		}
 	}
-	this.memoryHighWriter[0x72] = this.memoryWriter[0xFF72] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x72] = this.memoryWriter[0xFF72] = function (parentObj, _address, data) {
 		parentObj.memory[0xFF72] = data;
 	}
-	this.memoryHighWriter[0x73] = this.memoryWriter[0xFF73] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x73] = this.memoryWriter[0xFF73] = function (parentObj, _address, data) {
 		parentObj.memory[0xFF73] = data;
 	}
-	this.memoryHighWriter[0x75] = this.memoryWriter[0xFF75] = function (parentObj, address, data) {
+	this.memoryHighWriter[0x75] = this.memoryWriter[0xFF75] = function (parentObj, _address, data) {
 		parentObj.memory[0xFF75] = data;
 	}
 	this.memoryHighWriter[0x76] = this.memoryWriter[0xFF76] = this.cartIgnoreWrite;
 	this.memoryHighWriter[0x77] = this.memoryWriter[0xFF77] = this.cartIgnoreWrite;
 	//IE (Interrupt Enable)
-	this.memoryHighWriter[0xFF] = this.memoryWriter[0xFFFF] = function (parentObj, address, data) {
+	this.memoryHighWriter[0xFF] = this.memoryWriter[0xFFFF] = function (parentObj, _address, data) {
 		parentObj.interruptsEnabled = data;
 		parentObj.checkIRQMatching();
 	}
@@ -9279,7 +9273,7 @@ GameBoyCore.prototype.recompileModelSpecificIOWriteHandling = function () {
 	if (this.cGBC) {
 		//GameBoy Color Specific I/O:
 		//SC (Serial Transfer Control Register)
-		this.memoryHighWriter[0x2] = this.memoryWriter[0xFF02] = function (parentObj, address, data) {
+		this.memoryHighWriter[0x2] = this.memoryWriter[0xFF02] = function (parentObj, _address, data) {
 			if (((data & 0x1) == 0x1)) {
 				//Internal clock:
 				parentObj.memory[0xFF02] = (data & 0x7F);
@@ -9292,7 +9286,7 @@ GameBoyCore.prototype.recompileModelSpecificIOWriteHandling = function () {
 				parentObj.serialShiftTimer = parentObj.serialShiftTimerAllocated = parentObj.serialTimer = 0;	//Zero the timers, since we're emulating as if nothing is connected.
 			}
 		}
-		this.memoryHighWriter[0x40] = this.memoryWriter[0xFF40] = function (parentObj, address, data) {
+		this.memoryHighWriter[0x40] = this.memoryWriter[0xFF40] = function (parentObj, _address, data) {
 			if (parentObj.memory[0xFF40] != data) {
 				parentObj.midScanLineJIT();
 				var temp_var = (data > 0x7F);
@@ -9325,7 +9319,7 @@ GameBoyCore.prototype.recompileModelSpecificIOWriteHandling = function () {
 				parentObj.memory[0xFF40] = data;
 			}
 		}
-		this.memoryHighWriter[0x41] = this.memoryWriter[0xFF41] = function (parentObj, address, data) {
+		this.memoryHighWriter[0x41] = this.memoryWriter[0xFF41] = function (parentObj, _address, data) {
 			parentObj.LYCMatchTriggerSTAT = ((data & 0x40) == 0x40);
 			parentObj.mode2TriggerSTAT = ((data & 0x20) == 0x20);
 			parentObj.mode1TriggerSTAT = ((data & 0x10) == 0x10);
@@ -9363,10 +9357,10 @@ GameBoyCore.prototype.recompileModelSpecificIOWriteHandling = function () {
 			}
 		}
 		//KEY1
-		this.memoryHighWriter[0x4D] = this.memoryWriter[0xFF4D] = function (parentObj, address, data) {
+		this.memoryHighWriter[0x4D] = this.memoryWriter[0xFF4D] = function (parentObj, _address, data) {
 			parentObj.memory[0xFF4D] = (data & 0x7F) | (parentObj.memory[0xFF4D] & 0x80);
 		}
-		this.memoryHighWriter[0x4F] = this.memoryWriter[0xFF4F] = function (parentObj, address, data) {
+		this.memoryHighWriter[0x4F] = this.memoryWriter[0xFF4F] = function (parentObj, _address, data) {
 			parentObj.currVRAMBank = data & 0x01;
 			if (parentObj.currVRAMBank > 0) {
 				parentObj.BGCHRCurrentBank = parentObj.BGCHRBank2;
@@ -9376,27 +9370,27 @@ GameBoyCore.prototype.recompileModelSpecificIOWriteHandling = function () {
 			}
 			//Only writable by GBC.
 		}
-		this.memoryHighWriter[0x51] = this.memoryWriter[0xFF51] = function (parentObj, address, data) {
+		this.memoryHighWriter[0x51] = this.memoryWriter[0xFF51] = function (parentObj, _address, data) {
 			if (!parentObj.hdmaRunning) {
 				parentObj.memory[0xFF51] = data;
 			}
 		}
-		this.memoryHighWriter[0x52] = this.memoryWriter[0xFF52] = function (parentObj, address, data) {
+		this.memoryHighWriter[0x52] = this.memoryWriter[0xFF52] = function (parentObj, _address, data) {
 			if (!parentObj.hdmaRunning) {
 				parentObj.memory[0xFF52] = data & 0xF0;
 			}
 		}
-		this.memoryHighWriter[0x53] = this.memoryWriter[0xFF53] = function (parentObj, address, data) {
+		this.memoryHighWriter[0x53] = this.memoryWriter[0xFF53] = function (parentObj, _address, data) {
 			if (!parentObj.hdmaRunning) {
 				parentObj.memory[0xFF53] = data & 0x1F;
 			}
 		}
-		this.memoryHighWriter[0x54] = this.memoryWriter[0xFF54] = function (parentObj, address, data) {
+		this.memoryHighWriter[0x54] = this.memoryWriter[0xFF54] = function (parentObj, _address, data) {
 			if (!parentObj.hdmaRunning) {
 				parentObj.memory[0xFF54] = data & 0xF0;
 			}
 		}
-		this.memoryHighWriter[0x55] = this.memoryWriter[0xFF55] = function (parentObj, address, data) {
+		this.memoryHighWriter[0x55] = this.memoryWriter[0xFF55] = function (parentObj, _address, data) {
 			if (!parentObj.hdmaRunning) {
 				if ((data & 0x80) == 0) {
 					//DMA
@@ -9418,11 +9412,11 @@ GameBoyCore.prototype.recompileModelSpecificIOWriteHandling = function () {
 				parentObj.memory[0xFF55] = data & 0x7F;
 			}
 		}
-		this.memoryHighWriter[0x68] = this.memoryWriter[0xFF68] = function (parentObj, address, data) {
+		this.memoryHighWriter[0x68] = this.memoryWriter[0xFF68] = function (parentObj, _address, data) {
 			parentObj.memory[0xFF69] = parentObj.gbcBGRawPalette[data & 0x3F];
 			parentObj.memory[0xFF68] = data;
 		}
-		this.memoryHighWriter[0x69] = this.memoryWriter[0xFF69] = function (parentObj, address, data) {
+		this.memoryHighWriter[0x69] = this.memoryWriter[0xFF69] = function (parentObj, _address, data) {
 			parentObj.updateGBCBGPalette(parentObj.memory[0xFF68] & 0x3F, data);
 			if (parentObj.memory[0xFF68] > 0x7F) { // high bit = autoincrement
 				var next = ((parentObj.memory[0xFF68] + 1) & 0x3F);
@@ -9433,11 +9427,11 @@ GameBoyCore.prototype.recompileModelSpecificIOWriteHandling = function () {
 				parentObj.memory[0xFF69] = data;
 			}
 		}
-		this.memoryHighWriter[0x6A] = this.memoryWriter[0xFF6A] = function (parentObj, address, data) {
+		this.memoryHighWriter[0x6A] = this.memoryWriter[0xFF6A] = function (parentObj, _address, data) {
 			parentObj.memory[0xFF6B] = parentObj.gbcOBJRawPalette[data & 0x3F];
 			parentObj.memory[0xFF6A] = data;
 		}
-		this.memoryHighWriter[0x6B] = this.memoryWriter[0xFF6B] = function (parentObj, address, data) {
+		this.memoryHighWriter[0x6B] = this.memoryWriter[0xFF6B] = function (parentObj, _address, data) {
 			parentObj.updateGBCOBJPalette(parentObj.memory[0xFF6A] & 0x3F, data);
 			if (parentObj.memory[0xFF6A] > 0x7F) { // high bit = autoincrement
 				var next = ((parentObj.memory[0xFF6A] + 1) & 0x3F);
@@ -9449,7 +9443,7 @@ GameBoyCore.prototype.recompileModelSpecificIOWriteHandling = function () {
 			}
 		}
 		//SVBK
-		this.memoryHighWriter[0x70] = this.memoryWriter[0xFF70] = function (parentObj, address, data) {
+		this.memoryHighWriter[0x70] = this.memoryWriter[0xFF70] = function (parentObj, _address, data) {
 			var addressCheck = (parentObj.memory[0xFF51] << 8) | parentObj.memory[0xFF52];	//Cannot change the RAM bank while WRAM is the source of a running HDMA.
 			if (!parentObj.hdmaRunning || addressCheck < 0xD000 || addressCheck >= 0xE000) {
 				parentObj.gbcRamBank = Math.max(data & 0x07, 1);	//Bank range is from 1-7
@@ -9458,14 +9452,14 @@ GameBoyCore.prototype.recompileModelSpecificIOWriteHandling = function () {
 			}
 			parentObj.memory[0xFF70] = data;	//Bit 6 cannot be written to.
 		}
-		this.memoryHighWriter[0x74] = this.memoryWriter[0xFF74] = function (parentObj, address, data) {
+		this.memoryHighWriter[0x74] = this.memoryWriter[0xFF74] = function (parentObj, _address, data) {
 			parentObj.memory[0xFF74] = data;
 		}
 	}
 	else {
 		//Fill in the GameBoy Color I/O registers as normal RAM for GameBoy compatibility:
 		//SC (Serial Transfer Control Register)
-		this.memoryHighWriter[0x2] = this.memoryWriter[0xFF02] = function (parentObj, address, data) {
+		this.memoryHighWriter[0x2] = this.memoryWriter[0xFF02] = function (parentObj, _address, data) {
 			if (((data & 0x1) == 0x1)) {
 				//Internal clock:
 				parentObj.memory[0xFF02] = (data & 0x7F);
@@ -9478,7 +9472,7 @@ GameBoyCore.prototype.recompileModelSpecificIOWriteHandling = function () {
 				parentObj.serialShiftTimer = parentObj.serialShiftTimerAllocated = parentObj.serialTimer = 0;	//Zero the timers, since we're emulating as if nothing is connected.
 			}
 		}
-		this.memoryHighWriter[0x40] = this.memoryWriter[0xFF40] = function (parentObj, address, data) {
+		this.memoryHighWriter[0x40] = this.memoryWriter[0xFF40] = function (parentObj, _address, data) {
 			if (parentObj.memory[0xFF40] != data) {
 				parentObj.midScanLineJIT();
 				var temp_var = (data > 0x7F);
@@ -9510,7 +9504,7 @@ GameBoyCore.prototype.recompileModelSpecificIOWriteHandling = function () {
 				parentObj.memory[0xFF40] = data;
 			}
 		}
-		this.memoryHighWriter[0x41] = this.memoryWriter[0xFF41] = function (parentObj, address, data) {
+		this.memoryHighWriter[0x41] = this.memoryWriter[0xFF41] = function (parentObj, _address, data) {
 			parentObj.LYCMatchTriggerSTAT = ((data & 0x40) == 0x40);
 			parentObj.mode2TriggerSTAT = ((data & 0x20) == 0x20);
 			parentObj.mode1TriggerSTAT = ((data & 0x10) == 0x10);
@@ -9551,28 +9545,28 @@ GameBoyCore.prototype.recompileModelSpecificIOWriteHandling = function () {
 				parentObj.modeSTAT = stat;
 			}
 		}
-		this.memoryHighWriter[0x47] = this.memoryWriter[0xFF47] = function (parentObj, address, data) {
+		this.memoryHighWriter[0x47] = this.memoryWriter[0xFF47] = function (parentObj, _address, data) {
 			if (parentObj.memory[0xFF47] != data) {
 				parentObj.midScanLineJIT();
 				parentObj.updateGBBGPalette(data);
 				parentObj.memory[0xFF47] = data;
 			}
 		}
-		this.memoryHighWriter[0x48] = this.memoryWriter[0xFF48] = function (parentObj, address, data) {
+		this.memoryHighWriter[0x48] = this.memoryWriter[0xFF48] = function (parentObj, _address, data) {
 			if (parentObj.memory[0xFF48] != data) {
 				parentObj.midScanLineJIT();
 				parentObj.updateGBOBJPalette(0, data);
 				parentObj.memory[0xFF48] = data;
 			}
 		}
-		this.memoryHighWriter[0x49] = this.memoryWriter[0xFF49] = function (parentObj, address, data) {
+		this.memoryHighWriter[0x49] = this.memoryWriter[0xFF49] = function (parentObj, _address, data) {
 			if (parentObj.memory[0xFF49] != data) {
 				parentObj.midScanLineJIT();
 				parentObj.updateGBOBJPalette(4, data);
 				parentObj.memory[0xFF49] = data;
 			}
 		}
-		this.memoryHighWriter[0x4D] = this.memoryWriter[0xFF4D] = function (parentObj, address, data) {
+		this.memoryHighWriter[0x4D] = this.memoryWriter[0xFF4D] = function (parentObj, _address, data) {
 			parentObj.memory[0xFF4D] = data;
 		}
 		this.memoryHighWriter[0x4F] = this.memoryWriter[0xFF4F] = this.cartIgnoreWrite;	//Not writable in DMG mode.
@@ -9589,14 +9583,14 @@ GameBoyCore.prototype.recompileModelSpecificIOWriteHandling = function () {
 GameBoyCore.prototype.recompileBootIOWriteHandling = function () {
 	//Boot I/O Registers:
 	if (this.inBootstrap) {
-		this.memoryHighWriter[0x50] = this.memoryWriter[0xFF50] = function (parentObj, address, data) {
+		this.memoryHighWriter[0x50] = this.memoryWriter[0xFF50] = function (parentObj, _address, data) {
 			cout("Boot ROM reads blocked: Bootstrap process has ended.", 0);
 			parentObj.inBootstrap = false;
 			parentObj.disableBootROM();			//Fill in the boot ROM ranges with ROM  bank 0 ROM ranges
 			parentObj.memory[0xFF50] = data;	//Bits are sustained in memory?
 		}
 		if (this.cGBC) {
-			this.memoryHighWriter[0x6C] = this.memoryWriter[0xFF6C] = function (parentObj, address, data) {
+			this.memoryHighWriter[0x6C] = this.memoryWriter[0xFF6C] = function (parentObj, _address, data) {
 				if (parentObj.inBootstrap) {
 					parentObj.cGBC = ((data & 0x1) == 0);
 					//Exception to the GBC identifying code:
@@ -9625,18 +9619,19 @@ GameBoyCore.prototype.toTypedArray = function (baseArray, memtype) {
 			return [];
 		}
 		var length = baseArray.length;
+		let typedArrayTemp;
 		switch (memtype) {
 			case "uint8":
-				var typedArrayTemp = new Uint8Array(length);
+				typedArrayTemp = new Uint8Array(length);
 				break;
 			case "int8":
-				var typedArrayTemp = new Int8Array(length);
+				typedArrayTemp = new Int8Array(length);
 				break;
 			case "int32":
-				var typedArrayTemp = new Int32Array(length);
+				typedArrayTemp = new Int32Array(length);
 				break;
 			case "float32":
-				var typedArrayTemp = new Float32Array(length);
+				typedArrayTemp = new Float32Array(length);
 		}
 		for (var index = 0; index < length; index++) {
 			typedArrayTemp[index] = baseArray[index];
@@ -9667,22 +9662,23 @@ GameBoyCore.prototype.fromTypedArray = function (baseArray) {
 }
 
 GameBoyCore.prototype.getTypedArray = function (length, defaultValue, numberType) {
+	let arrayHandle;
 	try {
 		if (settings[5]) {
 			throw(new Error("Settings forced typed arrays to be disabled."));
 		}
 		switch (numberType) {
 			case "int8":
-				var arrayHandle = new Int8Array(length);
+				arrayHandle = new Int8Array(length);
 				break;
 			case "uint8":
-				var arrayHandle = new Uint8Array(length);
+				arrayHandle = new Uint8Array(length);
 				break;
 			case "int32":
-				var arrayHandle = new Int32Array(length);
+				arrayHandle = new Int32Array(length);
 				break;
 			case "float32":
-				var arrayHandle = new Float32Array(length);
+				arrayHandle = new Float32Array(length);
 		}
 		if (defaultValue != 0) {
 			var index = 0;
@@ -9693,7 +9689,7 @@ GameBoyCore.prototype.getTypedArray = function (length, defaultValue, numberType
 	}
 	catch (error) {
 		cout("Could not convert an array to a typed array: " + error.message, 1);
-		var arrayHandle = [];
+		arrayHandle = [];
 		var index = 0;
 		while (index < length) {
 			arrayHandle[index++] = defaultValue;
@@ -9701,5 +9697,3 @@ GameBoyCore.prototype.getTypedArray = function (length, defaultValue, numberType
 	}
 	return arrayHandle;
 }
-
-module.exports = GameBoyCore;

@@ -2,8 +2,8 @@ import { io } from './GameBoyIO';
 import { findValue, findKey, checkStorageLength, deleteValue } from './local-storage';
 import { windowCreate, windowStacks } from './windowStack';
 import { addEvent, popupMenu, showAlert } from './util';
+import { cout, clear_terminal } from './terminal';
 
-const { cout, clear_terminal } = require('./terminal');
 const settings = require('./settings');
 
 var inFullscreen = false;

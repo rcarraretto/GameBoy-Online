@@ -1,5 +1,7 @@
+import { expect } from 'chai';
+import { GameBoyCore } from '../src/GameBoyCore';
+
 describe("add", function() {
-  var GameBoyCore = require('../src/GameBoyCore');
   var core;
 
   beforeEach(function() {

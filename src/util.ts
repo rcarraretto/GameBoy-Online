@@ -1,4 +1,4 @@
-const { cout } = require('./terminal');
+import { cout } from './terminal';
 
 export function addEvent(sEvent, oElement, fListener) {
 	try {

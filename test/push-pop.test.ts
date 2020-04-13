@@ -1,6 +1,7 @@
+import { expect } from 'chai';
+import { GameBoyCore } from '../src/GameBoyCore';
+
 describe("push / pop", function() {
-  var GameBoyCore = require('../src/GameBoyCore');
-  var _ = require('lodash');
   var core;
 
   beforeEach(function() {

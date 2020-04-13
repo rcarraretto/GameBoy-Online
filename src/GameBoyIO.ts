@@ -1,16 +1,15 @@
-"use strict";
-
 import { setValue, findValue, deleteValue } from './local-storage';
-const { cout } = require('./terminal');
+import { cout } from './terminal';
+import { GameBoyCore } from './GameBoyCore'
+
 const settings = require('./settings');
-const GameBoyCore = require('./GameBoyCore');
 
 var gameboy = null;						//GameBoyCore object.
 var gbRunInterval = null;				//GameBoyCore Timer
 function start(canvas, ROM) {
 	clearLastEmulation();
 	autoSave();	//If we are about to load a new game, then save the last one...
-	gameboy = new GameBoyCore(canvas, ROM);
+	gameboy = new GameBoyCore(canvas, ROM, pause);
 	gameboy.openMBC = openSRAM;
 	gameboy.openRTC = openRTC;
 	gameboy.start();
@@ -182,7 +181,7 @@ function openState(filename, canvas) {
 			try {
 				clearLastEmulation();
 				cout("Attempting to run a saved emulation state.", 0);
-				gameboy = new GameBoyCore(canvas, "");
+				gameboy = new GameBoyCore(canvas, "", pause);
 				gameboy.savedStateFileName = filename;
 				gameboy.returnFromState(findValue(filename));
 				run();

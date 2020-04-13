@@ -1,7 +1,5 @@
-"use strict";
-
 import { addEvent, removeEvent, isSameNode, isDescendantOf } from './util';
-const { cout } = require('./terminal');
+import { cout } from './terminal';
 
 export var windowStacks = [];
 export function windowCreate(sId, bShow) {

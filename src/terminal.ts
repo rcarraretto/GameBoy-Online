@@ -1,6 +1,6 @@
 const { DEBUG_MESSAGES, DEBUG_WINDOWING } = require('./config');
 
-function cout(message, colorIndex) {
+export function cout(message, colorIndex) {
 	if (typeof document === 'undefined') {
 		return;
 	}
@@ -24,14 +24,10 @@ function cout(message, colorIndex) {
 		terminal_output.scrollTop = terminal_output.scrollHeight - terminal_output.clientHeight;
 	}
 }
-function clear_terminal() {
+
+export function clear_terminal() {
 	var terminal_output = document.getElementById("terminal_output");
 	while (terminal_output.firstChild != null) {
 		terminal_output.removeChild(terminal_output.firstChild);
 	}
 }
-
-module.exports = {
-	cout,
-	clear_terminal,
-};
