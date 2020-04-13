@@ -1,6 +1,6 @@
-version: 2
+version: 2.1
 jobs:
-  build:
+  test:
     docker:
       - image: circleci/node:6-stretch
     steps:
@@ -17,3 +17,9 @@ jobs:
       - run:
           name: test
           command: npm test
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - test
