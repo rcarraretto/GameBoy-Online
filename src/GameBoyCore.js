@@ -1,8 +1,8 @@
 "use strict";
 
-const { cout } = require('./other/terminal');
+const { cout } = require('./terminal');
 const settings = require('./settings');
-const XAudioServer = require('./other/XAudioServer');
+const XAudioServer = require('./XAudioServer');
 
  /*
   JavaScript GameBoy Color Emulator

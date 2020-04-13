@@ -1,5 +1,5 @@
 describe("push / pop", function() {
-  var GameBoyCore = require('../js/GameBoyCore');
+  var GameBoyCore = require('../src/GameBoyCore');
   var _ = require('lodash');
   var core;
 

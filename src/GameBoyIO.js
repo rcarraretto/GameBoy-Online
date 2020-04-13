@@ -1,6 +1,6 @@
 "use strict";
 
-const { cout } = require('./other/terminal');
+const { cout } = require('./terminal');
 const settings = require('./settings');
 const GameBoyCore = require('./GameBoyCore');
 

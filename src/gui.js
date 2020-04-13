@@ -1,8 +1,8 @@
 const { cout, clear_terminal } = require('./terminal');
 const { windowCreate, windowStacks } = require('./windowStack');
 const { addEvent, isSameNode, isDescendantOf, popupMenu, showAlert } = require('./util');
-const { GameBoyGyroSignalHandler, initNewCanvasSize, start, initLCD, GameBoyKeyUp, GameBoyKeyDown } = require('../GameBoyIO');
-const settings = require('./../settings');
+const { GameBoyGyroSignalHandler, initNewCanvasSize, start, initLCD, GameBoyKeyUp, GameBoyKeyDown } = require('./GameBoyIO');
+const settings = require('./settings');
 
 var inFullscreen = false;
 var mainCanvas = null;

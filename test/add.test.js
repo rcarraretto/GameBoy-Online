@@ -1,5 +1,5 @@
 describe("add", function() {
-  var GameBoyCore = require('../js/GameBoyCore');
+  var GameBoyCore = require('../src/GameBoyCore');
   var core;
 
   beforeEach(function() {
