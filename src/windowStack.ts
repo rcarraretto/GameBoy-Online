@@ -1,6 +1,6 @@
 "use strict";
 
-const { addEvent, removeEvent, isSameNode, isDescendantOf } = require('./util');
+import { addEvent, removeEvent, isSameNode, isDescendantOf } from './util';
 const { cout } = require('./terminal');
 
 export var windowStacks = [];

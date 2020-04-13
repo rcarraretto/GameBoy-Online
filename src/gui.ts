@@ -1,9 +1,9 @@
 import { io } from './GameBoyIO';
 import { findValue, findKey, checkStorageLength, deleteValue } from './local-storage';
 import { windowCreate, windowStacks } from './windowStack';
+import { addEvent, popupMenu, showAlert } from './util';
 
 const { cout, clear_terminal } = require('./terminal');
-const { import_save, addEvent, popupMenu, showAlert } = require('./util');
 const settings = require('./settings');
 
 var inFullscreen = false;
@@ -193,7 +193,7 @@ function registerGUIEvents() {
 							if (this.readyState == 2) {
 								cout("file imported.", 0);
 								try {
-									import_save(this.result);
+									io.import_save(this.result);
 									refreshStorageListing();
 								}
 								catch (error) {
@@ -211,7 +211,7 @@ function registerGUIEvents() {
 						//Gecko 1.9.0, 1.9.1 (Non-Standard Method)
 						var romImageString = this.files[this.files.length - 1].getAsBinary();
 						try {
-							import_save(romImageString);
+							io.import_save(romImageString);
 							refreshStorageListing();
 						}
 						catch (error) {
