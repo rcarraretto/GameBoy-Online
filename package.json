@@ -12,6 +12,7 @@
     "webpack-dev-server": "3.10.3"
   },
   "scripts": {
+    "dev": "webpack-dev-server --open",
     "test": "mocha --reporter min --require test/mocha.js"
   }
 }

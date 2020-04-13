@@ -1,5 +1,4 @@
-JavaScript GameBoy Color Emulator
-=================================
+# JavaScript GameBoy Color Emulator
 
 **Copyright (C) 2010 - 2016 Grant Galitz**
 
@@ -25,28 +24,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Known browsers to work well in:
--------------------------------
-
-* Firefox 4-27 (Windows 7, Windows Vista, Mac OS X)
-* Google Chrome 18+
-* Safari 5.1.5+
-
-Browsers that suck at performance or fail to run the code correctly:
---------------------------------------------------------------------
-
-* Firefox 4+ (*nix versions of Firefox have audio lockup bugs) - Retest this
-* Firefox 28+ (Web Audio API creates 500 ms or greater latency, forced by Firefox)
-* Opera (Crashes + Slow + Graphics Glitches) - Retest this
-* Safari 5.1.X (Below 5.1.5) (Slow or crashes)
-* IE 1-8 (Cannot run)
-* IE 9-10 (Slow, No native audio support (Requires flash bridge in the audio lib))
-* IE 11 (No native audio support (Requires flash bridge in the audio lib))
-* Firefox 1-3.6 (Slow)
-* ALL VERSIONS OF MOBILE SAFARI AND OPERA (Stop pestering me, iOS just **CAN'T** run this well.)
-
-CPU instruction set accuracy test results (Blargg's cpu_instrs.gb test ROM):
------------------------------------------------------
+## CPU instruction set accuracy test results (Blargg's cpu_instrs.gb test ROM):
 
 * **GameBoy Online:**
 
@@ -61,7 +39,14 @@ CPU instruction set accuracy test results (Blargg's cpu_instrs.gb test ROM):
 
 	![Gambatte](http://i.imgur.com/vGHFz.png "Passes")
 
-Test
-----
-On the first time, `npm install`.
-Then `npm test`.
+## Install
+
+`npm install`
+
+## Test
+
+`npm test`
+
+## Dev
+
+`npm run dev`
