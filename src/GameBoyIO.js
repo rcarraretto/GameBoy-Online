@@ -411,9 +411,20 @@ function initLCD() {
 
 module.exports = {
     GameBoyGyroSignalHandler,
+    GameBoyEmulatorInitialized,
     initNewCanvasSize,
     start,
     initLCD,
     GameBoyKeyUp,
     GameBoyKeyDown,
+    generateBlob,
+    generateMultiBlob,
+    openState,
+    autoSave,
+    saveSRAM,
+    save,
+    pause,
+    run,
+    import_save,
+    getGameboy: () => gameboy,
 };

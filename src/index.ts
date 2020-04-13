@@ -1,4 +1,4 @@
-const { windowingInitialize } = require('./gui.js');
+import { windowingInitialize } from './gui';
 
 window.onload = function () {
     windowingInitialize();
