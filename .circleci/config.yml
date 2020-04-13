@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   test:
     docker:
-      - image: circleci/node:6-stretch
+      - image: circleci/node:dubnium
     steps:
       - checkout
       - restore_cache:
