@@ -1,8 +1,8 @@
 import { io } from './GameBoyIO';
 import { findValue, findKey, checkStorageLength, deleteValue } from './local-storage';
+import { windowCreate, windowStacks } from './windowStack';
 
 const { cout, clear_terminal } = require('./terminal');
-const { windowCreate, windowStacks } = require('./windowStack');
 const { import_save, addEvent, popupMenu, showAlert } = require('./util');
 const settings = require('./settings');
 

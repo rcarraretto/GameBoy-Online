@@ -1,9 +1,10 @@
 "use strict";
 
 const { addEvent, removeEvent, isSameNode, isDescendantOf } = require('./util');
+const { cout } = require('./terminal');
 
-var windowStacks = [];
-function windowCreate(sId, bShow) {
+export var windowStacks = [];
+export function windowCreate(sId, bShow) {
 	var oWindow = new windowStack(document.getElementById(sId));
 	if (bShow) {
 		oWindow.show();
@@ -20,7 +21,7 @@ function windowStack(element) {
 		this.events = [
 			["mousedown", function (event) { thisObj2.dragEnable(event); }],
 			["mousemove", function (event) { thisObj2.drag(event); }],
-			["mouseup", function (event) { thisObj2.dragDisable(); }]
+			["mouseup", function () { thisObj2.dragDisable(); }]
 		];
 	}
 }
@@ -44,12 +45,13 @@ windowStack.prototype.unregisterMouseEvents = function () {
 	}
 }
 windowStack.prototype.getStyleFloatOf = function (propertyNameOf, JSpropertyNameOf) {
+	let dirtyValue;
 	try {
-		var dirtyValue = window.getComputedStyle(this.domObject, null).getPropertyValue(propertyNameOf);
+		dirtyValue = window.getComputedStyle(this.domObject, null).getPropertyValue(propertyNameOf);
 	}
 	catch (error) {
 		try {
-			var dirtyValue = this.domObject.currentStyle.getAttribute(JSpropertyNameOf);	/*JS object notation style keywords, not the CSS keywords!*/
+			dirtyValue = this.domObject.currentStyle.getAttribute(JSpropertyNameOf);	/*JS object notation style keywords, not the CSS keywords!*/
 		}
 		catch (error) {
 			cout(error.message, 2);
@@ -140,8 +142,3 @@ windowStack.prototype.show = function () {
 	this.domObject.style.display = "block";
 	this.registerMouseEvents();
 }
-
-module.exports = {
-	windowCreate,
-	windowStacks,
-};
