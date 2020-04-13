@@ -1,5 +1,6 @@
 "use strict";
 
+import { setValue, findValue, deleteValue } from './local-storage';
 const { cout } = require('./terminal');
 const settings = require('./settings');
 const GameBoyCore = require('./GameBoyCore');
@@ -24,7 +25,7 @@ function run() {
 			gameboy.firstIteration = dateObj.getTime();
 			gameboy.iterations = 0;
 			gbRunInterval = setInterval(function () {
-				if (!document.hidden && !document.msHidden && !document.mozHidden && !document.webkitHidden) {
+				if (!document.hidden) {
 					gameboy.run();
 				}
 			}, settings[6]);
@@ -275,7 +276,7 @@ function generateMultiBlob(blobPairs) {
 	saveString = "EMULATOR_DATA" + to_little_endian_dword(totalLength) + saveString;
 	return saveString;
 }
-function decodeBlob(blobData) {
+function decodeBlob(blobData: string) {
 	/*Format is as follows:
 		- 13 byte string "EMULATOR_DATA"
 		- 4 byte total size (including these 4 bytes).
@@ -289,7 +290,7 @@ function decodeBlob(blobData) {
 		}
 	*/
 	var length = blobData.length;
-	var blobProperties = {};
+	var blobProperties: any = {};
 	blobProperties.consoleID = null;
 	var blobsCount = -1;
 	blobProperties.blobs = [];
@@ -409,7 +410,7 @@ function initLCD() {
     gameboy.initLCD();
 };
 
-module.exports = {
+export const io = {
     GameBoyGyroSignalHandler,
     GameBoyEmulatorInitialized,
     initNewCanvasSize,
