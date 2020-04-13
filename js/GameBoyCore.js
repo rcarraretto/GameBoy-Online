@@ -1,4 +1,9 @@
 "use strict";
+
+const { cout } = require('./other/terminal');
+const settings = require('./settings');
+const XAudioServer = require('./other/XAudioServer');
+
  /*
   JavaScript GameBoy Color Emulator
   Copyright (C) 2010-2016 Grant Galitz
@@ -9,7 +14,6 @@
 
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-(function() {
 
 function GameBoyCore(canvas, ROMImage) {
 	//Params, etc...
@@ -4983,7 +4987,6 @@ GameBoyCore.prototype.MBCRAMUtilized = function () {
 }
 
 GameBoyCore.prototype.recomputeDimension = function () {
-	initNewCanvas();
 	//Cache some dimension info:
 	this.onscreenWidth = this.canvas.width;
 	this.onscreenHeight = this.canvas.height;
@@ -9699,11 +9702,4 @@ GameBoyCore.prototype.getTypedArray = function (length, defaultValue, numberType
 	return arrayHandle;
 }
 
-if (typeof cout === 'undefined')
-	var cout = function() {};
-
-if (typeof module !== 'undefined' && typeof module.exports !== 'undefined')
-	module.exports = GameBoyCore;
-else
-	window.GameBoyCore = GameBoyCore;
-})();
+module.exports = GameBoyCore;

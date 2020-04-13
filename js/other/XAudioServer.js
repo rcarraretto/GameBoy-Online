@@ -1,6 +1,11 @@
 //2010-2013 Grant Galitz - XAudioJS realtime audio output compatibility library:
-var XAudioJSscriptsHandle = document.getElementsByTagName("script");
-var XAudioJSsourceHandle = XAudioJSscriptsHandle[XAudioJSscriptsHandle.length-1].src;
+const Resampler = require('./resampler');
+
+if (typeof document !== 'undefined') {
+    var XAudioJSscriptsHandle = document.getElementsByTagName("script");
+    var XAudioJSsourceHandle = XAudioJSscriptsHandle[XAudioJSscriptsHandle.length-1].src;
+}
+
 function XAudioServer(channels, sampleRate, minBufferSize, maxBufferSize, underRunCallback, volume, failureCallback) {
 	XAudioJSChannelsAllocated = Math.max(channels, 1);
 	this.XAudioJSSampleRate = Math.abs(sampleRate);
@@ -505,3 +510,5 @@ function XAudioJSGetArraySlice(buffer, lengthOf) {
 		}
 	}
 }
+
+module.exports = XAudioServer;

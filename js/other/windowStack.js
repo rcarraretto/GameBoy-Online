@@ -1,4 +1,7 @@
 "use strict";
+
+const { addEvent, removeEvent, isSameNode, isDescendantOf } = require('./util');
+
 var windowStacks = [];
 function windowCreate(sId, bShow) {
 	var oWindow = new windowStack(document.getElementById(sId));
@@ -137,39 +140,8 @@ windowStack.prototype.show = function () {
 	this.domObject.style.display = "block";
 	this.registerMouseEvents();
 }
-function popupMenu(oClick, oMenu) {
-	this.clickElement = oClick;
-	this.menuElement = oMenu;
-	var thisObj2 = this;
-	this.eventHandle = [
-		function (event) { thisObj2.startPopup(event); },
-		function (event) { thisObj2.endPopup(event); }
-	];
-	this.open = false;
-	addEvent("click", this.clickElement, this.eventHandle[0]);
-}
-popupMenu.prototype.startPopup = function (event) {
-	if (!this.open) {
-		this.open = true;
-		this.menuElement.style.display = "block";
-		removeEvent("click", this.clickElement, this.eventHandle[0]);
-		this.position(event);
-		addEvent("mouseout", this.menuElement, this.eventHandle[1]);
-	}
-}
-popupMenu.prototype.endPopup = function (event) {
-	if (this.open) {
-		if (mouseLeaveVerify(this.menuElement, event)) {
-			this.open = false;
-			this.menuElement.style.display = "none";
-			removeEvent("mouseout", this.menuElement, this.eventHandle[1]);
-			addEvent("click", this.clickElement, this.eventHandle[0]);
-		}
-	}
-}
-popupMenu.prototype.position = function (event) {
-	if (this.open) {
-		this.menuElement.style.left = (pageXCoord(event) - 5) + "px";
-		this.menuElement.style.top = (pageYCoord(event) - 5) + "px";
-	}
-}
+
+module.exports = {
+	windowCreate,
+	windowStacks,
+};

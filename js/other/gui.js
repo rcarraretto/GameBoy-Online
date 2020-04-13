@@ -1,3 +1,9 @@
+const { cout, clear_terminal } = require('./terminal');
+const { windowCreate, windowStacks } = require('./windowStack');
+const { addEvent, isSameNode, isDescendantOf, popupMenu, showAlert } = require('./util');
+const { GameBoyGyroSignalHandler, initNewCanvasSize, start, initLCD, GameBoyKeyUp, GameBoyKeyDown } = require('../GameBoyIO');
+const settings = require('./../settings');
+
 var inFullscreen = false;
 var mainCanvas = null;
 var fullscreenCanvas = null;
@@ -91,7 +97,7 @@ function registerGUIEvents() {
 				start(mainCanvas, base64_decode(datauri));
 			}
 			catch (error) {
-				alert(error.message + " file: " + error.fileName + " line: " + error.lineNumber);
+				showAlert(error);
 			}
 		}
 	});
@@ -137,7 +143,7 @@ function registerGUIEvents() {
 									start(mainCanvas, this.result);
 								}
 								catch (error) {
-									alert(error.message + " file: " + error.fileName + " line: " + error.lineNumber);
+									showAlert(error);
 								}
 							}
 							else {
@@ -155,9 +161,9 @@ function registerGUIEvents() {
 							start(mainCanvas, romImageString);
 						}
 						catch (error) {
-							alert(error.message + " file: " + error.fileName + " line: " + error.lineNumber);
+							showAlert(error);
 						}
-						
+
 					}
 				}
 				else {
@@ -189,7 +195,7 @@ function registerGUIEvents() {
 									refreshStorageListing();
 								}
 								catch (error) {
-									alert(error.message + " file: " + error.fileName + " line: " + error.lineNumber);
+									showAlert(error);
 								}
 							}
 							else {
@@ -207,9 +213,9 @@ function registerGUIEvents() {
 							refreshStorageListing();
 						}
 						catch (error) {
-							alert(error.message + " file: " + error.fileName + " line: " + error.lineNumber);
+							showAlert(error);
 						}
-						
+
 					}
 				}
 				else {
@@ -237,7 +243,7 @@ function registerGUIEvents() {
 				}
 			}
 			catch (error) {
-				alert(error.message + " file: " + error.fileName + " line: " + error.lineNumber);
+				showAlert(error);
 			}
 		}
 		else {
@@ -284,7 +290,7 @@ function registerGUIEvents() {
 	addEvent("click", document.getElementById("software_resizing"), function () {
 		settings[12] = document.getElementById("software_resizing").checked;
 		if (GameBoyEmulatorInitialized()) {
-			gameboy.initLCD();
+			initLCD();
 		}
 	});
 	addEvent("click", document.getElementById("typed_arrays_disallow"), function () {
@@ -296,7 +302,7 @@ function registerGUIEvents() {
 	addEvent("click", document.getElementById("resize_smoothing"), function () {
 		settings[13] = document.getElementById("resize_smoothing").checked;
 		if (GameBoyEmulatorInitialized()) {
-			gameboy.initLCD();
+			initLCD();
 		}
 	});
     addEvent("click", document.getElementById("channel1"), function () {
@@ -375,7 +381,7 @@ function fullscreenPlayer() {
 			document.getElementById("fullscreenContainer").style.display = "none";
 			windowStacks[0].show();
 		}
-		gameboy.initLCD();
+		initLCD();
 		inFullscreen = !inFullscreen;
 	}
 	else {
@@ -580,73 +586,7 @@ function findKey(keyNum) {
 	}
 	return null;
 }
-//Some wrappers and extensions for non-DOM3 browsers:
-function isDescendantOf(ParentElement, toCheck) {
-	if (!ParentElement || !toCheck) {
-		return false;
-	}
-	//Verify an object as either a direct or indirect child to another object.
-	function traverseTree(domElement) {
-		while (domElement != null) {
-			if (domElement.nodeType == 1) {
-				if (isSameNode(domElement, toCheck)) {
-					return true;
-				}
-				if (hasChildNodes(domElement)) {
-					if (traverseTree(domElement.firstChild)) {
-						return true;
-					}
-				}
-			}
-			domElement = domElement.nextSibling;
-		}
-		return false;
-	}
-	return traverseTree(ParentElement.firstChild);
-}
-function hasChildNodes(oElement) {
-	return (typeof oElement.hasChildNodes == "function") ? oElement.hasChildNodes() : ((oElement.firstChild != null) ? true : false);
-}
-function isSameNode(oCheck1, oCheck2) {
-	return (typeof oCheck1.isSameNode == "function") ? oCheck1.isSameNode(oCheck2) : (oCheck1 === oCheck2);
-}
-function pageXCoord(event) {
-	if (typeof event.pageX == "undefined") {
-		return event.clientX + document.documentElement.scrollLeft;
-	}
-	return event.pageX;
-}
-function pageYCoord(event) {
-	if (typeof event.pageY == "undefined") {
-		return event.clientY + document.documentElement.scrollTop;
-	}
-	return event.pageY;
-}
-function mouseLeaveVerify(oElement, event) {
-	//Hook target element with onmouseout and use this function to verify onmouseleave.
-	return isDescendantOf(oElement, (typeof event.target != "undefined") ? event.target : event.srcElement) && !isDescendantOf(oElement, (typeof event.relatedTarget != "undefined") ? event.relatedTarget : event.toElement);
-}
-function mouseEnterVerify(oElement, event) {
-	//Hook target element with onmouseover and use this function to verify onmouseenter.
-	return !isDescendantOf(oElement, (typeof event.target != "undefined") ? event.target : event.srcElement) && isDescendantOf(oElement, (typeof event.relatedTarget != "undefined") ? event.relatedTarget : event.fromElement);
-}
-function addEvent(sEvent, oElement, fListener) {
-	try {	
-		oElement.addEventListener(sEvent, fListener, false);
-		cout("In addEvent() : Standard addEventListener() called to add a(n) \"" + sEvent + "\" event.", -1);
-	}
-	catch (error) {
-		oElement.attachEvent("on" + sEvent, fListener);	//Pity for IE.
-		cout("In addEvent() : Nonstandard attachEvent() called to add an \"on" + sEvent + "\" event.", -1);
-	}
-}
-function removeEvent(sEvent, oElement, fListener) {
-	try {	
-		oElement.removeEventListener(sEvent, fListener, false);
-		cout("In removeEvent() : Standard removeEventListener() called to remove a(n) \"" + sEvent + "\" event.", -1);
-	}
-	catch (error) {
-		oElement.detachEvent("on" + sEvent, fListener);	//Pity for IE.
-		cout("In removeEvent() : Nonstandard detachEvent() called to remove an \"on" + sEvent + "\" event.", -1);
-	}
-}
+
+module.exports = {
+    windowingInitialize,
+};

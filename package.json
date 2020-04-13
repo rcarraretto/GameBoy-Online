@@ -1,12 +1,15 @@
 {
-  "private": true,
   "name": "gameboy-online",
   "description": "JavaScript GameBoy Color Emulator",
+  "private": true,
   "dependencies": {},
   "devDependencies": {
-    "chai": "^4.1.2",
-    "lodash": "^4.17.4",
-    "mocha": "^4.0.1"
+    "chai": "4.2.0",
+    "lodash": "4.17.15",
+    "mocha": "7.1.1",
+    "webpack": "4.42.1",
+    "webpack-cli": "3.3.11",
+    "webpack-dev-server": "3.10.3"
   },
   "scripts": {
     "test": "mocha --reporter min --require test/mocha.js"

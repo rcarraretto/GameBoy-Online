@@ -1,4 +1,9 @@
+const { DEBUG_MESSAGES, DEBUG_WINDOWING } = require('../../src/config');
+
 function cout(message, colorIndex) {
+	if (typeof document === 'undefined') {
+		return;
+	}
 	var terminal_output = document.getElementById("terminal_output");
 	if ((colorIndex != 0 || DEBUG_MESSAGES) && (colorIndex != -1 || DEBUG_WINDOWING)) {
 		var lineout = document.createElement('span');
@@ -25,3 +30,8 @@ function clear_terminal() {
 		terminal_output.removeChild(terminal_output.firstChild);
 	}
 }
+
+module.exports = {
+	cout,
+	clear_terminal,
+};
