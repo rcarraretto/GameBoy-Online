@@ -1,12 +1,7 @@
 //2010-2013 Grant Galitz - XAudioJS realtime audio output compatibility library:
 const Resampler = require('./resampler');
 
-if (typeof document !== 'undefined') {
-    var XAudioJSscriptsHandle = document.getElementsByTagName("script");
-    var XAudioJSsourceHandle = XAudioJSscriptsHandle[XAudioJSscriptsHandle.length-1].src;
-}
-
-function XAudioServer(channels, sampleRate, minBufferSize, maxBufferSize, underRunCallback, volume, failureCallback) {
+export function XAudioServer(channels, sampleRate, minBufferSize, maxBufferSize, underRunCallback, volume, failureCallback) {
 	XAudioJSChannelsAllocated = Math.max(channels, 1);
 	this.XAudioJSSampleRate = Math.abs(sampleRate);
 	XAudioJSMinBufferSize = (minBufferSize >= (XAudioJSSamplesPerCallback * XAudioJSChannelsAllocated) && minBufferSize < maxBufferSize) ? (minBufferSize & (-XAudioJSChannelsAllocated)) : (XAudioJSSamplesPerCallback * XAudioJSChannelsAllocated);
@@ -156,7 +151,7 @@ XAudioServer.prototype.initializeWebAudio = function () {
             XAudioJSWebAudioContextHandle = new AudioContext();								//Create a system audio context.
         }
         catch (error) {
-            XAudioJSWebAudioContextHandle = new webkitAudioContext();							//Create a system audio context.
+            XAudioJSWebAudioContextHandle = new window.webkitAudioContext();							//Create a system audio context.
         }
         XAudioJSWebAudioLaunchedContext = true;
     }
@@ -233,7 +228,7 @@ XAudioServer.prototype.getFloat32 = function (size) {
 var XAudioJSWebAudioContextHandle = null;
 var XAudioJSWebAudioAudioNode = null;
 var XAudioJSWebAudioWatchDogTimer = null;
-var XAudioJSWebAudioWatchDogLast = false;
+var XAudioJSWebAudioWatchDogLast = null;
 var XAudioJSWebAudioLaunchedContext = false;
 var XAudioJSAudioContextSampleBuffer = [];
 var XAudioJSResampledBuffer = [];
@@ -248,7 +243,7 @@ var XAudioJSResampleBufferEnd = 0;
 var XAudioJSResampleBufferSize = 0;
 var XAudioJSMozAudioSampleRate = 44100;
 var XAudioJSSamplesPerCallback = 2048;			//Has to be between 2048 and 4096 (If over, then samples are ignored, if under then silence is added).
-var XAudioJSBinaryString = [];
+
 function XAudioJSWebAudioEvent(event) {		//Web Audio API callback...
 	if (XAudioJSWebAudioWatchDogTimer) {
 		XAudioJSWebAudioWatchDogLast = (new Date()).getTime();
@@ -320,5 +315,3 @@ function XAudioJSGetArraySlice(buffer, lengthOf) {
 		}
 	}
 }
-
-module.exports = XAudioServer;

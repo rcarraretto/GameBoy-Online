@@ -20,6 +20,6 @@
   },
   "scripts": {
     "dev": "webpack-dev-server --open",
-    "test": "mocha \"test/**/*.test.ts\""
+    "test": "TS_NODE_FILES=true mocha \"test/**/*.test.ts\""
   }
 }

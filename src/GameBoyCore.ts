@@ -1,6 +1,6 @@
+import { XAudioServer } from './XAudioServer';
 const { cout } = require('./terminal');
 const settings = require('./settings');
-const XAudioServer = require('./XAudioServer');
 const ResizeC = require('./resize');
 
  /*
