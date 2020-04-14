@@ -53,7 +53,6 @@ XAudioServer.prototype.writeAudio = function (buffer) {
 			this.MOZExecuteCallback();
 			break;
 		case 1:
-		case 3:
 			this.callbackBasedWriteAudioNoCallback(buffer);
 			this.callbackBasedExecuteCallback();
 			break;
@@ -75,7 +74,6 @@ XAudioServer.prototype.writeAudioNoCallback = function (buffer) {
 			this.MOZWriteAudioNoCallback(buffer);
 			break;
 		case 1:
-		case 3:
 			this.callbackBasedWriteAudioNoCallback(buffer);
 			break;
 		default:
@@ -89,7 +87,6 @@ XAudioServer.prototype.remainingBuffer = function () {
 		case 0:
 			return Math.floor((this.samplesAlreadyWritten - this.audioHandleMoz.mozCurrentSampleOffset()) * XAudioJSResampleControl.ratioWeight / XAudioJSChannelsAllocated) * XAudioJSChannelsAllocated;
 		case 1:
-		case 3:
 			return (Math.floor((XAudioJSResampledSamplesLeft() * XAudioJSResampleControl.ratioWeight) / XAudioJSChannelsAllocated) * XAudioJSChannelsAllocated) + XAudioJSAudioBufferSize;
 		default:
 			this.failureCallback();
@@ -117,7 +114,6 @@ XAudioServer.prototype.executeCallback = function () {
 			this.MOZExecuteCallback();
 			break;
 		case 1:
-		case 3:
 			this.callbackBasedExecuteCallback();
 			break;
 		default:
@@ -134,32 +130,12 @@ XAudioServer.prototype.initializeAudio = function () {
             this.initializeWebAudio();
         }
         catch (error) {
-            try {
-                this.initializeMediaStream();
-            }
-            catch (error) {
-		this.audioType = -1;
-		this.failureCallback();
-            }
+	    this.audioType = -1;
+	    this.failureCallback();
         }
     }
 }
-XAudioServer.prototype.initializeMediaStream = function () {
-	this.audioHandleMediaStream = new Audio();
-	this.resetCallbackAPIAudioBuffer(XAudioJSMediaStreamSampleRate);
-	if (XAudioJSMediaStreamWorker) {
-		//WebWorker is not GC'd, so manually collect it:
-		XAudioJSMediaStreamWorker.terminate();
-	}
-	XAudioJSMediaStreamWorker = new Worker(XAudioJSsourceHandle.substring(0, XAudioJSsourceHandle.length - 3) + "MediaStreamWorker.js");
-	this.audioHandleMediaStreamProcessing = new ProcessedMediaStream(XAudioJSMediaStreamWorker, XAudioJSMediaStreamSampleRate, XAudioJSChannelsAllocated);
-	this.audioHandleMediaStream.src = this.audioHandleMediaStreamProcessing;
-	this.audioHandleMediaStream.volume = XAudioJSVolume;
-	XAudioJSMediaStreamWorker.onmessage = XAudioJSMediaStreamPushAudio;
-	XAudioJSMediaStreamWorker.postMessage([1, XAudioJSResampleBufferSize, XAudioJSChannelsAllocated]);
-	this.audioHandleMediaStream.play();
-	this.audioType = 3;
-}
+
 XAudioServer.prototype.initializeMozAudio = function () {
     this.audioHandleMoz = new Audio();
 	this.audioHandleMoz.mozSetup(XAudioJSChannelsAllocated, XAudioJSMozAudioSampleRate);
@@ -227,9 +203,6 @@ XAudioServer.prototype.changeVolume = function (newVolume) {
 				this.audioHandleMoz.volume = XAudioJSVolume;
 			case 1:
 				break;
-			case 3:
-				this.audioHandleMediaStream.volume = XAudioJSVolume;
-				break;
 			default:
 				this.failureCallback();
 		}
@@ -273,12 +246,8 @@ var XAudioJSAudioBufferSize = 0;
 var XAudioJSResampleBufferStart = 0;
 var XAudioJSResampleBufferEnd = 0;
 var XAudioJSResampleBufferSize = 0;
-var XAudioJSMediaStreamWorker = null;
-var XAudioJSMediaStreamBuffer = [];
-var XAudioJSMediaStreamSampleRate = 44100;
 var XAudioJSMozAudioSampleRate = 44100;
 var XAudioJSSamplesPerCallback = 2048;			//Has to be between 2048 and 4096 (If over, then samples are ignored, if under then silence is added).
-var XAudioJSMediaStreamLengthAliasCounter = 0;
 var XAudioJSBinaryString = [];
 function XAudioJSWebAudioEvent(event) {		//Web Audio API callback...
 	if (XAudioJSWebAudioWatchDogTimer) {
@@ -307,31 +276,7 @@ function XAudioJSWebAudioEvent(event) {		//Web Audio API callback...
 		++index;
 	}
 }
-//MediaStream API buffer push
-function XAudioJSMediaStreamPushAudio(event) {
-	var index = 0;
-	var audioLengthRequested = event.data;
-	var samplesPerCallbackAll = XAudioJSSamplesPerCallback * XAudioJSChannelsAllocated;
-	var XAudioJSMediaStreamLengthAlias = audioLengthRequested % XAudioJSSamplesPerCallback;
-	audioLengthRequested = audioLengthRequested - (XAudioJSMediaStreamLengthAliasCounter - (XAudioJSMediaStreamLengthAliasCounter % XAudioJSSamplesPerCallback)) - XAudioJSMediaStreamLengthAlias + XAudioJSSamplesPerCallback;
-	XAudioJSMediaStreamLengthAliasCounter -= XAudioJSMediaStreamLengthAliasCounter - (XAudioJSMediaStreamLengthAliasCounter % XAudioJSSamplesPerCallback);
-	XAudioJSMediaStreamLengthAliasCounter += XAudioJSSamplesPerCallback - XAudioJSMediaStreamLengthAlias;
-	if (XAudioJSMediaStreamBuffer.length != samplesPerCallbackAll) {
-		XAudioJSMediaStreamBuffer = new Float32Array(samplesPerCallbackAll);
-	}
-	XAudioJSResampleRefill();
-	while (index < audioLengthRequested) {
-		var index2 = 0;
-		while (index2 < samplesPerCallbackAll && XAudioJSResampleBufferStart != XAudioJSResampleBufferEnd) {
-			XAudioJSMediaStreamBuffer[index2++] = XAudioJSResampledBuffer[XAudioJSResampleBufferStart++];
-			if (XAudioJSResampleBufferStart == XAudioJSResampleBufferSize) {
-				XAudioJSResampleBufferStart = 0;
-			}
-		}
-		XAudioJSMediaStreamWorker.postMessage([0, XAudioJSMediaStreamBuffer]);
-		index += XAudioJSSamplesPerCallback;
-	}
-}
+
 function XAudioJSResampleRefill() {
 	if (XAudioJSAudioBufferSize > 0) {
 		//Resample a chunk of audio:
