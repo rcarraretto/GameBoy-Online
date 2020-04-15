@@ -1,7 +1,7 @@
 import { XAudioServer } from './XAudioServer';
+import { Resize } from './resize';
 const { cout } = require('./terminal');
 const settings = require('./settings');
-const ResizeC = require('./resize');
 
  /*
   JavaScript GameBoy Color Emulator
@@ -6370,7 +6370,7 @@ GameBoyCore.prototype.resizeFrameBuffer = function () {
 
 GameBoyCore.prototype.compileResizeFrameBufferFunction = function () {
 	if (this.offscreenRGBCount > 0) {
-		this.resizer = new ResizeC(160, 144, this.offscreenWidth, this.offscreenHeight, false, settings[13]);
+		this.resizer = new Resize(160, 144, this.offscreenWidth, this.offscreenHeight, false, settings[13]);
 	}
 }
 

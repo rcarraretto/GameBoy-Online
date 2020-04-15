@@ -1,21 +1,13 @@
 //JavaScript Image Resizer (c) 2012 - Grant Galitz
-var resizeWorker = null;
-self.onmessage = function (event) {
-	switch (event.data[0]) {
-		case "setup":
-			resizeWorker = new Resize(event.data[1], event.data[2], event.data[3], event.data[4], event.data[5], event.data[6]);
-			break;
-		case "resize":
-			resizeWorker.resize(event.data[1]);
-	}
-}
-function Resize(widthOriginal, heightOriginal, targetWidth, targetHeight, colorChannels, interpolationPass) {
-	this.widthOriginal = widthOriginal;
-	this.heightOriginal = heightOriginal;
-	this.targetWidth = targetWidth;
-	this.targetHeight = targetHeight;
-	this.colorChannels = colorChannels;
+
+export function Resize(widthOriginal, heightOriginal, targetWidth, targetHeight, blendAlpha, interpolationPass) {
+	this.widthOriginal = Math.abs(parseInt(widthOriginal) || 0);
+	this.heightOriginal = Math.abs(parseInt(heightOriginal) || 0);
+	this.targetWidth = Math.abs(parseInt(targetWidth) || 0);
+	this.targetHeight = Math.abs(parseInt(targetHeight) || 0);
+	this.colorChannels = (!!blendAlpha) ? 4 : 3;
 	this.interpolationPass = !!interpolationPass;
+	this.resizeCallback = function () {};
 	this.targetWidthMultipliedByChannels = this.targetWidth * this.colorChannels;
 	this.originalWidthMultipliedByChannels = this.widthOriginal * this.colorChannels;
 	this.originalHeightMultipliedByChannels = this.heightOriginal * this.colorChannels;
@@ -32,6 +24,7 @@ Resize.prototype.initialize = function () {
 		throw(new Error("Invalid settings specified for the resizer."));
 	}
 }
+
 Resize.prototype.configurePasses = function () {
 	if (this.widthOriginal == this.targetWidth) {
 		//Bypass the width resizer pass:
@@ -53,7 +46,7 @@ Resize.prototype.configurePasses = function () {
 		//Bypass the height resizer pass:
 		this.resizeHeight = this.bypassResizer;
 	}
-	else {	
+	else {
 		//Setup the height resizer pass:
 		this.ratioWeightHeightPass = this.heightOriginal / this.targetHeight;
 		if (this.ratioWeightHeightPass < 1 && this.interpolationPass) {
@@ -389,7 +382,7 @@ Resize.prototype.resizeHeightRGBA = function (buffer) {
 	return outputBuffer;
 }
 Resize.prototype.resize = function (buffer) {
-	self.postMessage(this.resizeHeight(this.resizeWidth(buffer)));
+	this.resizeCallback(this.resizeHeight(this.resizeWidth(buffer)));
 }
 Resize.prototype.bypassResizer = function (buffer) {
 	//Just return the buffer passsed:
