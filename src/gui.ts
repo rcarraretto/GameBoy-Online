@@ -3,8 +3,7 @@ import { findValue, findKey, checkStorageLength, deleteValue } from './local-sto
 import { windowCreate, windowStacks } from './windowStack';
 import { addEvent, popupMenu, showAlert } from './util';
 import { cout, clear_terminal } from './terminal';
-
-const settings = require('./settings');
+import { settings } from './settings';
 
 var inFullscreen = false;
 var mainCanvas = null;
@@ -42,21 +41,21 @@ export function windowingInitialize() {
 		cout("Fatal windowing error: \"" + error.message + "\" file:" + error.fileName + " line: " + error.lineNumber, 2);
 	}
 	//Update the settings to the emulator's default:
-	setChecked("enable_sound", settings[0]);
-	setChecked("enable_gbc_bios", settings[1]);
-	setChecked("disable_colors", settings[2]);
-	setChecked("rom_only_override", settings[9]);
-	setChecked("mbc_enable_override", settings[10]);
-	setChecked("enable_colorization", settings[4]);
+	setChecked("enable_sound", settings.enable_sound);
+	setChecked("enable_gbc_bios", settings.enable_gbc_bios);
+	setChecked("disable_colors", settings.disable_colors);
+	setChecked("rom_only_override", settings.rom_only_override);
+	setChecked("mbc_enable_override", settings.mbc_enable_override);
+	setChecked("enable_colorization", settings.enable_colorization);
 	setChecked("do_minimal", showAsMinimal);
-	setChecked("software_resizing", settings[12]);
-	setChecked("typed_arrays_disallow", settings[5]);
-	setChecked("gb_boot_rom_utilized", settings[11]);
-	setChecked("resize_smoothing", settings[13]);
-	setChecked("channel1", settings[14][0]);
-	setChecked("channel2", settings[14][1]);
-	setChecked("channel3", settings[14][2]);
-	setChecked("channel4", settings[14][3]);
+	setChecked("software_resizing", settings.software_resizing);
+	setChecked("typed_arrays_disallow", settings.typed_arrays_disallow);
+	setChecked("gb_boot_rom_utilized", settings.gb_boot_rom_utilized);
+	setChecked("resize_smoothing", settings.resize_smoothing);
+	setChecked("channel1", settings.channels[0]);
+	setChecked("channel2", settings.channels[1]);
+	setChecked("channel3", settings.channels[2]);
+	setChecked("channel4", settings.channels[3]);
 }
 function registerGUIEvents() {
 	cout("In registerGUIEvents() : Registering GUI Events.", -1);
@@ -107,7 +106,7 @@ function registerGUIEvents() {
 		if (io.GameBoyEmulatorInitialized()) {
 			var volume = prompt("Set the volume here:", "1.0");
 			if (volume != null && volume.length > 0) {
-				settings[3] = Math.min(Math.max(parseFloat(volume), 0), 1);
+				settings.volume = Math.min(Math.max(parseFloat(volume), 0), 1);
 				io.getGameboy().changeVolume();
 			}
 		}
@@ -265,59 +264,59 @@ function registerGUIEvents() {
 		io.saveSRAM();
 	});
 	addEvent("click", document.getElementById("enable_sound"), function () {
-		settings[0] = isChecked("enable_sound");
+		settings.enable_sound = isChecked("enable_sound");
 		if (io.GameBoyEmulatorInitialized()) {
 			io.getGameboy().initSound();
 		}
 	});
 	addEvent("click", document.getElementById("disable_colors"), function () {
-		settings[2] = isChecked("disable_colors");
+		settings.disable_colors = isChecked("disable_colors");
 	});
 	addEvent("click", document.getElementById("rom_only_override"), function () {
-		settings[9] = isChecked("rom_only_override");
+		settings.rom_only_override = isChecked("rom_only_override");
 	});
 	addEvent("click", document.getElementById("mbc_enable_override"), function () {
-		settings[10] = isChecked("mbc_enable_override");
+		settings.mbc_enable_override = isChecked("mbc_enable_override");
 	});
 	addEvent("click", document.getElementById("enable_gbc_bios"), function () {
-		settings[1] = isChecked("enable_gbc_bios");
+		settings.enable_gbc_bios = isChecked("enable_gbc_bios");
 	});
 	addEvent("click", document.getElementById("enable_colorization"), function () {
-		settings[4] = isChecked("enable_colorization");
+		settings.enable_colorization = isChecked("enable_colorization");
 	});
 	addEvent("click", document.getElementById("do_minimal"), function () {
 		showAsMinimal = isChecked("do_minimal");
 		fullscreenCanvas.className = (showAsMinimal) ? "minimum" : "maximum";
 	});
 	addEvent("click", document.getElementById("software_resizing"), function () {
-		settings[12] = isChecked("software_resizing");
+		settings.software_resizing = isChecked("software_resizing");
 		if (io.GameBoyEmulatorInitialized()) {
 			io.initLCD();
 		}
 	});
 	addEvent("click", document.getElementById("typed_arrays_disallow"), function () {
-		settings[5] = isChecked("typed_arrays_disallow");
+		settings.typed_arrays_disallow = isChecked("typed_arrays_disallow");
 	});
 	addEvent("click", document.getElementById("gb_boot_rom_utilized"), function () {
-		settings[11] = isChecked("gb_boot_rom_utilized");
+		settings.gb_boot_rom_utilized = isChecked("gb_boot_rom_utilized");
 	});
 	addEvent("click", document.getElementById("resize_smoothing"), function () {
-		settings[13] = isChecked("resize_smoothing");
+		settings.resize_smoothing = isChecked("resize_smoothing");
 		if (io.GameBoyEmulatorInitialized()) {
 			io.initLCD();
 		}
 	});
 	addEvent("click", document.getElementById("channel1"), function () {
-		settings[14][0] = isChecked("channel1");
+		settings.channels[0] = isChecked("channel1");
 	});
 	addEvent("click", document.getElementById("channel2"), function () {
-		settings[14][1] = isChecked("channel2");
+		settings.channels[1] = isChecked("channel2");
 	});
 	addEvent("click", document.getElementById("channel3"), function () {
-		settings[14][2] = isChecked("channel3");
+		settings.channels[2] = isChecked("channel3");
 	});
 	addEvent("click", document.getElementById("channel4"), function () {
-		settings[14][3] = isChecked("channel4");
+		settings.channels[3] = isChecked("channel4");
 	});
 	addEvent("click", document.getElementById("view_fullscreen"), fullscreenPlayer);
 	new popupMenu(document.getElementById("GameBoy_view_menu"), document.getElementById("GameBoy_view_popup"));

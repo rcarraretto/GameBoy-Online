@@ -1,8 +1,7 @@
 import { setValue, findValue, deleteValue } from './local-storage';
 import { cout } from './terminal';
 import { GameBoyCore } from './GameBoyCore'
-
-const settings = require('./settings');
+import { settings } from './settings';
 
 var gameboy = null;						//GameBoyCore object.
 var gbRunInterval = null;				//GameBoyCore Timer
@@ -27,7 +26,7 @@ function run() {
 				if (!document.hidden) {
 					gameboy.run();
 				}
-			}, settings[6]);
+			}, settings.loop_interval);
 		}
 		else {
 			cout("The GameBoy core is already running.", 1);
@@ -391,7 +390,7 @@ function initNewCanvas() {
 //Call this when resizing the canvas:
 function initNewCanvasSize() {
 	if (GameBoyEmulatorInitialized()) {
-		if (!settings[12]) {
+		if (!settings.software_resizing) {
 			if (gameboy.onscreenWidth != 160 || gameboy.onscreenHeight != 144) {
 				initLCD();
 			}
