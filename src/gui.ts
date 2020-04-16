@@ -4,6 +4,7 @@ import { windowCreate, windowStacks } from './windowStack';
 import { addEvent, popupMenu, showAlert } from './util';
 import { cout, clear_terminal } from './terminal';
 import { settings } from './settings';
+import { base64, base64_decode } from './base64';
 
 var inFullscreen = false;
 var mainCanvas = null;

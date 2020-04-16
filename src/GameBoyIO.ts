@@ -2,6 +2,7 @@ import { setValue, findValue, deleteValue } from './local-storage';
 import { cout } from './terminal';
 import { GameBoyCore } from './GameBoyCore'
 import { settings } from './settings';
+import { arrayToBase64, base64ToArray, to_little_endian_dword, base64, to_byte } from './base64';
 
 var gameboy = null;						//GameBoyCore object.
 var gbRunInterval = null;				//GameBoyCore Timer
