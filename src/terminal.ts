@@ -1,4 +1,5 @@
-const { DEBUG_MESSAGES, DEBUG_WINDOWING } = require('./config');
+const DEBUG_MESSAGES = false;
+const DEBUG_WINDOWING = false;
 
 export function cout(message, colorIndex) {
 	if (typeof document === 'undefined') {
