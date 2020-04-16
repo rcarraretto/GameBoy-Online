@@ -1,5 +1,5 @@
 //2010-2013 Grant Galitz - XAudioJS realtime audio output compatibility library:
-const Resampler = require('./resampler');
+import { Resampler } from './resampler';
 
 export function XAudioServer(channels, sampleRate, minBufferSize, maxBufferSize, underRunCallback, volume, failureCallback) {
 	XAudioJSChannelsAllocated = Math.max(channels, 1);

@@ -1,5 +1,5 @@
 //JavaScript Audio Resampler (c) 2011 - Grant Galitz
-function Resampler(fromSampleRate, toSampleRate, channels, outputBufferSize, noReturn) {
+export function Resampler(fromSampleRate, toSampleRate, channels, outputBufferSize, noReturn) {
 	this.fromSampleRate = fromSampleRate;
 	this.toSampleRate = toSampleRate;
 	this.channels = channels | 0;
@@ -204,5 +204,3 @@ Resampler.prototype.initializeBuffers = function () {
 		this.lastOutput = [];
 	}
 }
-
-module.exports = Resampler;
