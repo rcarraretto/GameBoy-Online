@@ -1,4 +1,4 @@
-import { io } from './GameBoyIO';
+import * as io from './GameBoyIO';
 import { findValue, findKey, checkStorageLength, deleteValue } from './local-storage';
 import { windowCreate, windowStacks } from './windowStack';
 import { addEvent, popupMenu, showAlert } from './util';
