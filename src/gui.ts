@@ -130,54 +130,34 @@ function registerGUIEvents() {
 	});
 	addEvent("change", document.getElementById("local_file_open"), function () {
 		windowStacks[4].hide();
-		if (typeof this.files != "undefined") {
-			try {
-				if (this.files.length >= 1) {
-					cout("Reading the local file \"" + this.files[0].name + "\"", 0);
-					try {
-						//Gecko 1.9.2+ (Standard Method)
-						var binaryHandle = new FileReader();
-						binaryHandle.onload = function () {
-							if (this.readyState == 2) {
-								cout("file loaded.", 0);
-								try {
-									initPlayer();
-									io.start(mainCanvas, this.result);
-								}
-								catch (error) {
-									showAlert(error);
-								}
-							}
-							else {
-								cout("loading file, please wait...", 0);
-							}
-						}
-						binaryHandle.readAsBinaryString(this.files[this.files.length - 1]);
-					}
-					catch (error) {
-						cout("Browser does not support the FileReader object, falling back to the non-standard File object access,", 2);
-						//Gecko 1.9.0, 1.9.1 (Non-Standard Method)
-						var romImageString = this.files[this.files.length - 1].getAsBinary();
-						try {
-							initPlayer();
-							io.start(mainCanvas, romImageString);
-						}
-						catch (error) {
-							showAlert(error);
-						}
-
-					}
-				}
-				else {
-					cout("Incorrect number of files selected for local loading.", 1);
-				}
-			}
-			catch (error) {
-				cout("Could not load in a locally stored ROM file.", 2);
-			}
+		if (typeof this.files === "undefined") {
+			cout("Could not find the handle on the file to open.", 2);
+			return;
 		}
-		else {
-			cout("could not find the handle on the file to open.", 2);
+		if (this.files.length !== 1) {
+			cout("Incorrect number of files selected for local loading.", 1);
+			return;
+		}
+		const file = this.files[0];
+		try {
+			cout(`Reading local file: "${file.name}"`, 0);
+			const binaryHandle = new FileReader();
+			binaryHandle.onload = function () {
+				if (this.readyState == 2) {
+					cout("File loaded.", 0);
+					try {
+						initPlayer();
+						io.start(mainCanvas, this.result);
+					} catch (error) {
+						showAlert(error);
+					}
+				} else {
+					cout("Loading file, please wait...", 0);
+				}
+			}
+			binaryHandle.readAsBinaryString(file);
+		} catch (error) {
+			cout("Could not load in a locally stored ROM file.", 2);
 		}
 	});
 	addEvent("change", document.getElementById("save_open"), function () {
