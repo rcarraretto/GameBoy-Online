@@ -381,7 +381,7 @@ function fullscreenPlayer() {
 }
 
 // @ts-ignore
-function runFreeze(keyName) {
+window.runFreeze = (keyName) => {
 	try {
 		windowStacks[8].hide();
 		initPlayer();
