@@ -3,6 +3,7 @@ import { Resize } from './resize';
 import { cout } from './terminal';
 import { settings } from './settings';
 import { OPCODE } from './opcodes';
+import { GBBOOTROM, GBCBOOTROM, ffxxDump, SecondaryTICKTable, TICKTable } from './constants';
 
  /*
   JavaScript GameBoy Color Emulator
@@ -15,7 +16,307 @@ import { OPCODE } from './opcodes';
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-export function GameBoyCore(canvas = null, ROMImage = null, pause = null) {
+export class GameBoyCore {
+    public canvas: any;
+    public drawContext: any;
+    public ROMImage: any;
+    public pause: any;
+    public registerA: any;
+    public FZero: any;
+    public FSubtract: any;
+    public FHalfCarry: any;
+    public FCarry: any;
+    public registerB: any;
+    public registerC: any;
+    public registerD: any;
+    public registerE: any;
+    public registersHL: any;
+    public stackPointer: any;
+    public programCounter: any;
+    public CPUCyclesTotal: any;
+    public CPUCyclesTotalBase: any;
+    public CPUCyclesTotalCurrent: any;
+    public CPUCyclesTotalRoundoff: any;
+    public baseCPUCyclesPerIteration: any;
+    public remainingClocks: any;
+    public inBootstrap: any;
+    public usedBootROM: any;
+    public usedGBCBootROM: any;
+    public halt: any;
+    public skipPCIncrement: any;
+    public stopEmulator: any;
+    public IME: any;
+    public IRQLineMatched: any;
+    public interruptsRequested: any;
+    public interruptsEnabled: any;
+    public hdmaRunning: any;
+    public CPUTicks: any;
+    public doubleSpeedShifter: any;
+    public JoyPad: any;
+    public CPUStopped: any;
+    public memoryReader: any;
+    public memoryWriter: any;
+    public memoryHighReader: any;
+    public memoryHighWriter: any;
+    public ROM: any;
+    public memory: any;
+    public MBCRam: any;
+    public VRAM: any;
+    public GBCMemory: any;
+    public MBC1Mode: any;
+    public MBCRAMBanksEnabled: any;
+    public currMBCRAMBank: any;
+    public currMBCRAMBankPosition: any;
+    public cGBC: any;
+    public gbcRamBank: any;
+    public gbcRamBankPosition: any;
+    public gbcRamBankPositionECHO: any;
+    public RAMBanks: any;
+    public ROMBank1offs: any;
+    public currentROMBank: any;
+    public cartridgeType: any;
+    public name: any;
+    public gameCode: any;
+    public fromSaveState: any;
+    public savedStateFileName: any;
+    public STATTracker: any;
+    public modeSTAT: any;
+    public spriteCount: any;
+    public LYCMatchTriggerSTAT: any;
+    public mode2TriggerSTAT: any;
+    public mode1TriggerSTAT: any;
+    public mode0TriggerSTAT: any;
+    public LCDisOn: any;
+    public LINECONTROL: any;
+    public DISPLAYOFFCONTROL: any;
+    public LCDCONTROL: any;
+    public RTCisLatched: any;
+    public latchedSeconds: any;
+    public latchedMinutes: any;
+    public latchedHours: any;
+    public latchedLDays: any;
+    public latchedHDays: any;
+    public RTCSeconds: any;
+    public RTCMinutes: any;
+    public RTCHours: any;
+    public RTCDays: any;
+    public RTCDayOverFlow: any;
+    public RTCHALT: any;
+    public highX: any;
+    public lowX: any;
+    public highY: any;
+    public lowY: any;
+    public audioHandle: any;
+    public numSamplesTotal: any;
+    public dutyLookup: any;
+    public bufferContainAmount: any;
+    public LSFR15Table: any;
+    public LSFR7Table: any;
+    public noiseSampleTable: any;
+    public soundMasterEnabled: any;
+    public channel3PCM: any;
+    public VinLeftChannelMasterVolume: any;
+    public VinRightChannelMasterVolume: any;
+    public leftChannel1: any;
+    public leftChannel2: any;
+    public leftChannel3: any;
+    public leftChannel4: any;
+    public rightChannel1: any;
+    public rightChannel2: any;
+    public rightChannel3: any;
+    public rightChannel4: any;
+    public audioClocksUntilNextEvent: any;
+    public audioClocksUntilNextEventCounter: any;
+    public channel1currentSampleLeft: any;
+    public channel1currentSampleRight: any;
+    public channel2currentSampleLeft: any;
+    public channel2currentSampleRight: any;
+    public channel3currentSampleLeft: any;
+    public channel3currentSampleRight: any;
+    public channel4currentSampleLeft: any;
+    public channel4currentSampleRight: any;
+    public channel1currentSampleLeftSecondary: any;
+    public channel1currentSampleRightSecondary: any;
+    public channel2currentSampleLeftSecondary: any;
+    public channel2currentSampleRightSecondary: any;
+    public channel3currentSampleLeftSecondary: any;
+    public channel3currentSampleRightSecondary: any;
+    public channel4currentSampleLeftSecondary: any;
+    public channel4currentSampleRightSecondary: any;
+    public channel1currentSampleLeftTrimary: any;
+    public channel1currentSampleRightTrimary: any;
+    public channel2currentSampleLeftTrimary: any;
+    public channel2currentSampleRightTrimary: any;
+    public mixerOutputCache: any;
+    public emulatorSpeed: any;
+    public audioTicks: any;
+    public audioIndex: any;
+    public downsampleInput: any;
+    public audioDestinationPosition: any;
+    public rollover: any;
+    public emulatorTicks: any;
+    public DIVTicks: any;
+    public LCDTicks: any;
+    public timerTicks: any;
+    public TIMAEnabled: any;
+    public TACClocker: any;
+    public serialTimer: any;
+    public serialShiftTimer: any;
+    public lastIteration: any;
+    public firstIteration: any;
+    public actualScanLine: any;
+    public lastUnrenderedLine: any;
+    public queuedScanLines: any;
+    public totalLinesPassed: any;
+    public haltPostClocks: any;
+    public cMBC1: any;
+    public cMBC2: any;
+    public cMBC3: any;
+    public cMBC5: any;
+    public cMBC7: any;
+    public cSRAM: any;
+    public cMMMO1: any;
+    public cRUMBLE: any;
+    public cCamera: any;
+    public cTAMA5: any;
+    public cHuC3: any;
+    public cHuC1: any;
+    public cTIMER: any;
+    public ROMBanks: any;
+    public numRAMBanks: any;
+    public currVRAMBank: any;
+    public backgroundX: any;
+    public backgroundY: any;
+    public gfxWindowDisplay: any;
+    public gfxSpriteShow: any;
+    public gfxSpriteNormalHeight: any;
+    public bgEnabled: any;
+    public BGPriorityEnabled: any;
+    public gfxWindowCHRBankPosition: any;
+    public gfxBackgroundCHRBankPosition: any;
+    public gfxBackgroundBankOffset: any;
+    public windowY: any;
+    public windowX: any;
+    public drewBlank: any;
+    public drewFrame: any;
+    public midScanlineOffset: any;
+    public pixelEnd: any;
+    public currentX: any;
+    public BGCHRBank1: any;
+    public BGCHRBank2: any;
+    public BGCHRCurrentBank: any;
+    public tileCache: any;
+    public colors: any;
+    public OBJPalette: any;
+    public BGPalette: any;
+    public gbcOBJRawPalette: any;
+    public gbcBGRawPalette: any;
+    public gbOBJPalette: any;
+    public gbBGPalette: any;
+    public gbcOBJPalette: any;
+    public gbcBGPalette: any;
+    public gbBGColorizedPalette: any;
+    public gbOBJColorizedPalette: any;
+    public cachedBGPaletteConversion: any;
+    public cachedOBJPaletteConversion: any;
+    public updateGBBGPalette: any;
+    public updateGBOBJPalette: any;
+    public colorizedGBPalettes: any;
+    public BGLayerRender: any;
+    public WindowLayerRender: any;
+    public SpriteLayerRender: any;
+    public frameBuffer: any;
+    public swizzledFrame: any;
+    public canvasBuffer: any;
+    public pixelStart: any;
+    public onscreenWidth: any;
+    public onscreenHeight: any;
+    public offscreenWidth: any;
+    public offscreenHeight: any;
+    public offscreenRGBCount: any;
+    public resizePathClear: any;
+    public serialShiftTimerAllocated: any;
+    public IRQEnableDelay: any;
+    public iterations: any;
+    public cBATT: any;
+    public channel1FrequencyTracker: any;
+    public channel1FrequencyCounter: any;
+    public channel1totalLength: any;
+    public channel1envelopeVolume: any;
+    public channel1envelopeType: any;
+    public channel1envelopeSweeps: any;
+    public channel1envelopeSweepsLast: any;
+    public channel1consecutive: any;
+    public channel1frequency: any;
+    public channel1SweepFault: any;
+    public channel1ShadowFrequency: any;
+    public channel1timeSweep: any;
+    public channel1lastTimeSweep: any;
+    public channel1Swept: any;
+    public channel1frequencySweepDivider: any;
+    public channel1decreaseSweep: any;
+    public channel2FrequencyTracker: any;
+    public channel2FrequencyCounter: any;
+    public channel2totalLength: any;
+    public channel2envelopeVolume: any;
+    public channel2envelopeType: any;
+    public channel2envelopeSweeps: any;
+    public channel2envelopeSweepsLast: any;
+    public channel2consecutive: any;
+    public channel2frequency: any;
+    public channel3canPlay: any;
+    public channel3totalLength: any;
+    public channel3patternType: any;
+    public channel3frequency: any;
+    public channel3consecutive: any;
+    public channel4FrequencyPeriod: any;
+    public channel4lastSampleLookup: any;
+    public channel4totalLength: any;
+    public channel4envelopeVolume: any;
+    public channel4currentVolume: any;
+    public channel4envelopeType: any;
+    public channel4envelopeSweeps: any;
+    public channel4envelopeSweepsLast: any;
+    public channel4consecutive: any;
+    public channel4BitRange: any;
+    public channel1DutyTracker: any;
+    public channel1CachedDuty: any;
+    public channel2DutyTracker: any;
+    public channel2CachedDuty: any;
+    public channel1Enabled: any;
+    public channel2Enabled: any;
+    public channel3Enabled: any;
+    public channel4Enabled: any;
+    public sequencerClocks: any;
+    public sequencePosition: any;
+    public channel3Counter: any;
+    public channel4Counter: any;
+    public cachedChannel3Sample: any;
+    public cachedChannel4Sample: any;
+    public channel3FrequencyPeriod: any;
+    public channel3lastSampleLookup: any;
+    public ROMBankEdge: any;
+    public TICKTable: any
+    public SecondaryTICKTable: any;
+    public channel4VolumeShifter: any;
+    public openRTC: any;
+    public openMBC: any;
+    public numROMBanks: any;
+    public clocksPerSecond: any;
+    public canvasOffscreen: any;
+    public drawContextOffscreen: any;
+    public drawContextOnscreen: any;
+    public resizer: any;
+    public audioResamplerFirstPassFactor: any;
+    public downSampleInputDivider: any;
+    public channel1canPlay: any;
+    public channel2canPlay: any;
+    public channel4canPlay: any;
+    public audioBuffer: any;
+    public sortBuffer: any;
+    public OAMAddressCache: any;
+
+    constructor(canvas = null, ROMImage = null, pause = null) {
 	//Params, etc...
 	this.canvas = canvas;						//Canvas DOM object for drawing out the graphics to.
 	this.drawContext = null;					// LCD Context
@@ -273,81 +574,9 @@ export function GameBoyCore(canvas = null, ROMImage = null, pause = null) {
 	this.resizePathClear = true;
 	//Initialize the white noise cache tables ahead of time:
 	this.intializeWhiteNoise();
-}
-GameBoyCore.prototype.GBBOOTROM = [		//GB BOOT ROM
-	//Add 256 byte boot rom here if you are going to use it.
-];
-GameBoyCore.prototype.GBCBOOTROM = [	//GBC BOOT ROM
-	//Add 2048 byte boot rom here if you are going to use it.
-];
-GameBoyCore.prototype.ffxxDump = [	//Dump of the post-BOOT I/O register state (From gambatte):
-	0x0F, 0x00, 0x7C, 0xFF, 0x00, 0x00, 0x00, 0xF8, 	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x01,
-	0x80, 0xBF, 0xF3, 0xFF, 0xBF, 0xFF, 0x3F, 0x00, 	0xFF, 0xBF, 0x7F, 0xFF, 0x9F, 0xFF, 0xBF, 0xFF,
-	0xFF, 0x00, 0x00, 0xBF, 0x77, 0xF3, 0xF1, 0xFF, 	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-	0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 	0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF,
-	0x91, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFC, 	0x00, 0x00, 0x00, 0x00, 0xFF, 0x7E, 0xFF, 0xFE,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x3E, 0xFF, 	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 	0xC0, 0xFF, 0xC1, 0x00, 0xFE, 0xFF, 0xFF, 0xFF,
-	0xF8, 0xFF, 0x00, 0x00, 0x00, 0x8F, 0x00, 0x00, 	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-	0xCE, 0xED, 0x66, 0x66, 0xCC, 0x0D, 0x00, 0x0B, 	0x03, 0x73, 0x00, 0x83, 0x00, 0x0C, 0x00, 0x0D,
-	0x00, 0x08, 0x11, 0x1F, 0x88, 0x89, 0x00, 0x0E, 	0xDC, 0xCC, 0x6E, 0xE6, 0xDD, 0xDD, 0xD9, 0x99,
-	0xBB, 0xBB, 0x67, 0x63, 0x6E, 0x0E, 0xEC, 0xCC, 	0xDD, 0xDC, 0x99, 0x9F, 0xBB, 0xB9, 0x33, 0x3E,
-	0x45, 0xEC, 0x52, 0xFA, 0x08, 0xB7, 0x07, 0x5D, 	0x01, 0xFD, 0xC0, 0xFF, 0x08, 0xFC, 0x00, 0xE5,
-	0x0B, 0xF8, 0xC2, 0xCE, 0xF4, 0xF9, 0x0F, 0x7F, 	0x45, 0x6D, 0x3D, 0xFE, 0x46, 0x97, 0x33, 0x5E,
-	0x08, 0xEF, 0xF1, 0xFF, 0x86, 0x83, 0x24, 0x74, 	0x12, 0xFC, 0x00, 0x9F, 0xB4, 0xB7, 0x06, 0xD5,
-	0xD0, 0x7A, 0x00, 0x9E, 0x04, 0x5F, 0x41, 0x2F, 	0x1D, 0x77, 0x36, 0x75, 0x81, 0xAA, 0x70, 0x3A,
-	0x98, 0xD1, 0x71, 0x02, 0x4D, 0x01, 0xC1, 0xFF, 	0x0D, 0x00, 0xD3, 0x05, 0xF9, 0x00, 0x0B, 0x00
-];
+    }
 
-GameBoyCore.prototype.OPCODE = OPCODE;
-
-GameBoyCore.prototype.TICKTable = [		//Number of machine cycles for each instruction:
-/*   0,  1,  2,  3,  4,  5,  6,  7,      8,  9,  A, B,  C,  D, E,  F*/
-     4, 12,  8,  8,  4,  4,  8,  4,     20,  8,  8, 8,  4,  4, 8,  4,  //0
-     4, 12,  8,  8,  4,  4,  8,  4,     12,  8,  8, 8,  4,  4, 8,  4,  //1
-     8, 12,  8,  8,  4,  4,  8,  4,      8,  8,  8, 8,  4,  4, 8,  4,  //2
-     8, 12,  8,  8, 12, 12, 12,  4,      8,  8,  8, 8,  4,  4, 8,  4,  //3
-
-     4,  4,  4,  4,  4,  4,  8,  4,      4,  4,  4, 4,  4,  4, 8,  4,  //4
-     4,  4,  4,  4,  4,  4,  8,  4,      4,  4,  4, 4,  4,  4, 8,  4,  //5
-     4,  4,  4,  4,  4,  4,  8,  4,      4,  4,  4, 4,  4,  4, 8,  4,  //6
-     8,  8,  8,  8,  8,  8,  4,  8,      4,  4,  4, 4,  4,  4, 8,  4,  //7
-
-     4,  4,  4,  4,  4,  4,  8,  4,      4,  4,  4, 4,  4,  4, 8,  4,  //8
-     4,  4,  4,  4,  4,  4,  8,  4,      4,  4,  4, 4,  4,  4, 8,  4,  //9
-     4,  4,  4,  4,  4,  4,  8,  4,      4,  4,  4, 4,  4,  4, 8,  4,  //A
-     4,  4,  4,  4,  4,  4,  8,  4,      4,  4,  4, 4,  4,  4, 8,  4,  //B
-
-     8, 12, 12, 16, 12, 16,  8, 16,      8, 16, 12, 0, 12, 24, 8, 16,  //C
-     8, 12, 12,  4, 12, 16,  8, 16,      8, 16, 12, 4, 12,  4, 8, 16,  //D
-    12, 12,  8,  4,  4, 16,  8, 16,     16,  4, 16, 4,  4,  4, 8, 16,  //E
-    12, 12,  8,  4,  4, 16,  8, 16,     12,  8, 16, 4,  0,  4, 8, 16   //F
-];
-
-GameBoyCore.prototype.SecondaryTICKTable = [	//Number of machine cycles for each 0xCBXX instruction:
-/*  0, 1, 2, 3, 4, 5,  6, 7,        8, 9, A, B, C, D,  E, F*/
-    8, 8, 8, 8, 8, 8, 16, 8,        8, 8, 8, 8, 8, 8, 16, 8,  //0
-    8, 8, 8, 8, 8, 8, 16, 8,        8, 8, 8, 8, 8, 8, 16, 8,  //1
-    8, 8, 8, 8, 8, 8, 16, 8,        8, 8, 8, 8, 8, 8, 16, 8,  //2
-    8, 8, 8, 8, 8, 8, 16, 8,        8, 8, 8, 8, 8, 8, 16, 8,  //3
-
-    8, 8, 8, 8, 8, 8, 12, 8,        8, 8, 8, 8, 8, 8, 12, 8,  //4
-    8, 8, 8, 8, 8, 8, 12, 8,        8, 8, 8, 8, 8, 8, 12, 8,  //5
-    8, 8, 8, 8, 8, 8, 12, 8,        8, 8, 8, 8, 8, 8, 12, 8,  //6
-    8, 8, 8, 8, 8, 8, 12, 8,        8, 8, 8, 8, 8, 8, 12, 8,  //7
-
-    8, 8, 8, 8, 8, 8, 16, 8,        8, 8, 8, 8, 8, 8, 16, 8,  //8
-    8, 8, 8, 8, 8, 8, 16, 8,        8, 8, 8, 8, 8, 8, 16, 8,  //9
-    8, 8, 8, 8, 8, 8, 16, 8,        8, 8, 8, 8, 8, 8, 16, 8,  //A
-    8, 8, 8, 8, 8, 8, 16, 8,        8, 8, 8, 8, 8, 8, 16, 8,  //B
-
-    8, 8, 8, 8, 8, 8, 16, 8,        8, 8, 8, 8, 8, 8, 16, 8,  //C
-    8, 8, 8, 8, 8, 8, 16, 8,        8, 8, 8, 8, 8, 8, 16, 8,  //D
-    8, 8, 8, 8, 8, 8, 16, 8,        8, 8, 8, 8, 8, 8, 16, 8,  //E
-    8, 8, 8, 8, 8, 8, 16, 8,        8, 8, 8, 8, 8, 8, 16, 8   //F
-];
-
-GameBoyCore.prototype.saveSRAMState = function () {
+public saveSRAMState() {
 	if (!this.cBATT || this.MBCRam.length == 0) {
 		//No battery backup...
 		return [];
@@ -358,7 +587,7 @@ GameBoyCore.prototype.saveSRAMState = function () {
 	}
 }
 
-GameBoyCore.prototype.saveRTCState = function () {
+public saveRTCState() {
 	if (!this.cTIMER) {
 		//No battery backup...
 		return [];
@@ -383,7 +612,7 @@ GameBoyCore.prototype.saveRTCState = function () {
 	}
 }
 
-GameBoyCore.prototype.saveState = function () {
+public saveState() {
 	return [
 		this.fromTypedArray(this.ROM),
 		this.inBootstrap,
@@ -595,7 +824,7 @@ GameBoyCore.prototype.saveState = function () {
 	];
 }
 
-GameBoyCore.prototype.returnFromState = function (returnedFrom) {
+public returnFromState(returnedFrom) {
 	var index = 0;
 	var state = returnedFrom.slice(0);
 	this.ROM = this.toTypedArray(state[index++], "uint8");
@@ -808,8 +1037,8 @@ GameBoyCore.prototype.returnFromState = function (returnedFrom) {
 	this.audioClocksUntilNextEvent = state[index++];
 	this.audioClocksUntilNextEventCounter = state[index];
 	this.fromSaveState = true;
-	this.TICKTable = this.toTypedArray(this.TICKTable, "uint8");
-	this.SecondaryTICKTable = this.toTypedArray(this.SecondaryTICKTable, "uint8");
+	this.TICKTable = this.toTypedArray(TICKTable, "uint8");
+	this.SecondaryTICKTable = this.toTypedArray(SecondaryTICKTable, "uint8");
 	this.initializeReferencesFromSaveState();
 	this.memoryReadJumpCompile();
 	this.memoryWriteJumpCompile();
@@ -819,7 +1048,7 @@ GameBoyCore.prototype.returnFromState = function (returnedFrom) {
 	this.channel4VolumeShifter = (this.channel4BitRange == 0x7FFF) ? 15 : 7;
 }
 
-GameBoyCore.prototype.returnFromRTCState = function () {
+public returnFromRTCState() {
 	if (typeof this.openRTC == "function" && this.cTIMER) {
 		var rtcData = this.openRTC(this.name);
 		var index = 0;
@@ -839,7 +1068,7 @@ GameBoyCore.prototype.returnFromRTCState = function () {
 	}
 }
 
-GameBoyCore.prototype.start = function () {
+public start() {
 	this.initMemory();	//Write the startup memory.
 	this.ROMLoad();		//Load the ROM into memory and get cartridge information from it.
 	this.initLCD();		//Initialize the graphics.
@@ -847,17 +1076,17 @@ GameBoyCore.prototype.start = function () {
 	this.run();			//Start the emulation.
 }
 
-GameBoyCore.prototype.initMemory = function () {
+public initMemory() {
 	//Initialize the RAM:
 	this.memory = this.getTypedArray(0x10000, 0, "uint8");
 	this.frameBuffer = this.getTypedArray(23040, 0xF8F8F8, "int32");
 	this.BGCHRBank1 = this.getTypedArray(0x800, 0, "uint8");
-	this.TICKTable = this.toTypedArray(this.TICKTable, "uint8");
-	this.SecondaryTICKTable = this.toTypedArray(this.SecondaryTICKTable, "uint8");
+	this.TICKTable = this.toTypedArray(TICKTable, "uint8");
+	this.SecondaryTICKTable = this.toTypedArray(SecondaryTICKTable, "uint8");
 	this.channel3PCM = this.getTypedArray(0x20, 0, "int8");
 }
 
-GameBoyCore.prototype.generateCacheArray = function (tileAmount) {
+public generateCacheArray(tileAmount) {
 	var tileArray = [];
 	var tileNumber = 0;
 	while (tileNumber < tileAmount) {
@@ -866,13 +1095,13 @@ GameBoyCore.prototype.generateCacheArray = function (tileAmount) {
 	return tileArray;
 }
 
-GameBoyCore.prototype.initSkipBootstrap = function () {
+public initSkipBootstrap() {
 	//Fill in the boot ROM set register values
 	//Default values to the GB boot ROM values, then fill in the GBC boot ROM values after ROM loading
 	var index = 0xFF;
 	while (index >= 0) {
 		if (index >= 0x30 && index < 0x40) {
-			this.memoryWrite(0xFF00 | index, this.ffxxDump[index]);
+			this.memoryWrite(0xFF00 | index, ffxxDump[index]);
 		}
 		else {
 			switch (index) {
@@ -883,10 +1112,10 @@ GameBoyCore.prototype.initSkipBootstrap = function () {
 				case 0x07:
 				case 0x0F:
 				case 0xFF:
-					this.memoryWrite(0xFF00 | index, this.ffxxDump[index]);
+					this.memoryWrite(0xFF00 | index, ffxxDump[index]);
 					break;
 				default:
-					this.memory[0xFF00 | index] = this.ffxxDump[index];
+					this.memory[0xFF00 | index] = ffxxDump[index];
 			}
 		}
 		--index;
@@ -1014,7 +1243,7 @@ GameBoyCore.prototype.initSkipBootstrap = function () {
 	this.currentX = 0;
 }
 
-GameBoyCore.prototype.initBootstrap = function () {
+public initBootstrap() {
 	//Start as an unset device:
 	cout("Starting the selected boot ROM.", 0);
 	this.programCounter = 0;
@@ -1044,10 +1273,10 @@ GameBoyCore.prototype.initBootstrap = function () {
 	this.memory[0xFF00] = 0xF;	//Set the joypad state.
 }
 
-GameBoyCore.prototype.ROMLoad = function () {
+public ROMLoad() {
 	//Load the first two ROM banks (0x0000 - 0x7FFF) into regular gameboy memory:
 	this.ROM = [];
-	this.usedBootROM = settings.enable_gbc_bios && ((!settings.gb_boot_rom_utilized && this.GBCBOOTROM.length == 0x800) || (settings.gb_boot_rom_utilized && this.GBBOOTROM.length == 0x100));
+	this.usedBootROM = settings.enable_gbc_bios && ((!settings.gb_boot_rom_utilized && GBCBOOTROM.length == 0x800) || (settings.gb_boot_rom_utilized && GBBOOTROM.length == 0x100));
 	var maxLength = this.ROMImage.length;
 	if (maxLength < 0x4000) {
 		throw(new Error("ROM image size too small."));
@@ -1058,14 +1287,14 @@ GameBoyCore.prototype.ROMLoad = function () {
 		if (!settings.gb_boot_rom_utilized) {
 			//Patch in the GBC boot ROM into the memory map:
 			for (; romIndex < 0x100; ++romIndex) {
-				this.memory[romIndex] = this.GBCBOOTROM[romIndex];											//Load in the GameBoy Color BOOT ROM.
+				this.memory[romIndex] = GBCBOOTROM[romIndex];											//Load in the GameBoy Color BOOT ROM.
 				this.ROM[romIndex] = (this.ROMImage.charCodeAt(romIndex) & 0xFF);							//Decode the ROM binary for the switch out.
 			}
 			for (; romIndex < 0x200; ++romIndex) {
 				this.memory[romIndex] = this.ROM[romIndex] = (this.ROMImage.charCodeAt(romIndex) & 0xFF);	//Load in the game ROM.
 			}
 			for (; romIndex < 0x900; ++romIndex) {
-				this.memory[romIndex] = this.GBCBOOTROM[romIndex - 0x100];									//Load in the GameBoy Color BOOT ROM.
+				this.memory[romIndex] = GBCBOOTROM[romIndex - 0x100];									//Load in the GameBoy Color BOOT ROM.
 				this.ROM[romIndex] = (this.ROMImage.charCodeAt(romIndex) & 0xFF);							//Decode the ROM binary for the switch out.
 			}
 			this.usedGBCBootROM = true;
@@ -1073,7 +1302,7 @@ GameBoyCore.prototype.ROMLoad = function () {
 		else {
 			//Patch in the GBC boot ROM into the memory map:
 			for (; romIndex < 0x100; ++romIndex) {
-				this.memory[romIndex] = this.GBBOOTROM[romIndex];											//Load in the GameBoy Color BOOT ROM.
+				this.memory[romIndex] = GBBOOTROM[romIndex];											//Load in the GameBoy Color BOOT ROM.
 				this.ROM[romIndex] = (this.ROMImage.charCodeAt(romIndex) & 0xFF);							//Decode the ROM binary for the switch out.
 			}
 		}
@@ -1098,7 +1327,7 @@ GameBoyCore.prototype.ROMLoad = function () {
 	this.checkIRQMatching();
 }
 
-GameBoyCore.prototype.getROMImage = function () {
+public getROMImage() {
 	//Return the binary version of the ROM image currently running:
 	if (this.ROMImage.length > 0) {
 		return this.ROMImage.length;
@@ -1110,7 +1339,7 @@ GameBoyCore.prototype.getROMImage = function () {
 	return this.ROMImage;
 }
 
-GameBoyCore.prototype.interpretCartridge = function () {
+public interpretCartridge() {
 	// ROM name
 	for (var index = 0x134; index < 0x13F; index++) {
 		if (this.ROMImage.charCodeAt(index) > 0) {
@@ -1342,7 +1571,7 @@ GameBoyCore.prototype.interpretCartridge = function () {
 	this.ROMImage = "";	//Memory consumption reduction.
 }
 
-GameBoyCore.prototype.disableBootROM = function () {
+public disableBootROM() {
 	//Remove any traces of the boot ROM from ROM memory.
 	for (var index = 0; index < 0x100; ++index) {
 		this.memory[index] = this.ROM[index];	//Replace the GameBoy or GameBoy Color boot ROM with the game ROM.
@@ -1365,7 +1594,7 @@ GameBoyCore.prototype.disableBootROM = function () {
 	}
 }
 
-GameBoyCore.prototype.initializeTiming = function () {
+public initializeTiming() {
 	//Emulator Timing:
 	this.clocksPerSecond = this.emulatorSpeed * 0x400000;
 	this.baseCPUCyclesPerIteration = this.clocksPerSecond / 1000 * settings.loop_interval;
@@ -1374,7 +1603,7 @@ GameBoyCore.prototype.initializeTiming = function () {
 	this.CPUCyclesTotalCurrent = 0;
 }
 
-GameBoyCore.prototype.setSpeed = function (speed) {
+public setSpeed(speed) {
 	this.emulatorSpeed = speed;
 	this.initializeTiming();
 	if (this.audioHandle) {
@@ -1382,7 +1611,7 @@ GameBoyCore.prototype.setSpeed = function (speed) {
 	}
 }
 
-GameBoyCore.prototype.setupRAM = function () {
+public setupRAM() {
 	//Setup the auxilliary/switchable RAM:
 	if (this.cMBC2) {
 		this.numRAMBanks = 1 / 16;
@@ -1422,11 +1651,11 @@ GameBoyCore.prototype.setupRAM = function () {
 	this.memoryWriteJumpCompile();
 }
 
-GameBoyCore.prototype.MBCRAMUtilized = function () {
+public MBCRAMUtilized() {
 	return this.cMBC1 || this.cMBC2 || this.cMBC3 || this.cMBC5 || this.cMBC7 || this.cRUMBLE;
 }
 
-GameBoyCore.prototype.recomputeDimension = function () {
+public recomputeDimension() {
 	//Cache some dimension info:
 	this.onscreenWidth = this.canvas.width;
 	this.onscreenHeight = this.canvas.height;
@@ -1444,7 +1673,7 @@ GameBoyCore.prototype.recomputeDimension = function () {
 	this.offscreenRGBCount = this.offscreenWidth * this.offscreenHeight * 4;
 }
 
-GameBoyCore.prototype.initLCD = function () {
+public initLCD() {
 	this.recomputeDimension();
 	if (this.offscreenRGBCount != 92160) {
 		//Only create the resizer handle if we need it:
@@ -1497,7 +1726,7 @@ GameBoyCore.prototype.initLCD = function () {
 	}
 }
 
-GameBoyCore.prototype.graphicsBlit = function () {
+public graphicsBlit() {
 	if (this.offscreenWidth == this.onscreenWidth && this.offscreenHeight == this.onscreenHeight) {
 		this.drawContextOnscreen.putImageData(this.canvasBuffer, 0, 0);
 	}
@@ -1507,7 +1736,7 @@ GameBoyCore.prototype.graphicsBlit = function () {
 	}
 }
 
-GameBoyCore.prototype.JoyPadEvent = function (key, down) {
+public JoyPadEvent(key, down) {
 	if (down) {
 		this.JoyPad &= 0xFF ^ (1 << key);
 		if (!this.cGBC && (!this.usedBootROM || !this.usedGBCBootROM)) {
@@ -1523,7 +1752,7 @@ GameBoyCore.prototype.JoyPadEvent = function (key, down) {
 	this.CPUStopped = false;
 }
 
-GameBoyCore.prototype.GyroEvent = function (x, y) {
+public GyroEvent(x, y) {
 	x *= -100;
 	x += 2047;
 	this.highX = x >> 8;
@@ -1534,7 +1763,7 @@ GameBoyCore.prototype.GyroEvent = function (x, y) {
 	this.lowY = y & 0xFF;
 }
 
-GameBoyCore.prototype.initSound = function () {
+public initSound() {
 	this.audioResamplerFirstPassFactor = Math.max(Math.min(Math.floor(this.clocksPerSecond / 44100), Math.floor(0xFFFF / 0x1E0)), 1);
 	this.downSampleInputDivider = 1 / (this.audioResamplerFirstPassFactor * 0xF0);
 	if (settings.enable_sound) {
@@ -1549,13 +1778,13 @@ GameBoyCore.prototype.initSound = function () {
 	}
 }
 
-GameBoyCore.prototype.changeVolume = function () {
+public changeVolume() {
 	if (settings.enable_sound && this.audioHandle) {
 		this.audioHandle.changeVolume(settings.volume);
 	}
 }
 
-GameBoyCore.prototype.initAudioBuffer = function () {
+public initAudioBuffer() {
 	this.audioIndex = 0;
 	this.audioDestinationPosition = 0;
 	this.downsampleInput = 0;
@@ -1564,7 +1793,7 @@ GameBoyCore.prototype.initAudioBuffer = function () {
 	this.audioBuffer = this.getTypedArray(this.numSamplesTotal, 0, "float32");
 }
 
-GameBoyCore.prototype.intializeWhiteNoise = function () {
+public intializeWhiteNoise() {
 	//Noise Sample Tables:
 	var randomFactor = 1;
 	//15-bit LSFR Cache Generation:
@@ -1624,7 +1853,7 @@ GameBoyCore.prototype.intializeWhiteNoise = function () {
 	this.noiseSampleTable = this.LSFR15Table;
 }
 
-GameBoyCore.prototype.audioUnderrunAdjustment = function () {
+public audioUnderrunAdjustment() {
 	if (settings.enable_sound) {
 		var underrunAmount = this.audioHandle.remainingBuffer();
 		if (typeof underrunAmount == "number") {
@@ -1636,7 +1865,7 @@ GameBoyCore.prototype.audioUnderrunAdjustment = function () {
 	}
 }
 
-GameBoyCore.prototype.initializeAudioStartState = function () {
+public initializeAudioStartState() {
 	this.channel1FrequencyTracker = 0x2000;
 	this.channel1DutyTracker = 0;
 	this.channel1CachedDuty = this.dutyLookup[2];
@@ -1712,7 +1941,7 @@ GameBoyCore.prototype.initializeAudioStartState = function () {
 	this.noiseSampleTable = this.LSFR15Table;
 }
 
-GameBoyCore.prototype.outputAudio = function () {
+public outputAudio() {
 	this.audioBuffer[this.audioDestinationPosition++] = (this.downsampleInput >>> 16) * this.downSampleInputDivider - 1;
 	this.audioBuffer[this.audioDestinationPosition++] = (this.downsampleInput & 0xFFFF) * this.downSampleInputDivider - 1;
 	if (this.audioDestinationPosition == this.numSamplesTotal) {
@@ -1723,7 +1952,7 @@ GameBoyCore.prototype.outputAudio = function () {
 }
 
 //Below are the audio generation functions timed against the CPU:
-GameBoyCore.prototype.generateAudio = function (numSamples) {
+public generateAudio(numSamples) {
 	var multiplier = 0;
 	if (this.soundMasterEnabled && !this.CPUStopped) {
 		for (var clockUpTo = 0; numSamples > 0;) {
@@ -1765,7 +1994,7 @@ GameBoyCore.prototype.generateAudio = function (numSamples) {
 }
 
 //Generate audio, but don't actually output it (Used for when sound is disabled by user/browser):
-GameBoyCore.prototype.generateAudioFake = function (numSamples) {
+public generateAudioFake(numSamples) {
 	if (this.soundMasterEnabled && !this.CPUStopped) {
 		for (var clockUpTo = 0; numSamples > 0;) {
 			clockUpTo = Math.min(this.audioClocksUntilNextEventCounter, this.sequencerClocks, numSamples);
@@ -1783,7 +2012,7 @@ GameBoyCore.prototype.generateAudioFake = function (numSamples) {
 	}
 }
 
-GameBoyCore.prototype.audioJIT = function () {
+public audioJIT() {
 	//Audio Sample Generation Timing:
 	if (settings.enable_sound) {
 		this.generateAudio(this.audioTicks);
@@ -1794,7 +2023,7 @@ GameBoyCore.prototype.audioJIT = function () {
 	this.audioTicks = 0;
 }
 
-GameBoyCore.prototype.audioComputeSequencer = function () {
+public audioComputeSequencer() {
 	switch (this.sequencePosition++) {
 		case 0:
 			this.clockAudioLength();
@@ -1816,7 +2045,7 @@ GameBoyCore.prototype.audioComputeSequencer = function () {
 	}
 }
 
-GameBoyCore.prototype.clockAudioLength = function () {
+public clockAudioLength() {
 	//Channel 1:
 	if (this.channel1totalLength > 1) {
 		--this.channel1totalLength;
@@ -1855,7 +2084,7 @@ GameBoyCore.prototype.clockAudioLength = function () {
 	}
 }
 
-GameBoyCore.prototype.clockAudioSweep = function () {
+public clockAudioSweep() {
 	//Channel 1:
 	if (!this.channel1SweepFault && this.channel1timeSweep > 0) {
 		if (--this.channel1timeSweep == 0) {
@@ -1864,7 +2093,7 @@ GameBoyCore.prototype.clockAudioSweep = function () {
 	}
 }
 
-GameBoyCore.prototype.runAudioSweep = function () {
+public runAudioSweep() {
 	//Channel 1:
 	if (this.channel1lastTimeSweep > 0) {
 		if (this.channel1frequencySweepDivider > 0) {
@@ -1903,7 +2132,7 @@ GameBoyCore.prototype.runAudioSweep = function () {
 	}
 }
 
-GameBoyCore.prototype.channel1AudioSweepPerformDummy = function () {
+public channel1AudioSweepPerformDummy() {
 	//Channel 1:
 	if (this.channel1frequencySweepDivider > 0) {
 		if (!this.channel1decreaseSweep) {
@@ -1925,7 +2154,7 @@ GameBoyCore.prototype.channel1AudioSweepPerformDummy = function () {
 	}
 }
 
-GameBoyCore.prototype.clockAudioEnvelope = function () {
+public clockAudioEnvelope() {
 	//Channel 1:
 	if (this.channel1envelopeSweepsLast > -1) {
 		if (this.channel1envelopeSweeps > 0) {
@@ -2006,7 +2235,7 @@ GameBoyCore.prototype.clockAudioEnvelope = function () {
 	}
 }
 
-GameBoyCore.prototype.computeAudioChannels = function () {
+public computeAudioChannels() {
 	//Clock down the four audio channels to the next closest audio event:
 	this.channel1FrequencyCounter -= this.audioClocksUntilNextEvent;
 	this.channel2FrequencyCounter -= this.audioClocksUntilNextEvent;
@@ -2042,24 +2271,24 @@ GameBoyCore.prototype.computeAudioChannels = function () {
 	this.audioClocksUntilNextEventCounter = this.audioClocksUntilNextEvent = Math.min(this.channel1FrequencyCounter, this.channel2FrequencyCounter, this.channel3Counter, this.channel4Counter);
 }
 
-GameBoyCore.prototype.channel1EnableCheck = function () {
+public channel1EnableCheck() {
 	this.channel1Enabled = ((this.channel1consecutive || this.channel1totalLength > 0) && !this.channel1SweepFault && this.channel1canPlay);
 	this.channel1OutputLevelSecondaryCache();
 }
 
-GameBoyCore.prototype.channel1VolumeEnableCheck = function () {
+public channel1VolumeEnableCheck() {
 	this.channel1canPlay = (this.memory[0xFF12] > 7);
 	this.channel1EnableCheck();
 	this.channel1OutputLevelSecondaryCache();
 }
 
-GameBoyCore.prototype.channel1OutputLevelCache = function () {
+public channel1OutputLevelCache() {
 	this.channel1currentSampleLeft = (this.leftChannel1) ? this.channel1envelopeVolume : 0;
 	this.channel1currentSampleRight = (this.rightChannel1) ? this.channel1envelopeVolume : 0;
 	this.channel1OutputLevelSecondaryCache();
 }
 
-GameBoyCore.prototype.channel1OutputLevelSecondaryCache = function () {
+public channel1OutputLevelSecondaryCache() {
 	if (this.channel1Enabled) {
 		this.channel1currentSampleLeftSecondary = this.channel1currentSampleLeft;
 		this.channel1currentSampleRightSecondary = this.channel1currentSampleRight;
@@ -2071,7 +2300,7 @@ GameBoyCore.prototype.channel1OutputLevelSecondaryCache = function () {
 	this.channel1OutputLevelTrimaryCache();
 }
 
-GameBoyCore.prototype.channel1OutputLevelTrimaryCache = function () {
+public channel1OutputLevelTrimaryCache() {
 	if (this.channel1CachedDuty[this.channel1DutyTracker] && settings.channels[0]) {
 		this.channel1currentSampleLeftTrimary = this.channel1currentSampleLeftSecondary;
 		this.channel1currentSampleRightTrimary = this.channel1currentSampleRightSecondary;
@@ -2083,24 +2312,24 @@ GameBoyCore.prototype.channel1OutputLevelTrimaryCache = function () {
 	this.mixerOutputLevelCache();
 }
 
-GameBoyCore.prototype.channel2EnableCheck = function () {
+public channel2EnableCheck() {
 	this.channel2Enabled = ((this.channel2consecutive || this.channel2totalLength > 0) && this.channel2canPlay);
 	this.channel2OutputLevelSecondaryCache();
 }
 
-GameBoyCore.prototype.channel2VolumeEnableCheck = function () {
+public channel2VolumeEnableCheck() {
 	this.channel2canPlay = (this.memory[0xFF17] > 7);
 	this.channel2EnableCheck();
 	this.channel2OutputLevelSecondaryCache();
 }
 
-GameBoyCore.prototype.channel2OutputLevelCache = function () {
+public channel2OutputLevelCache() {
 	this.channel2currentSampleLeft = (this.leftChannel2) ? this.channel2envelopeVolume : 0;
 	this.channel2currentSampleRight = (this.rightChannel2) ? this.channel2envelopeVolume : 0;
 	this.channel2OutputLevelSecondaryCache();
 }
 
-GameBoyCore.prototype.channel2OutputLevelSecondaryCache = function () {
+public channel2OutputLevelSecondaryCache() {
 	if (this.channel2Enabled) {
 		this.channel2currentSampleLeftSecondary = this.channel2currentSampleLeft;
 		this.channel2currentSampleRightSecondary = this.channel2currentSampleRight;
@@ -2112,7 +2341,7 @@ GameBoyCore.prototype.channel2OutputLevelSecondaryCache = function () {
 	this.channel2OutputLevelTrimaryCache();
 }
 
-GameBoyCore.prototype.channel2OutputLevelTrimaryCache = function () {
+public channel2OutputLevelTrimaryCache() {
 	if (this.channel2CachedDuty[this.channel2DutyTracker] && settings.channels[1]) {
 		this.channel2currentSampleLeftTrimary = this.channel2currentSampleLeftSecondary;
 		this.channel2currentSampleRightTrimary = this.channel2currentSampleRightSecondary;
@@ -2124,18 +2353,18 @@ GameBoyCore.prototype.channel2OutputLevelTrimaryCache = function () {
 	this.mixerOutputLevelCache();
 }
 
-GameBoyCore.prototype.channel3EnableCheck = function () {
+public channel3EnableCheck() {
 	this.channel3Enabled = (/*this.channel3canPlay && */(this.channel3consecutive || this.channel3totalLength > 0));
 	this.channel3OutputLevelSecondaryCache();
 }
 
-GameBoyCore.prototype.channel3OutputLevelCache = function () {
+public channel3OutputLevelCache() {
 	this.channel3currentSampleLeft = (this.leftChannel3) ? this.cachedChannel3Sample : 0;
 	this.channel3currentSampleRight = (this.rightChannel3) ? this.cachedChannel3Sample : 0;
 	this.channel3OutputLevelSecondaryCache();
 }
 
-GameBoyCore.prototype.channel3OutputLevelSecondaryCache = function () {
+public channel3OutputLevelSecondaryCache() {
 	if (this.channel3Enabled && settings.channels[2]) {
 		this.channel3currentSampleLeftSecondary = this.channel3currentSampleLeft;
 		this.channel3currentSampleRightSecondary = this.channel3currentSampleRight;
@@ -2147,24 +2376,24 @@ GameBoyCore.prototype.channel3OutputLevelSecondaryCache = function () {
 	this.mixerOutputLevelCache();
 }
 
-GameBoyCore.prototype.channel4EnableCheck = function () {
+public channel4EnableCheck() {
 	this.channel4Enabled = ((this.channel4consecutive || this.channel4totalLength > 0) && this.channel4canPlay);
 	this.channel4OutputLevelSecondaryCache();
 }
 
-GameBoyCore.prototype.channel4VolumeEnableCheck = function () {
+public channel4VolumeEnableCheck() {
 	this.channel4canPlay = (this.memory[0xFF21] > 7);
 	this.channel4EnableCheck();
 	this.channel4OutputLevelSecondaryCache();
 }
 
-GameBoyCore.prototype.channel4OutputLevelCache = function () {
+public channel4OutputLevelCache() {
 	this.channel4currentSampleLeft = (this.leftChannel4) ? this.cachedChannel4Sample : 0;
 	this.channel4currentSampleRight = (this.rightChannel4) ? this.cachedChannel4Sample : 0;
 	this.channel4OutputLevelSecondaryCache();
 }
 
-GameBoyCore.prototype.channel4OutputLevelSecondaryCache = function () {
+public channel4OutputLevelSecondaryCache() {
 	if (this.channel4Enabled && settings.channels[3]) {
 		this.channel4currentSampleLeftSecondary = this.channel4currentSampleLeft;
 		this.channel4currentSampleRightSecondary = this.channel4currentSampleRight;
@@ -2176,17 +2405,17 @@ GameBoyCore.prototype.channel4OutputLevelSecondaryCache = function () {
 	this.mixerOutputLevelCache();
 }
 
-GameBoyCore.prototype.mixerOutputLevelCache = function () {
+public mixerOutputLevelCache() {
 	this.mixerOutputCache = ((((this.channel1currentSampleLeftTrimary + this.channel2currentSampleLeftTrimary + this.channel3currentSampleLeftSecondary + this.channel4currentSampleLeftSecondary) * this.VinLeftChannelMasterVolume) << 16) |
 	((this.channel1currentSampleRightTrimary + this.channel2currentSampleRightTrimary + this.channel3currentSampleRightSecondary + this.channel4currentSampleRightSecondary) * this.VinRightChannelMasterVolume));
 }
 
-GameBoyCore.prototype.channel3UpdateCache = function () {
+public channel3UpdateCache() {
 	this.cachedChannel3Sample = this.channel3PCM[this.channel3lastSampleLookup] >> this.channel3patternType;
 	this.channel3OutputLevelCache();
 }
 
-GameBoyCore.prototype.channel3WriteRAM = function (address, data) {
+public channel3WriteRAM(address, data) {
 	if (this.channel3canPlay) {
 		this.audioJIT();
 		//address = this.channel3lastSampleLookup >> 1;
@@ -2197,12 +2426,12 @@ GameBoyCore.prototype.channel3WriteRAM = function (address, data) {
 	this.channel3PCM[address | 1] = data & 0xF;
 }
 
-GameBoyCore.prototype.channel4UpdateCache = function () {
+public channel4UpdateCache() {
 	this.cachedChannel4Sample = this.noiseSampleTable[this.channel4currentVolume | this.channel4lastSampleLookup];
 	this.channel4OutputLevelCache();
 }
 
-GameBoyCore.prototype.run = function () {
+public run() {
 	//The preprocessing before the actual iteration loop:
 	if ((this.stopEmulator & 2) == 0) {
 		if ((this.stopEmulator & 1) == 1) {
@@ -2241,7 +2470,7 @@ GameBoyCore.prototype.run = function () {
 	}
 }
 
-GameBoyCore.prototype.executeIteration = function () {
+public executeIteration() {
 	//Iterate the interpreter loop:
 	var opcodeToExecute = 0;
 	var timedTicks = 0;
@@ -2271,7 +2500,7 @@ GameBoyCore.prototype.executeIteration = function () {
 		//Get how many CPU cycles the current instruction counts for:
 		this.CPUTicks = this.TICKTable[opcodeToExecute];
 		//Execute the current instruction:
-		this.OPCODE[opcodeToExecute](this);
+		OPCODE[opcodeToExecute](this);
 		//Update the state (Inlined updateCoreFull manually here):
 		//Update the clocking for the LCD emulation:
 		this.LCDTicks += this.CPUTicks >> this.doubleSpeedShifter;	//LCD Timing
@@ -2314,7 +2543,7 @@ GameBoyCore.prototype.executeIteration = function () {
 	}
 }
 
-GameBoyCore.prototype.iterationEndRoutine = function () {
+public iterationEndRoutine() {
 	if ((this.stopEmulator & 0x1) == 0) {
 		this.audioJIT();	//Make sure we at least output once per iteration.
 		//Update DIV Alignment (Integer overflow safety):
@@ -2328,7 +2557,7 @@ GameBoyCore.prototype.iterationEndRoutine = function () {
 	}
 }
 
-GameBoyCore.prototype.handleSTOP = function () {
+public handleSTOP() {
 	this.CPUStopped = true;						//Stop CPU until joypad input changes.
 	this.iterationEndRoutine();
 	if (this.emulatorTicks < 0) {
@@ -2337,17 +2566,18 @@ GameBoyCore.prototype.handleSTOP = function () {
 	}
 }
 
-GameBoyCore.prototype.recalculateIterationClockLimit = function () {
+public recalculateIterationClockLimit() {
 	var endModulus = this.CPUCyclesTotalCurrent % 4;
 	this.CPUCyclesTotal = this.CPUCyclesTotalBase + this.CPUCyclesTotalCurrent - endModulus;
 	this.CPUCyclesTotalCurrent = endModulus;
 }
 
-GameBoyCore.prototype.recalculateIterationClockLimitForAudio = function (audioClocking) {
+public recalculateIterationClockLimitForAudio(audioClocking) {
 	this.CPUCyclesTotal += Math.min((audioClocking >> 2) << 2, this.CPUCyclesTotalBase << 1);
 }
 
-GameBoyCore.prototype.scanLineMode2 = function () {	//OAM Search Period
+//OAM Search Period
+public scanLineMode2() {
 	if (this.STATTracker != 1) {
 		if (this.mode2TriggerSTAT) {
 			this.interruptsRequested |= 0x2;
@@ -2358,7 +2588,8 @@ GameBoyCore.prototype.scanLineMode2 = function () {	//OAM Search Period
 	}
 }
 
-GameBoyCore.prototype.scanLineMode3 = function () {	//Scan Line Drawing Period
+//Scan Line Drawing Period
+public scanLineMode3() {
 	if (this.modeSTAT != 3) {
 		if (this.STATTracker == 0 && this.mode2TriggerSTAT) {
 			this.interruptsRequested |= 0x2;
@@ -2369,7 +2600,8 @@ GameBoyCore.prototype.scanLineMode3 = function () {	//Scan Line Drawing Period
 	}
 }
 
-GameBoyCore.prototype.scanLineMode0 = function () {	//Horizontal Blanking Period
+//Horizontal Blanking Period
+public scanLineMode0() {
 	if (this.modeSTAT != 0) {
 		if (this.STATTracker != 2) {
 			if (this.STATTracker == 0) {
@@ -2397,7 +2629,7 @@ GameBoyCore.prototype.scanLineMode0 = function () {	//Horizontal Blanking Period
 	}
 }
 
-GameBoyCore.prototype.clocksUntilLYCMatch = function () {
+public clocksUntilLYCMatch() {
 	if (this.memory[0xFF45] != 0) {
 		if (this.memory[0xFF45] > this.actualScanLine) {
 			return 456 * (this.memory[0xFF45] - this.actualScanLine);
@@ -2407,7 +2639,7 @@ GameBoyCore.prototype.clocksUntilLYCMatch = function () {
 	return (456 * ((this.actualScanLine == 153 && this.memory[0xFF44] == 0) ? 154 : (153 - this.actualScanLine))) + 8;
 }
 
-GameBoyCore.prototype.clocksUntilMode0 = function () {
+public clocksUntilMode0() {
 	switch (this.modeSTAT) {
 		case 0:
 			if (this.actualScanLine == 143) {
@@ -2426,7 +2658,7 @@ GameBoyCore.prototype.clocksUntilMode0 = function () {
 	}
 }
 
-GameBoyCore.prototype.updateSpriteCount = function (line) {
+public updateSpriteCount(line) {
 	this.spriteCount = 252;
 	if (this.cGBC && this.gfxSpriteShow) {										//Is the window enabled and are we in CGB mode?
 		var lineAdjusted = line + 0x10;
@@ -2441,7 +2673,8 @@ GameBoyCore.prototype.updateSpriteCount = function (line) {
 	}
 }
 
-GameBoyCore.prototype.matchLYC = function () {	//LYC Register Compare
+//LYC Register Compare
+public matchLYC() {
 	if (this.memory[0xFF44] == this.memory[0xFF45]) {
 		this.memory[0xFF41] |= 0x04;
 		if (this.LYCMatchTriggerSTAT) {
@@ -2454,7 +2687,7 @@ GameBoyCore.prototype.matchLYC = function () {	//LYC Register Compare
 	}
 }
 
-GameBoyCore.prototype.updateCore = function () {
+public updateCore() {
 	//Update the clocking for the LCD emulation:
 	this.LCDTicks += this.CPUTicks >> this.doubleSpeedShifter;	//LCD Timing
 	this.LCDCONTROL[this.actualScanLine](this);					//Scan Line and STAT Mode Control
@@ -2491,7 +2724,7 @@ GameBoyCore.prototype.updateCore = function () {
 	}
 }
 
-GameBoyCore.prototype.updateCoreFull = function () {
+public updateCoreFull() {
 	//Update the state machine:
 	this.updateCore();
 	//End of iteration routine:
@@ -2500,7 +2733,7 @@ GameBoyCore.prototype.updateCoreFull = function () {
 	}
 }
 
-GameBoyCore.prototype.initializeLCDController = function () {
+public initializeLCDController() {
 	//Display on hanlding:
 	var line = 0;
 	while (line < 154) {
@@ -2675,7 +2908,7 @@ GameBoyCore.prototype.initializeLCDController = function () {
 	}
 }
 
-GameBoyCore.prototype.DisplayShowOff = function () {
+public DisplayShowOff() {
 	if (this.drewBlank == 0) {
 		//Output a blank screen to the output framebuffer:
 		this.clearFrameBuffer();
@@ -2684,7 +2917,7 @@ GameBoyCore.prototype.DisplayShowOff = function () {
 	this.drewBlank = 2;
 }
 
-GameBoyCore.prototype.executeHDMA = function () {
+public executeHDMA() {
 	this.DMAWrite(1);
 	if (this.halt) {
 		if ((this.LCDTicks - this.spriteCount) < ((4 >> this.doubleSpeedShifter) | 0x20)) {
@@ -2705,7 +2938,7 @@ GameBoyCore.prototype.executeHDMA = function () {
 	}
 }
 
-GameBoyCore.prototype.clockUpdate = function () {
+public clockUpdate() {
 	if (this.cTIMER) {
 		var dateObj = new Date();
 		var newTime = dateObj.getTime();
@@ -2734,19 +2967,19 @@ GameBoyCore.prototype.clockUpdate = function () {
 	}
 }
 
-GameBoyCore.prototype.prepareFrame = function () {
+public prepareFrame() {
 	//Copy the internal frame buffer to the output buffer:
 	this.swizzleFrameBuffer();
 	this.drewFrame = true;
 }
 
-GameBoyCore.prototype.requestDraw = function () {
+public requestDraw() {
 	if (this.drewFrame) {
 		this.dispatchDraw();
 	}
 }
 
-GameBoyCore.prototype.dispatchDraw = function () {
+public dispatchDraw() {
 	if (this.offscreenRGBCount > 0) {
 		//We actually updated the graphics internally, so copy out:
 		if (this.offscreenRGBCount == 92160) {
@@ -2758,7 +2991,7 @@ GameBoyCore.prototype.dispatchDraw = function () {
 	}
 }
 
-GameBoyCore.prototype.processDraw = function (frameBuffer) {
+public processDraw(frameBuffer) {
 	var canvasRGBALength = this.offscreenRGBCount;
 	var canvasData = this.canvasBuffer.data;
 	var bufferIndex = 0;
@@ -2771,7 +3004,7 @@ GameBoyCore.prototype.processDraw = function (frameBuffer) {
 	this.drewFrame = false;
 }
 
-GameBoyCore.prototype.swizzleFrameBuffer = function () {
+public swizzleFrameBuffer() {
 	//Convert our dirty 24-bit (24-bit, with internal render flags above it) framebuffer to an 8-bit buffer with separate indices for the RGB channels:
 	var frameBuffer = this.frameBuffer;
 	var swizzledFrame = this.swizzledFrame;
@@ -2783,7 +3016,7 @@ GameBoyCore.prototype.swizzleFrameBuffer = function () {
 	}
 }
 
-GameBoyCore.prototype.clearFrameBuffer = function () {
+public clearFrameBuffer() {
 	var bufferIndex = 0;
 	var frameBuffer = this.swizzledFrame;
 	if (this.cGBC || this.colorizedGBPalettes) {
@@ -2800,7 +3033,7 @@ GameBoyCore.prototype.clearFrameBuffer = function () {
 	}
 }
 
-GameBoyCore.prototype.resizeFrameBuffer = function () {
+public resizeFrameBuffer() {
 	//Resize in javascript with resize.js:
 	if (this.resizePathClear) {
 		this.resizePathClear = false;
@@ -2808,13 +3041,13 @@ GameBoyCore.prototype.resizeFrameBuffer = function () {
 	}
 }
 
-GameBoyCore.prototype.compileResizeFrameBufferFunction = function () {
+public compileResizeFrameBufferFunction() {
 	if (this.offscreenRGBCount > 0) {
 		this.resizer = new Resize(160, 144, this.offscreenWidth, this.offscreenHeight, false, settings.resize_smoothing);
 	}
 }
 
-GameBoyCore.prototype.renderScanLine = function (scanlineToRender) {
+public renderScanLine(scanlineToRender) {
 	this.pixelStart = scanlineToRender * 160;
 	if (this.bgEnabled) {
 		this.pixelEnd = 160;
@@ -2833,7 +3066,7 @@ GameBoyCore.prototype.renderScanLine = function (scanlineToRender) {
 	this.midScanlineOffset = -1;
 }
 
-GameBoyCore.prototype.renderMidScanLine = function () {
+public renderMidScanLine() {
 	if (this.actualScanLine < 144 && this.modeSTAT == 3) {
 		//TODO: Get this accurate:
 		if (this.midScanlineOffset == -1) {
@@ -2860,7 +3093,7 @@ GameBoyCore.prototype.renderMidScanLine = function () {
 	}
 }
 
-GameBoyCore.prototype.initializeModeSpecificArrays = function () {
+public initializeModeSpecificArrays() {
 	this.LCDCONTROL = (this.LCDisOn) ? this.LINECONTROL : this.DISPLAYOFFCONTROL;
 	if (this.cGBC) {
 		this.gbcOBJRawPalette = this.getTypedArray(0x40, 0, "uint8");
@@ -2883,7 +3116,7 @@ GameBoyCore.prototype.initializeModeSpecificArrays = function () {
 	this.renderPathBuild();
 }
 
-GameBoyCore.prototype.GBCtoGBModeAdjust = function () {
+public GBCtoGBModeAdjust() {
 	cout("Stepping down from GBC mode.", 0);
 	this.VRAM = this.GBCMemory = this.BGCHRCurrentBank = this.BGCHRBank2 = null;
 	this.tileCache.length = 0x700;
@@ -2910,7 +3143,7 @@ GameBoyCore.prototype.GBCtoGBModeAdjust = function () {
 	this.memoryWriteJumpCompile();
 }
 
-GameBoyCore.prototype.renderPathBuild = function () {
+public renderPathBuild() {
 	if (!this.cGBC) {
 		this.BGLayerRender = this.BGGBLayerRender;
 		this.WindowLayerRender = this.WindowGBLayerRender;
@@ -2922,7 +3155,7 @@ GameBoyCore.prototype.renderPathBuild = function () {
 	}
 }
 
-GameBoyCore.prototype.priorityFlaggingPathRebuild = function () {
+public priorityFlaggingPathRebuild() {
 	if (this.BGPriorityEnabled) {
 		this.BGLayerRender = this.BGGBCLayerRender;
 		this.WindowLayerRender = this.WindowGBCLayerRender;
@@ -2933,7 +3166,7 @@ GameBoyCore.prototype.priorityFlaggingPathRebuild = function () {
 	}
 }
 
-GameBoyCore.prototype.initializeReferencesFromSaveState = function () {
+public initializeReferencesFromSaveState() {
 	this.LCDCONTROL = (this.LCDisOn) ? this.LINECONTROL : this.DISPLAYOFFCONTROL;
 	var tileIndex = 0;
 	if (!this.cGBC) {
@@ -2969,7 +3202,7 @@ GameBoyCore.prototype.initializeReferencesFromSaveState = function () {
 	this.renderPathBuild();
 }
 
-GameBoyCore.prototype.RGBTint = function (value) {
+public RGBTint(value) {
 	//Adjustment for the GBC's tinting (According to Gambatte):
 	var r = value & 0x1F;
 	var g = (value >> 5) & 0x1F;
@@ -2977,7 +3210,7 @@ GameBoyCore.prototype.RGBTint = function (value) {
 	return ((r * 13 + g * 2 + b) >> 1) << 16 | (g * 3 + b) << 9 | (r * 3 + g * 2 + b * 11) >> 1;
 }
 
-GameBoyCore.prototype.getGBCColor = function () {
+public getGBCColor() {
 	//GBC Colorization of DMG ROMs:
 	//BG
 	for (var counter = 0; counter < 4; counter++) {
@@ -3001,14 +3234,14 @@ GameBoyCore.prototype.getGBCColor = function () {
 	this.colorizedGBPalettes = true;
 }
 
-GameBoyCore.prototype.updateGBRegularBGPalette = function (data) {
+public updateGBRegularBGPalette(data) {
 	this.gbBGPalette[0] = this.colors[data & 0x03] | 0x2000000;
 	this.gbBGPalette[1] = this.colors[(data >> 2) & 0x03];
 	this.gbBGPalette[2] = this.colors[(data >> 4) & 0x03];
 	this.gbBGPalette[3] = this.colors[data >> 6];
 }
 
-GameBoyCore.prototype.updateGBColorizedBGPalette = function (data) {
+public updateGBColorizedBGPalette(data) {
 	//GB colorization:
 	this.gbBGColorizedPalette[0] = this.cachedBGPaletteConversion[data & 0x03] | 0x2000000;
 	this.gbBGColorizedPalette[1] = this.cachedBGPaletteConversion[(data >> 2) & 0x03];
@@ -3016,20 +3249,20 @@ GameBoyCore.prototype.updateGBColorizedBGPalette = function (data) {
 	this.gbBGColorizedPalette[3] = this.cachedBGPaletteConversion[data >> 6];
 }
 
-GameBoyCore.prototype.updateGBRegularOBJPalette = function (index, data) {
+public updateGBRegularOBJPalette(index, data) {
 	this.gbOBJPalette[index | 1] = this.colors[(data >> 2) & 0x03];
 	this.gbOBJPalette[index | 2] = this.colors[(data >> 4) & 0x03];
 	this.gbOBJPalette[index | 3] = this.colors[data >> 6];
 }
 
-GameBoyCore.prototype.updateGBColorizedOBJPalette = function (index, data) {
+public updateGBColorizedOBJPalette(index, data) {
 	//GB colorization:
 	this.gbOBJColorizedPalette[index | 1] = this.cachedOBJPaletteConversion[index | ((data >> 2) & 0x03)];
 	this.gbOBJColorizedPalette[index | 2] = this.cachedOBJPaletteConversion[index | ((data >> 4) & 0x03)];
 	this.gbOBJColorizedPalette[index | 3] = this.cachedOBJPaletteConversion[index | (data >> 6)];
 }
 
-GameBoyCore.prototype.updateGBCBGPalette = function (index, data) {
+public updateGBCBGPalette(index, data) {
 	if (this.gbcBGRawPalette[index] != data) {
 		this.midScanLineJIT();
 		//Update the color palette for BG tiles since it changed:
@@ -3051,7 +3284,7 @@ GameBoyCore.prototype.updateGBCBGPalette = function (index, data) {
 	}
 }
 
-GameBoyCore.prototype.updateGBCOBJPalette = function (index, data) {
+public updateGBCOBJPalette(index, data) {
 	if (this.gbcOBJRawPalette[index] != data) {
 		//Update the color palette for OBJ tiles since it changed:
 		this.gbcOBJRawPalette[index] = data;
@@ -3063,7 +3296,7 @@ GameBoyCore.prototype.updateGBCOBJPalette = function (index, data) {
 	}
 }
 
-GameBoyCore.prototype.BGGBLayerRender = function (scanlineToRender) {
+public BGGBLayerRender(scanlineToRender) {
 	var scrollYAdjusted = (this.backgroundY + scanlineToRender) & 0xFF;						//The line of the BG we're at.
 	var tileYLine = (scrollYAdjusted & 7) << 3;
 	var tileYDown = this.gfxBackgroundCHRBankPosition | ((scrollYAdjusted & 0xF8) << 2);	//The row of cached tiles we're fetching from.
@@ -3152,7 +3385,7 @@ GameBoyCore.prototype.BGGBLayerRender = function (scanlineToRender) {
 	}
 }
 
-GameBoyCore.prototype.BGGBCLayerRender = function (scanlineToRender) {
+public BGGBCLayerRender(scanlineToRender) {
 	var scrollYAdjusted = (this.backgroundY + scanlineToRender) & 0xFF;						//The line of the BG we're at.
 	var tileYLine = (scrollYAdjusted & 7) << 3;
 	var tileYDown = this.gfxBackgroundCHRBankPosition | ((scrollYAdjusted & 0xF8) << 2);	//The row of cached tiles we're fetching from.
@@ -3251,7 +3484,7 @@ GameBoyCore.prototype.BGGBCLayerRender = function (scanlineToRender) {
 	}
 }
 
-GameBoyCore.prototype.BGGBCLayerRenderNoPriorityFlagging = function (scanlineToRender) {
+public BGGBCLayerRenderNoPriorityFlagging(scanlineToRender) {
 	var scrollYAdjusted = (this.backgroundY + scanlineToRender) & 0xFF;						//The line of the BG we're at.
 	var tileYLine = (scrollYAdjusted & 7) << 3;
 	var tileYDown = this.gfxBackgroundCHRBankPosition | ((scrollYAdjusted & 0xF8) << 2);	//The row of cached tiles we're fetching from.
@@ -3350,7 +3583,7 @@ GameBoyCore.prototype.BGGBCLayerRenderNoPriorityFlagging = function (scanlineToR
 	}
 }
 
-GameBoyCore.prototype.WindowGBLayerRender = function (scanlineToRender) {
+public WindowGBLayerRender(scanlineToRender) {
 	if (this.gfxWindowDisplay) {									//Is the window enabled?
 		var scrollYAdjusted = scanlineToRender - this.windowY;		//The line of the BG we're at.
 		if (scrollYAdjusted >= 0) {
@@ -3415,7 +3648,7 @@ GameBoyCore.prototype.WindowGBLayerRender = function (scanlineToRender) {
 	}
 }
 
-GameBoyCore.prototype.WindowGBCLayerRender = function (scanlineToRender) {
+public WindowGBCLayerRender(scanlineToRender) {
 	if (this.gfxWindowDisplay) {									//Is the window enabled?
 		var scrollYAdjusted = scanlineToRender - this.windowY;		//The line of the BG we're at.
 		if (scrollYAdjusted >= 0) {
@@ -3486,7 +3719,7 @@ GameBoyCore.prototype.WindowGBCLayerRender = function (scanlineToRender) {
 	}
 }
 
-GameBoyCore.prototype.WindowGBCLayerRenderNoPriorityFlagging = function (scanlineToRender) {
+public WindowGBCLayerRenderNoPriorityFlagging(scanlineToRender) {
 	if (this.gfxWindowDisplay) {									//Is the window enabled?
 		var scrollYAdjusted = scanlineToRender - this.windowY;		//The line of the BG we're at.
 		if (scrollYAdjusted >= 0) {
@@ -3557,7 +3790,7 @@ GameBoyCore.prototype.WindowGBCLayerRenderNoPriorityFlagging = function (scanlin
 	}
 }
 
-GameBoyCore.prototype.SpriteGBLayerRender = function (scanlineToRender) {
+public SpriteGBLayerRender(scanlineToRender) {
 	if (this.gfxSpriteShow) {										//Are sprites enabled?
 		var lineAdjusted = scanlineToRender + 0x10;
 		var OAMAddress = 0xFE00;
@@ -3648,7 +3881,7 @@ GameBoyCore.prototype.SpriteGBLayerRender = function (scanlineToRender) {
 	}
 }
 
-GameBoyCore.prototype.findLowestSpriteDrawable = function (scanlineToRender, drawableRange) {
+public findLowestSpriteDrawable(scanlineToRender, drawableRange) {
 	var address = 0xFE00;
 	var spriteCount = 0;
 	var diff = 0;
@@ -3662,7 +3895,7 @@ GameBoyCore.prototype.findLowestSpriteDrawable = function (scanlineToRender, dra
 	return spriteCount;
 }
 
-GameBoyCore.prototype.SpriteGBCLayerRender = function (scanlineToRender) {
+public SpriteGBCLayerRender(scanlineToRender) {
 	if (this.gfxSpriteShow) {										//Are sprites enabled?
 		var OAMAddress = 0xFE00;
 		var lineAdjusted = scanlineToRender + 0x10;
@@ -3743,7 +3976,7 @@ GameBoyCore.prototype.SpriteGBCLayerRender = function (scanlineToRender) {
 }
 
 //Generate only a single tile line for the GB tile cache mode:
-GameBoyCore.prototype.generateGBTileLine = function (address) {
+public generateGBTileLine(address) {
 	var lineCopy = (this.memory[0x1 | address] << 8) | this.memory[0x9FFE & address];
 	var tileBlock = this.tileCache[(address & 0x1FF0) >> 4];
 	address = (address & 0xE) << 2;
@@ -3758,7 +3991,7 @@ GameBoyCore.prototype.generateGBTileLine = function (address) {
 }
 
 //Generate only a single tile line for the GBC tile cache mode (Bank 1):
-GameBoyCore.prototype.generateGBCTileLineBank1 = function (address) {
+public generateGBCTileLineBank1(address) {
 	var lineCopy = (this.memory[0x1 | address] << 8) | this.memory[0x9FFE & address];
 	address &= 0x1FFE;
 	var tileBlock1 = this.tileCache[address >> 4];
@@ -3778,7 +4011,7 @@ GameBoyCore.prototype.generateGBCTileLineBank1 = function (address) {
 }
 
 //Generate all the flip combinations for a full GBC VRAM bank 1 tile:
-GameBoyCore.prototype.generateGBCTileBank1 = function (vramAddress) {
+public generateGBCTileBank1(vramAddress) {
 	var address = vramAddress >> 4;
 	var tileBlock1 = this.tileCache[address];
 	var tileBlock2 = this.tileCache[0x200 | address];
@@ -3805,7 +4038,7 @@ GameBoyCore.prototype.generateGBCTileBank1 = function (vramAddress) {
 }
 
 //Generate only a single tile line for the GBC tile cache mode (Bank 2):
-GameBoyCore.prototype.generateGBCTileLineBank2 = function (address) {
+public generateGBCTileLineBank2(address) {
 	var lineCopy = (this.VRAM[0x1 | address] << 8) | this.VRAM[0x1FFE & address];
 	var tileBlock1 = this.tileCache[0x800 | (address >> 4)];
 	var tileBlock2 = this.tileCache[0xA00 | (address >> 4)];
@@ -3824,7 +4057,7 @@ GameBoyCore.prototype.generateGBCTileLineBank2 = function (address) {
 }
 
 //Generate all the flip combinations for a full GBC VRAM bank 2 tile:
-GameBoyCore.prototype.generateGBCTileBank2 = function (vramAddress) {
+public generateGBCTileBank2(vramAddress) {
 	var address = vramAddress >> 4;
 	var tileBlock1 = this.tileCache[0x800 | address];
 	var tileBlock2 = this.tileCache[0xA00 | address];
@@ -3850,7 +4083,7 @@ GameBoyCore.prototype.generateGBCTileBank2 = function (vramAddress) {
 }
 
 //Generate only a single tile line for the GB tile cache mode (OAM accessible range):
-GameBoyCore.prototype.generateGBOAMTileLine = function (address) {
+public generateGBOAMTileLine(address) {
 	var lineCopy = (this.memory[0x1 | address] << 8) | this.memory[0x9FFE & address];
 	address &= 0x1FFE;
 	var tileBlock1 = this.tileCache[address >> 4];
@@ -3869,20 +4102,20 @@ GameBoyCore.prototype.generateGBOAMTileLine = function (address) {
 	tileBlock4[addressFlipped | 7] = tileBlock2[address | 7] = tileBlock3[addressFlipped] = tileBlock1[address] = ((lineCopy & 0x8000) >> 14) | ((lineCopy & 0x80) >> 7);
 }
 
-GameBoyCore.prototype.graphicsJIT = function () {
+public graphicsJIT() {
 	if (this.LCDisOn) {
 		this.totalLinesPassed = 0;			//Mark frame for ensuring a JIT pass for the next framebuffer output.
 		this.graphicsJITScanlineGroup();
 	}
 }
 
-GameBoyCore.prototype.graphicsJITVBlank = function () {
+public graphicsJITVBlank() {
 	//JIT the graphics to v-blank framing:
 	this.totalLinesPassed += this.queuedScanLines;
 	this.graphicsJITScanlineGroup();
 }
 
-GameBoyCore.prototype.graphicsJITScanlineGroup = function () {
+public graphicsJITScanlineGroup() {
 	//Normal rendering JIT, where we try to do groups of scanlines at once:
 	while (this.queuedScanLines > 0) {
 		this.renderScanLine(this.lastUnrenderedLine);
@@ -3896,7 +4129,7 @@ GameBoyCore.prototype.graphicsJITScanlineGroup = function () {
 	}
 }
 
-GameBoyCore.prototype.incrementScanLineQueue = function () {
+public incrementScanLineQueue() {
 	if (this.queuedScanLines < 144) {
 		++this.queuedScanLines;
 	}
@@ -3912,13 +4145,13 @@ GameBoyCore.prototype.incrementScanLineQueue = function () {
 	}
 }
 
-GameBoyCore.prototype.midScanLineJIT = function () {
+public midScanLineJIT() {
 	this.graphicsJIT();
 	this.renderMidScanLine();
 }
 
 //Check for the highest priority IRQ to fire:
-GameBoyCore.prototype.launchIRQ = function () {
+public launchIRQ() {
 	var bitShift = 0;
 	var testbit = 1;
 	do {
@@ -3947,7 +4180,7 @@ GameBoyCore.prototype.launchIRQ = function () {
 /*
 	Check for IRQs to be fired while not in HALT:
 */
-GameBoyCore.prototype.checkIRQMatching = function () {
+public checkIRQMatching() {
 	if (this.IME) {
 		this.IRQLineMatched = this.interruptsEnabled & this.interruptsRequested & 0x1F;
 	}
@@ -3961,7 +4194,7 @@ GameBoyCore.prototype.checkIRQMatching = function () {
 	is very slow. Not many emulators do this because they have to cover
 	all the IRQ prediction cases and they usually get them wrong.
 */
-GameBoyCore.prototype.calculateHALTPeriod = function () {
+public calculateHALTPeriod() {
 	//Initialize our variables and start our prediction:
 	if (!this.halt) {
 		this.halt = true;
@@ -4039,17 +4272,17 @@ GameBoyCore.prototype.calculateHALTPeriod = function () {
 }
 
 //Memory Reading:
-GameBoyCore.prototype.memoryRead = function (address) {
+public memoryRead(address) {
 	//Act as a wrapper for reading the returns from the compiled jumps to memory.
 	return this.memoryReader[address](this, address);	//This seems to be faster than the usual if/else.
 }
 
-GameBoyCore.prototype.memoryHighRead = function (address) {
+public memoryHighRead(address) {
 	//Act as a wrapper for reading the returns from the compiled jumps to memory.
 	return this.memoryHighReader[address](this, address);	//This seems to be faster than the usual if/else.
 }
 
-GameBoyCore.prototype.memoryReadJumpCompile = function () {
+public memoryReadJumpCompile() {
 	//Faster in some browsers, since we are doing less conditionals overall by implementing them in advance.
 	for (var index = 0x0000; index <= 0xFFFF; index++) {
 		if (index < 0x4000) {
@@ -4497,19 +4730,19 @@ GameBoyCore.prototype.memoryReadJumpCompile = function () {
 	}
 }
 
-GameBoyCore.prototype.memoryReadNormal = function (parentObj, address) {
+public memoryReadNormal(parentObj, address) {
 	return parentObj.memory[address];
 }
 
-GameBoyCore.prototype.memoryHighReadNormal = function (parentObj, address) {
+public memoryHighReadNormal(parentObj, address) {
 	return parentObj.memory[0xFF00 | address];
 }
 
-GameBoyCore.prototype.memoryReadROM = function (parentObj, address) {
+public memoryReadROM(parentObj, address) {
 	return parentObj.ROM[parentObj.currentROMBank + address];
 }
 
-GameBoyCore.prototype.memoryReadMBC = function (parentObj, address) {
+public memoryReadMBC(parentObj, address) {
 	//Switchable RAM
 	if (parentObj.MBCRAMBanksEnabled || settings.mbc_enable_override) {
 		return parentObj.MBCRam[address + parentObj.currMBCRAMBankPosition];
@@ -4518,7 +4751,7 @@ GameBoyCore.prototype.memoryReadMBC = function (parentObj, address) {
 	return 0xFF;
 }
 
-GameBoyCore.prototype.memoryReadMBC7 = function (parentObj, address) {
+public memoryReadMBC7(parentObj, address) {
 	//Switchable RAM
 	if (parentObj.MBCRAMBanksEnabled || settings.mbc_enable_override) {
 		switch (address) {
@@ -4549,7 +4782,7 @@ GameBoyCore.prototype.memoryReadMBC7 = function (parentObj, address) {
 	return 0xFF;
 }
 
-GameBoyCore.prototype.memoryReadMBC3 = function (parentObj, address) {
+public memoryReadMBC3(parentObj, address) {
 	//Switchable RAM
 	if (parentObj.MBCRAMBanksEnabled || settings.mbc_enable_override) {
 		switch (parentObj.currMBCRAMBank) {
@@ -4579,47 +4812,47 @@ GameBoyCore.prototype.memoryReadMBC3 = function (parentObj, address) {
 	return 0xFF;
 }
 
-GameBoyCore.prototype.memoryReadGBCMemory = function (parentObj, address) {
+public memoryReadGBCMemory(parentObj, address) {
 	return parentObj.GBCMemory[address + parentObj.gbcRamBankPosition];
 }
 
-GameBoyCore.prototype.memoryReadOAM = function (parentObj, address) {
+public memoryReadOAM(parentObj, address) {
 	return (parentObj.modeSTAT > 1) ?  0xFF : parentObj.memory[address];
 }
 
-GameBoyCore.prototype.memoryReadECHOGBCMemory = function (parentObj, address) {
+public memoryReadECHOGBCMemory(parentObj, address) {
 	return parentObj.GBCMemory[address + parentObj.gbcRamBankPositionECHO];
 }
 
-GameBoyCore.prototype.memoryReadECHONormal = function (parentObj, address) {
+public memoryReadECHONormal(parentObj, address) {
 	return parentObj.memory[address - 0x2000];
 }
 
-GameBoyCore.prototype.memoryReadBAD = function (_parentObj, _address) {
+public memoryReadBAD(_parentObj, _address) {
 	return 0xFF;
 }
 
-GameBoyCore.prototype.VRAMDATAReadCGBCPU = function (parentObj, address) {
+public VRAMDATAReadCGBCPU(parentObj, address) {
 	//CPU Side Reading The VRAM (Optimized for GameBoy Color)
 	return (parentObj.modeSTAT > 2) ? 0xFF : ((parentObj.currVRAMBank == 0) ? parentObj.memory[address] : parentObj.VRAM[address & 0x1FFF]);
 }
 
-GameBoyCore.prototype.VRAMDATAReadDMGCPU = function (parentObj, address) {
+public VRAMDATAReadDMGCPU(parentObj, address) {
 	//CPU Side Reading The VRAM (Optimized for classic GameBoy)
 	return (parentObj.modeSTAT > 2) ? 0xFF : parentObj.memory[address];
 }
 
-GameBoyCore.prototype.VRAMCHRReadCGBCPU = function (parentObj, address) {
+public VRAMCHRReadCGBCPU(parentObj, address) {
 	//CPU Side Reading the Character Data Map:
 	return (parentObj.modeSTAT > 2) ? 0xFF : parentObj.BGCHRCurrentBank[address & 0x7FF];
 }
 
-GameBoyCore.prototype.VRAMCHRReadDMGCPU = function (parentObj, address) {
+public VRAMCHRReadDMGCPU(parentObj, address) {
 	//CPU Side Reading the Character Data Map:
 	return (parentObj.modeSTAT > 2) ? 0xFF : parentObj.BGCHRBank1[address & 0x7FF];
 }
 
-GameBoyCore.prototype.setCurrentMBC1ROMBank = function () {
+public setCurrentMBC1ROMBank() {
 	//Read the cartridge ROM data from RAM memory:
 	switch (this.ROMBank1offs) {
 		case 0x00:
@@ -4634,30 +4867,30 @@ GameBoyCore.prototype.setCurrentMBC1ROMBank = function () {
 	}
 }
 
-GameBoyCore.prototype.setCurrentMBC2AND3ROMBank = function () {
+public setCurrentMBC2AND3ROMBank() {
 	//Read the cartridge ROM data from RAM memory:
 	//Only map bank 0 to bank 1 here (MBC2 is like MBC1, but can only do 16 banks, so only the bank 0 quirk appears for MBC2):
 	this.currentROMBank = Math.max((this.ROMBank1offs % this.ROMBankEdge) - 1, 0) << 14;
 }
 
-GameBoyCore.prototype.setCurrentMBC5ROMBank = function () {
+public setCurrentMBC5ROMBank() {
 	//Read the cartridge ROM data from RAM memory:
 	this.currentROMBank = ((this.ROMBank1offs % this.ROMBankEdge) - 1) << 14;
 }
 
 //Memory Writing:
-GameBoyCore.prototype.memoryWrite = function (address, data) {
+public memoryWrite(address, data) {
 	//Act as a wrapper for writing by compiled jumps to specific memory writing functions.
 	this.memoryWriter[address](this, address, data);
 }
 
 //0xFFXX fast path:
-GameBoyCore.prototype.memoryHighWrite = function (address, data) {
+public memoryHighWrite(address, data) {
 	//Act as a wrapper for writing by compiled jumps to specific memory writing functions.
 	this.memoryHighWriter[address](this, address, data);
 }
 
-GameBoyCore.prototype.memoryWriteJumpCompile = function () {
+public memoryWriteJumpCompile() {
 	//Faster in some browsers, since we are doing less conditionals overall by implementing them in advance.
 	for (var index = 0x0000; index <= 0xFFFF; index++) {
 		if (index < 0x8000) {
@@ -4794,18 +5027,18 @@ GameBoyCore.prototype.memoryWriteJumpCompile = function () {
 	this.registerWriteJumpCompile();				//Compile the I/O write functions separately...
 }
 
-GameBoyCore.prototype.MBCWriteEnable = function (parentObj, _address, data) {
+public MBCWriteEnable(parentObj, _address, data) {
 	//MBC RAM Bank Enable/Disable:
 	parentObj.MBCRAMBanksEnabled = ((data & 0x0F) == 0x0A);	//If lower nibble is 0x0A, then enable, otherwise disable.
 }
 
-GameBoyCore.prototype.MBC1WriteROMBank = function (parentObj, _address, data) {
+public MBC1WriteROMBank(parentObj, _address, data) {
 	//MBC1 ROM bank switching:
 	parentObj.ROMBank1offs = (parentObj.ROMBank1offs & 0x60) | (data & 0x1F);
 	parentObj.setCurrentMBC1ROMBank();
 }
 
-GameBoyCore.prototype.MBC1WriteRAMBank = function (parentObj, _address, data) {
+public MBC1WriteRAMBank(parentObj, _address, data) {
 	//MBC1 RAM bank switching
 	if (parentObj.MBC1Mode) {
 		//4/32 Mode
@@ -4819,7 +5052,7 @@ GameBoyCore.prototype.MBC1WriteRAMBank = function (parentObj, _address, data) {
 	}
 }
 
-GameBoyCore.prototype.MBC1WriteType = function (parentObj, _address, data) {
+public MBC1WriteType(parentObj, _address, data) {
 	//MBC1 mode setting:
 	parentObj.MBC1Mode = ((data & 0x1) == 0x1);
 	if (parentObj.MBC1Mode) {
@@ -4832,19 +5065,19 @@ GameBoyCore.prototype.MBC1WriteType = function (parentObj, _address, data) {
 	}
 }
 
-GameBoyCore.prototype.MBC2WriteROMBank = function (parentObj, _address, data) {
+public MBC2WriteROMBank(parentObj, _address, data) {
 	//MBC2 ROM bank switching:
 	parentObj.ROMBank1offs = data & 0x0F;
 	parentObj.setCurrentMBC2AND3ROMBank();
 }
 
-GameBoyCore.prototype.MBC3WriteROMBank = function (parentObj, _address, data) {
+public MBC3WriteROMBank(parentObj, _address, data) {
 	//MBC3 ROM bank switching:
 	parentObj.ROMBank1offs = data & 0x7F;
 	parentObj.setCurrentMBC2AND3ROMBank();
 }
 
-GameBoyCore.prototype.MBC3WriteRAMBank = function (parentObj, _address, data) {
+public MBC3WriteRAMBank(parentObj, _address, data) {
 	parentObj.currMBCRAMBank = data;
 	if (data < 4) {
 		//MBC3 RAM bank switching
@@ -4852,7 +5085,7 @@ GameBoyCore.prototype.MBC3WriteRAMBank = function (parentObj, _address, data) {
 	}
 }
 
-GameBoyCore.prototype.MBC3WriteRTCLatch = function (parentObj, _address, data) {
+public MBC3WriteRTCLatch(parentObj, _address, data) {
 	if (data == 0) {
 		parentObj.RTCisLatched = false;
 	}
@@ -4867,56 +5100,56 @@ GameBoyCore.prototype.MBC3WriteRTCLatch = function (parentObj, _address, data) {
 	}
 }
 
-GameBoyCore.prototype.MBC5WriteROMBankLow = function (parentObj, _address, data) {
+public MBC5WriteROMBankLow(parentObj, _address, data) {
 	//MBC5 ROM bank switching:
 	parentObj.ROMBank1offs = (parentObj.ROMBank1offs & 0x100) | data;
 	parentObj.setCurrentMBC5ROMBank();
 }
 
-GameBoyCore.prototype.MBC5WriteROMBankHigh = function (parentObj, _address, data) {
+public MBC5WriteROMBankHigh(parentObj, _address, data) {
 	//MBC5 ROM bank switching (by least significant bit):
 	parentObj.ROMBank1offs  = ((data & 0x01) << 8) | (parentObj.ROMBank1offs & 0xFF);
 	parentObj.setCurrentMBC5ROMBank();
 }
 
-GameBoyCore.prototype.MBC5WriteRAMBank = function (parentObj, _address, data) {
+public MBC5WriteRAMBank(parentObj, _address, data) {
 	//MBC5 RAM bank switching
 	parentObj.currMBCRAMBank = data & 0xF;
 	parentObj.currMBCRAMBankPosition = (parentObj.currMBCRAMBank << 13) - 0xA000;
 }
 
-GameBoyCore.prototype.RUMBLEWriteRAMBank = function (parentObj, _address, data) {
+public RUMBLEWriteRAMBank(parentObj, _address, data) {
 	//MBC5 RAM bank switching
 	//Like MBC5, but bit 3 of the lower nibble is used for rumbling and bit 2 is ignored.
 	parentObj.currMBCRAMBank = data & 0x03;
 	parentObj.currMBCRAMBankPosition = (parentObj.currMBCRAMBank << 13) - 0xA000;
 }
 
-GameBoyCore.prototype.HuC3WriteRAMBank = function (parentObj, _address, data) {
+public HuC3WriteRAMBank(parentObj, _address, data) {
 	//HuC3 RAM bank switching
 	parentObj.currMBCRAMBank = data & 0x03;
 	parentObj.currMBCRAMBankPosition = (parentObj.currMBCRAMBank << 13) - 0xA000;
 }
 
-GameBoyCore.prototype.cartIgnoreWrite = function (_parentObj, _address, _data) {
+public cartIgnoreWrite(_parentObj, _address, _data) {
 	//We might have encountered illegal RAM writing or such, so just do nothing...
 }
 
-GameBoyCore.prototype.memoryWriteNormal = function (parentObj, address, data) {
+public memoryWriteNormal(parentObj, address, data) {
 	parentObj.memory[address] = data;
 }
 
-GameBoyCore.prototype.memoryHighWriteNormal = function (parentObj, address, data) {
+public memoryHighWriteNormal(parentObj, address, data) {
 	parentObj.memory[0xFF00 | address] = data;
 }
 
-GameBoyCore.prototype.memoryWriteMBCRAM = function (parentObj, address, data) {
+public memoryWriteMBCRAM(parentObj, address, data) {
 	if (parentObj.MBCRAMBanksEnabled || settings.mbc_enable_override) {
 		parentObj.MBCRam[address + parentObj.currMBCRAMBankPosition] = data;
 	}
 }
 
-GameBoyCore.prototype.memoryWriteMBC3RAM = function (parentObj, address, data) {
+public memoryWriteMBC3RAM(parentObj, address, data) {
 	if (parentObj.MBCRAMBanksEnabled || settings.mbc_enable_override) {
 		switch (parentObj.currMBCRAMBank) {
 			case 0x00:
@@ -4963,11 +5196,11 @@ GameBoyCore.prototype.memoryWriteMBC3RAM = function (parentObj, address, data) {
 	}
 }
 
-GameBoyCore.prototype.memoryWriteGBCRAM = function (parentObj, address, data) {
+public memoryWriteGBCRAM(parentObj, address, data) {
 	parentObj.GBCMemory[address + parentObj.gbcRamBankPosition] = data;
 }
 
-GameBoyCore.prototype.memoryWriteOAMRAM = function (parentObj, address, data) {
+public memoryWriteOAMRAM(parentObj, address, data) {
 	if (parentObj.modeSTAT < 2) {		//OAM RAM cannot be written to in mode 2 & 3
 		if (parentObj.memory[address] != data) {
 			parentObj.graphicsJIT();
@@ -4976,15 +5209,15 @@ GameBoyCore.prototype.memoryWriteOAMRAM = function (parentObj, address, data) {
 	}
 }
 
-GameBoyCore.prototype.memoryWriteECHOGBCRAM = function (parentObj, address, data) {
+public memoryWriteECHOGBCRAM(parentObj, address, data) {
 	parentObj.GBCMemory[address + parentObj.gbcRamBankPositionECHO] = data;
 }
 
-GameBoyCore.prototype.memoryWriteECHONormal = function (parentObj, address, data) {
+public memoryWriteECHONormal(parentObj, address, data) {
 	parentObj.memory[address - 0x2000] = data;
 }
 
-GameBoyCore.prototype.VRAMGBDATAWrite = function (parentObj, address, data) {
+public VRAMGBDATAWrite(parentObj, address, data) {
 	if (parentObj.modeSTAT < 3) {	//VRAM cannot be written to during mode 3
 		if (parentObj.memory[address] != data) {
 			//JIT the graphics render queue:
@@ -4995,7 +5228,7 @@ GameBoyCore.prototype.VRAMGBDATAWrite = function (parentObj, address, data) {
 	}
 }
 
-GameBoyCore.prototype.VRAMGBDATAUpperWrite = function (parentObj, address, data) {
+public VRAMGBDATAUpperWrite(parentObj, address, data) {
 	if (parentObj.modeSTAT < 3) {	//VRAM cannot be written to during mode 3
 		if (parentObj.memory[address] != data) {
 			//JIT the graphics render queue:
@@ -5006,7 +5239,7 @@ GameBoyCore.prototype.VRAMGBDATAUpperWrite = function (parentObj, address, data)
 	}
 }
 
-GameBoyCore.prototype.VRAMGBCDATAWrite = function (parentObj, address, data) {
+public VRAMGBCDATAWrite(parentObj, address, data) {
 	if (parentObj.modeSTAT < 3) {	//VRAM cannot be written to during mode 3
 		if (parentObj.currVRAMBank == 0) {
 			if (parentObj.memory[address] != data) {
@@ -5028,7 +5261,7 @@ GameBoyCore.prototype.VRAMGBCDATAWrite = function (parentObj, address, data) {
 	}
 }
 
-GameBoyCore.prototype.VRAMGBCHRMAPWrite = function (parentObj, address, data) {
+public VRAMGBCHRMAPWrite(parentObj, address, data) {
 	if (parentObj.modeSTAT < 3) {	//VRAM cannot be written to during mode 3
 		address &= 0x7FF;
 		if (parentObj.BGCHRBank1[address] != data) {
@@ -5039,7 +5272,7 @@ GameBoyCore.prototype.VRAMGBCHRMAPWrite = function (parentObj, address, data) {
 	}
 }
 
-GameBoyCore.prototype.VRAMGBCCHRMAPWrite = function (parentObj, address, data) {
+public VRAMGBCCHRMAPWrite(parentObj, address, data) {
 	if (parentObj.modeSTAT < 3) {	//VRAM cannot be written to during mode 3
 		address &= 0x7FF;
 		if (parentObj.BGCHRCurrentBank[address] != data) {
@@ -5050,7 +5283,7 @@ GameBoyCore.prototype.VRAMGBCCHRMAPWrite = function (parentObj, address, data) {
 	}
 }
 
-GameBoyCore.prototype.DMAWrite = function (tilesToTransfer) {
+public DMAWrite(tilesToTransfer) {
 	if (!this.halt) {
 		//Clock the CPU for the DMA transfer (CPU is halted during the transfer):
 		this.CPUTicks += 4 | ((tilesToTransfer << 5) << this.doubleSpeedShifter);
@@ -5167,7 +5400,7 @@ GameBoyCore.prototype.DMAWrite = function (tilesToTransfer) {
 	memory[0xFF54] = destination & 0xF0;
 }
 
-GameBoyCore.prototype.registerWriteJumpCompile = function () {
+public registerWriteJumpCompile() {
 	//I/O Registers (GB + GBC):
 	//JoyPad
 	this.memoryHighWriter[0] = this.memoryWriter[0xFF00] = function (parentObj, _address, data) {
@@ -5709,7 +5942,8 @@ GameBoyCore.prototype.registerWriteJumpCompile = function () {
 	this.recompileModelSpecificIOWriteHandling();
 	this.recompileBootIOWriteHandling();
 }
-GameBoyCore.prototype.recompileModelSpecificIOWriteHandling = function () {
+
+public recompileModelSpecificIOWriteHandling() {
 	if (this.cGBC) {
 		//GameBoy Color Specific I/O:
 		//SC (Serial Transfer Control Register)
@@ -6020,7 +6254,8 @@ GameBoyCore.prototype.recompileModelSpecificIOWriteHandling = function () {
 		this.memoryHighWriter[0x74] = this.memoryWriter[0xFF74] = this.cartIgnoreWrite;
 	}
 }
-GameBoyCore.prototype.recompileBootIOWriteHandling = function () {
+
+public recompileBootIOWriteHandling() {
 	//Boot I/O Registers:
 	if (this.inBootstrap) {
 		this.memoryHighWriter[0x50] = this.memoryWriter[0xFF50] = function (parentObj, _address, data) {
@@ -6049,8 +6284,9 @@ GameBoyCore.prototype.recompileBootIOWriteHandling = function () {
 		this.memoryHighWriter[0x50] = this.memoryWriter[0xFF50] = this.cartIgnoreWrite;
 	}
 }
+
 //Helper Functions
-GameBoyCore.prototype.toTypedArray = function (baseArray, memtype) {
+public toTypedArray(baseArray, memtype) {
 	try {
 		if (settings.typed_arrays_disallow) {
 			return baseArray;
@@ -6084,7 +6320,7 @@ GameBoyCore.prototype.toTypedArray = function (baseArray, memtype) {
 	}
 }
 
-GameBoyCore.prototype.fromTypedArray = function (baseArray) {
+public fromTypedArray(baseArray) {
 	try {
 		if (!baseArray || !baseArray.length) {
 			return [];
@@ -6101,7 +6337,7 @@ GameBoyCore.prototype.fromTypedArray = function (baseArray) {
 	}
 }
 
-GameBoyCore.prototype.getTypedArray = function (length, defaultValue, numberType) {
+public getTypedArray(length, defaultValue, numberType) {
 	let arrayHandle;
 	try {
 		if (settings.typed_arrays_disallow) {
@@ -6136,4 +6372,5 @@ GameBoyCore.prototype.getTypedArray = function (length, defaultValue, numberType
 		}
 	}
 	return arrayHandle;
+}
 }

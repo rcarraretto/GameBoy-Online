@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { GameBoyCore } from '../src/GameBoyCore';
+import { OPCODE } from '../src/opcodes';
 
 describe("push / pop", function() {
   var core;
@@ -15,7 +16,7 @@ describe("push / pop", function() {
     core.registerC = 0xCC;
     core.stackPointer = 0xC099;
 
-    core.OPCODE[0xC5](core);
+    OPCODE[0xC5](core);
 
     expect(core.stackPointer).to.equal(0xC097);
     expect(core.memory[0xC097]).to.equal(0xCC);
@@ -27,7 +28,7 @@ describe("push / pop", function() {
     core.registerE = 0xEE;
     core.stackPointer = 0xC099;
 
-    core.OPCODE[0xD5](core);
+    OPCODE[0xD5](core);
 
     expect(core.stackPointer).to.equal(0xC097);
     expect(core.memory[0xC097]).to.equal(0xEE);
@@ -38,7 +39,7 @@ describe("push / pop", function() {
     core.registersHL = 0xAABB;
     core.stackPointer = 0xC099;
 
-    core.OPCODE[0xE5](core);
+    OPCODE[0xE5](core);
 
     expect(core.stackPointer).to.equal(0xC097);
     expect(core.memory[0xC097]).to.equal(0xBB);
@@ -50,7 +51,7 @@ describe("push / pop", function() {
     core.memory[0xC097] = 0xCC;
     core.memory[0xC098] = 0xBB;
 
-    core.OPCODE[0xC1](core);
+    OPCODE[0xC1](core);
 
     expect(core.stackPointer).to.equal(0xC099);
     expect(core.registerC).to.equal(0xCC);
@@ -62,7 +63,7 @@ describe("push / pop", function() {
     core.memory[0xC097] = 0xEE;
     core.memory[0xC098] = 0xDD;
 
-    core.OPCODE[0xD1](core);
+    OPCODE[0xD1](core);
 
     expect(core.stackPointer).to.equal(0xC099);
     expect(core.registerD).to.equal(0xDD);
@@ -74,7 +75,7 @@ describe("push / pop", function() {
     core.memory[0xC097] = 0xBB;
     core.memory[0xC098] = 0xAA;
 
-    core.OPCODE[0xE1](core);
+    OPCODE[0xE1](core);
 
     expect(core.stackPointer).to.equal(0xC099);
     expect(core.registersHL).to.equal(0xAABB);
@@ -88,7 +89,7 @@ describe("push / pop", function() {
     core.FHalfCarry = false;
     core.FCarry = false;
 
-    core.OPCODE[0xF5](core);
+    OPCODE[0xF5](core);
 
     expect(core.stackPointer).to.equal(0xC097);
     expect(core.memory[0xC097]).to.equal(0x00);
@@ -103,7 +104,7 @@ describe("push / pop", function() {
     core.FHalfCarry = false;
     core.FCarry = false;
 
-    core.OPCODE[0xF5](core);
+    OPCODE[0xF5](core);
 
     expect(core.stackPointer).to.equal(0xC097);
     expect(core.memory[0xC097]).to.equal(0x80);
@@ -118,7 +119,7 @@ describe("push / pop", function() {
     core.FHalfCarry = false;
     core.FCarry = false;
 
-    core.OPCODE[0xF5](core);
+    OPCODE[0xF5](core);
 
     expect(core.stackPointer).to.equal(0xC097);
     expect(core.memory[0xC097]).to.equal(0x40);
@@ -133,7 +134,7 @@ describe("push / pop", function() {
     core.FHalfCarry = true;
     core.FCarry = false;
 
-    core.OPCODE[0xF5](core);
+    OPCODE[0xF5](core);
 
     expect(core.stackPointer).to.equal(0xC097);
     expect(core.memory[0xC097]).to.equal(0x20);
@@ -148,7 +149,7 @@ describe("push / pop", function() {
     core.FHalfCarry = false;
     core.FCarry = true;
 
-    core.OPCODE[0xF5](core);
+    OPCODE[0xF5](core);
 
     expect(core.stackPointer).to.equal(0xC097);
     expect(core.memory[0xC097]).to.equal(0x10);
@@ -163,7 +164,7 @@ describe("push / pop", function() {
     core.FHalfCarry = true;
     core.FCarry = true;
 
-    core.OPCODE[0xF5](core);
+    OPCODE[0xF5](core);
 
     expect(core.stackPointer).to.equal(0xC097);
     expect(core.memory[0xC097]).to.equal(0xF0);
@@ -175,7 +176,7 @@ describe("push / pop", function() {
     core.memory[0xC097] = 0x00;
     core.memory[0xC098] = 0xAA;
 
-    core.OPCODE[0xF1](core);
+    OPCODE[0xF1](core);
 
     expect(core.stackPointer).to.equal(0xC099);
     expect(core.FZero).to.equal(false);
@@ -190,7 +191,7 @@ describe("push / pop", function() {
     core.memory[0xC097] = 0x80;
     core.memory[0xC098] = 0xAA;
 
-    core.OPCODE[0xF1](core);
+    OPCODE[0xF1](core);
 
     expect(core.stackPointer).to.equal(0xC099);
     expect(core.FZero).to.equal(true);
@@ -205,7 +206,7 @@ describe("push / pop", function() {
     core.memory[0xC097] = 0x40;
     core.memory[0xC098] = 0xAA;
 
-    core.OPCODE[0xF1](core);
+    OPCODE[0xF1](core);
 
     expect(core.stackPointer).to.equal(0xC099);
     expect(core.FZero).to.equal(false);
@@ -220,7 +221,7 @@ describe("push / pop", function() {
     core.memory[0xC097] = 0x20;
     core.memory[0xC098] = 0xAA;
 
-    core.OPCODE[0xF1](core);
+    OPCODE[0xF1](core);
 
     expect(core.stackPointer).to.equal(0xC099);
     expect(core.FZero).to.equal(false);
@@ -235,7 +236,7 @@ describe("push / pop", function() {
     core.memory[0xC097] = 0x10;
     core.memory[0xC098] = 0xAA;
 
-    core.OPCODE[0xF1](core);
+    OPCODE[0xF1](core);
 
     expect(core.stackPointer).to.equal(0xC099);
     expect(core.FZero).to.equal(false);
@@ -250,7 +251,7 @@ describe("push / pop", function() {
     core.memory[0xC097] = 0xF0;
     core.memory[0xC098] = 0xAA;
 
-    core.OPCODE[0xF1](core);
+    OPCODE[0xF1](core);
 
     expect(core.stackPointer).to.equal(0xC099);
     expect(core.FZero).to.equal(true);

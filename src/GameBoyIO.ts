@@ -5,7 +5,7 @@ import { settings } from './settings';
 import { arrayToBase64, base64ToArray, to_little_endian_dword, base64, to_byte } from './base64';
 
 // GameBoyCore object
-var gameboy = null;
+var gameboy: GameBoyCore = null;
 // GameBoyCore Timer
 var gbRunInterval = null;
 

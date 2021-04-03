@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { GameBoyCore } from '../src/GameBoyCore';
 import * as _ from 'lodash';
+import { OPCODE } from '../src/opcodes';
 
 describe("nop", function() {
   var core;
@@ -18,7 +19,7 @@ describe("nop", function() {
 
   it("NOP", function() {
     var before = _.clone(core);
-    core.OPCODE[0x00](core)
+    OPCODE[0x00](core)
 
     expect(core.registerA).to.equal(before.registerA);
     expect(core.registerB).to.equal(before.registerB);

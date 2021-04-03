@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { GameBoyCore } from '../src/GameBoyCore';
+import { OPCODE } from '../src/opcodes';
 
 describe("sub", function() {
   var core;
@@ -12,7 +13,7 @@ describe("sub", function() {
   it("SUB A, A", function() {
     core.registerA = 0x01;
 
-    core.OPCODE[0x97](core);
+    OPCODE[0x97](core);
 
     expect(core.registerA).to.equal(0x00);
     expect(core.FHalfCarry).to.equal(false);
@@ -26,7 +27,7 @@ describe("sub", function() {
     core.registerA = 0x01;
     core.registerB = 0x01;
 
-    core.OPCODE[0x90](core);
+    OPCODE[0x90](core);
 
     expect(core.registerA).to.equal(0x00);
     expect(core.registerB).to.equal(0x01);
@@ -40,7 +41,7 @@ describe("sub", function() {
     core.registerA = 0x10;
     core.registerB = 0x01;
 
-    core.OPCODE[0x90](core);
+    OPCODE[0x90](core);
 
     expect(core.registerA).to.equal(0x0F);
     expect(core.registerB).to.equal(0x01);
@@ -54,7 +55,7 @@ describe("sub", function() {
     core.registerA = 0x01;
     core.registerB = 0x02;
 
-    core.OPCODE[0x90](core);
+    OPCODE[0x90](core);
 
     expect(core.registerA).to.equal(0xFF);
     expect(core.registerB).to.equal(0x02);
@@ -69,7 +70,7 @@ describe("sub", function() {
     core.registerA = 0x01;
     core.registerC = 0x01;
 
-    core.OPCODE[0x91](core);
+    OPCODE[0x91](core);
 
     expect(core.registerA).to.equal(0x00);
     expect(core.registerC).to.equal(0x01);
@@ -83,7 +84,7 @@ describe("sub", function() {
     core.registerA = 0x10;
     core.registerC = 0x01;
 
-    core.OPCODE[0x91](core);
+    OPCODE[0x91](core);
 
     expect(core.registerA).to.equal(0x0F);
     expect(core.registerC).to.equal(0x01);
@@ -97,7 +98,7 @@ describe("sub", function() {
     core.registerA = 0x01;
     core.registerC = 0x02;
 
-    core.OPCODE[0x91](core);
+    OPCODE[0x91](core);
 
     expect(core.registerA).to.equal(0xFF);
     expect(core.registerC).to.equal(0x02);
@@ -112,7 +113,7 @@ describe("sub", function() {
     core.registerA = 0x01;
     core.registerD = 0x01;
 
-    core.OPCODE[0x92](core);
+    OPCODE[0x92](core);
 
     expect(core.registerA).to.equal(0x00);
     expect(core.registerD).to.equal(0x01);
@@ -126,7 +127,7 @@ describe("sub", function() {
     core.registerA = 0x10;
     core.registerD = 0x01;
 
-    core.OPCODE[0x92](core);
+    OPCODE[0x92](core);
 
     expect(core.registerA).to.equal(0x0F);
     expect(core.registerD).to.equal(0x01);
@@ -140,7 +141,7 @@ describe("sub", function() {
     core.registerA = 0x01;
     core.registerD = 0x02;
 
-    core.OPCODE[0x92](core);
+    OPCODE[0x92](core);
 
     expect(core.registerA).to.equal(0xFF);
     expect(core.registerD).to.equal(0x02);
@@ -155,7 +156,7 @@ describe("sub", function() {
     core.registerA = 0x01;
     core.registerE = 0x01;
 
-    core.OPCODE[0x93](core);
+    OPCODE[0x93](core);
 
     expect(core.registerA).to.equal(0x00);
     expect(core.registerE).to.equal(0x01);
@@ -169,7 +170,7 @@ describe("sub", function() {
     core.registerA = 0x10;
     core.registerE = 0x01;
 
-    core.OPCODE[0x93](core);
+    OPCODE[0x93](core);
 
     expect(core.registerA).to.equal(0x0F);
     expect(core.registerE).to.equal(0x01);
@@ -183,7 +184,7 @@ describe("sub", function() {
     core.registerA = 0x01;
     core.registerE = 0x02;
 
-    core.OPCODE[0x93](core);
+    OPCODE[0x93](core);
 
     expect(core.registerA).to.equal(0xFF);
     expect(core.registerE).to.equal(0x02);
