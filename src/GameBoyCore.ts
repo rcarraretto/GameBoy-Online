@@ -5,6 +5,7 @@ import { settings } from './settings';
 import { OPCODE } from './opcodes';
 import { GBBOOTROM, GBCBOOTROM, ffxxDump, SecondaryTICKTable, TICKTable } from './constants';
 import { CachedDuty } from './types';
+import { getTypedArray, toTypedArray, fromTypedArray } from './typed-array';
 
  /*
   JavaScript GameBoy Color Emulator
@@ -711,7 +712,7 @@ public saveSRAMState() {
 	}
 	else {
 		//Return the MBC RAM for backup...
-		return this.fromTypedArray(this.MBCRam);
+		return fromTypedArray(this.MBCRam);
 	}
 }
 
@@ -742,7 +743,7 @@ public saveRTCState() {
 
 public saveState() {
 	return [
-		this.fromTypedArray(this.ROM),
+		fromTypedArray(this.ROM),
 		this.inBootstrap,
 		this.registerA,
 		this.FZero,
@@ -761,11 +762,11 @@ public saveState() {
 		this.hdmaRunning,
 		this.CPUTicks,
 		this.doubleSpeedShifter,
-		this.fromTypedArray(this.memory),
-		this.fromTypedArray(this.MBCRam),
-		this.fromTypedArray(this.VRAM),
+		fromTypedArray(this.memory),
+		fromTypedArray(this.MBCRam),
+		fromTypedArray(this.VRAM),
 		this.currVRAMBank,
-		this.fromTypedArray(this.GBCMemory),
+		fromTypedArray(this.GBCMemory),
 		this.MBC1Mode,
 		this.MBCRAMBanksEnabled,
 		this.currMBCRAMBank,
@@ -813,7 +814,7 @@ public saveState() {
 		this.cHuC3,
 		this.cHuC1,
 		this.drewBlank,
-		this.fromTypedArray(this.frameBuffer),
+		fromTypedArray(this.frameBuffer),
 		this.bgEnabled,
 		this.BGPriorityEnabled,
 		this.channel1FrequencyTracker,
@@ -846,7 +847,7 @@ public saveState() {
 		this.channel3patternType,
 		this.channel3frequency,
 		this.channel3consecutive,
-		this.fromTypedArray(this.channel3PCM),
+		fromTypedArray(this.channel3PCM),
 		this.channel4FrequencyPeriod,
 		this.channel4lastSampleLookup,
 		this.channel4totalLength,
@@ -927,18 +928,18 @@ public saveState() {
 		this.numRAMBanks,
 		this.windowY,
 		this.windowX,
-		this.fromTypedArray(this.gbcOBJRawPalette),
-		this.fromTypedArray(this.gbcBGRawPalette),
-		this.fromTypedArray(this.gbOBJPalette),
-		this.fromTypedArray(this.gbBGPalette),
-		this.fromTypedArray(this.gbcOBJPalette),
-		this.fromTypedArray(this.gbcBGPalette),
-		this.fromTypedArray(this.gbBGColorizedPalette),
-		this.fromTypedArray(this.gbOBJColorizedPalette),
-		this.fromTypedArray(this.cachedBGPaletteConversion),
-		this.fromTypedArray(this.cachedOBJPaletteConversion),
-		this.fromTypedArray(this.BGCHRBank1),
-		this.fromTypedArray(this.BGCHRBank2),
+		fromTypedArray(this.gbcOBJRawPalette),
+		fromTypedArray(this.gbcBGRawPalette),
+		fromTypedArray(this.gbOBJPalette),
+		fromTypedArray(this.gbBGPalette),
+		fromTypedArray(this.gbcOBJPalette),
+		fromTypedArray(this.gbcBGPalette),
+		fromTypedArray(this.gbBGColorizedPalette),
+		fromTypedArray(this.gbOBJColorizedPalette),
+		fromTypedArray(this.cachedBGPaletteConversion),
+		fromTypedArray(this.cachedOBJPaletteConversion),
+		fromTypedArray(this.BGCHRBank1),
+		fromTypedArray(this.BGCHRBank2),
 		this.haltPostClocks,
 		this.interruptsRequested,
 		this.interruptsEnabled,
@@ -955,7 +956,7 @@ public saveState() {
 public returnFromState(returnedFrom) {
 	var index = 0;
 	var state = returnedFrom.slice(0);
-	this.ROM = this.toTypedArray(state[index++], "uint8");
+	this.ROM = toTypedArray(state[index++], "uint8");
 	this.ROMBankEdge = Math.floor(this.ROM.length / 0x4000);
 	this.inBootstrap = state[index++];
 	this.registerA = state[index++];
@@ -975,11 +976,11 @@ public returnFromState(returnedFrom) {
 	this.hdmaRunning = state[index++];
 	this.CPUTicks = state[index++];
 	this.doubleSpeedShifter = state[index++];
-	this.memory = this.toTypedArray(state[index++], "uint8");
-	this.MBCRam = this.toTypedArray(state[index++], "uint8");
-	this.VRAM = this.toTypedArray(state[index++], "uint8");
+	this.memory = toTypedArray(state[index++], "uint8");
+	this.MBCRam = toTypedArray(state[index++], "uint8");
+	this.VRAM = toTypedArray(state[index++], "uint8");
 	this.currVRAMBank = state[index++];
-	this.GBCMemory = this.toTypedArray(state[index++], "uint8");
+	this.GBCMemory = toTypedArray(state[index++], "uint8");
 	this.MBC1Mode = state[index++];
 	this.MBCRAMBanksEnabled = state[index++];
 	this.currMBCRAMBank = state[index++];
@@ -1027,7 +1028,7 @@ public returnFromState(returnedFrom) {
 	this.cHuC3 = state[index++];
 	this.cHuC1 = state[index++];
 	this.drewBlank = state[index++];
-	this.frameBuffer = this.toTypedArray(state[index++], "int32");
+	this.frameBuffer = toTypedArray(state[index++], "int32");
 	this.bgEnabled = state[index++];
 	this.BGPriorityEnabled = state[index++];
 	this.channel1FrequencyTracker = state[index++];
@@ -1060,7 +1061,7 @@ public returnFromState(returnedFrom) {
 	this.channel3patternType = state[index++];
 	this.channel3frequency = state[index++];
 	this.channel3consecutive = state[index++];
-	this.channel3PCM = this.toTypedArray(state[index++], "int8");
+	this.channel3PCM = toTypedArray(state[index++], "int8");
 	this.channel4FrequencyPeriod = state[index++];
 	this.channel4lastSampleLookup = state[index++];
 	this.channel4totalLength = state[index++];
@@ -1141,18 +1142,18 @@ public returnFromState(returnedFrom) {
 	this.numRAMBanks = state[index++];
 	this.windowY = state[index++];
 	this.windowX = state[index++];
-	this.gbcOBJRawPalette = this.toTypedArray(state[index++], "uint8");
-	this.gbcBGRawPalette = this.toTypedArray(state[index++], "uint8");
-	this.gbOBJPalette = this.toTypedArray(state[index++], "int32");
-	this.gbBGPalette = this.toTypedArray(state[index++], "int32");
-	this.gbcOBJPalette = this.toTypedArray(state[index++], "int32");
-	this.gbcBGPalette = this.toTypedArray(state[index++], "int32");
-	this.gbBGColorizedPalette = this.toTypedArray(state[index++], "int32");
-	this.gbOBJColorizedPalette = this.toTypedArray(state[index++], "int32");
-	this.cachedBGPaletteConversion = this.toTypedArray(state[index++], "int32");
-	this.cachedOBJPaletteConversion = this.toTypedArray(state[index++], "int32");
-	this.BGCHRBank1 = this.toTypedArray(state[index++], "uint8");
-	this.BGCHRBank2 = this.toTypedArray(state[index++], "uint8");
+	this.gbcOBJRawPalette = toTypedArray(state[index++], "uint8");
+	this.gbcBGRawPalette = toTypedArray(state[index++], "uint8");
+	this.gbOBJPalette = toTypedArray(state[index++], "int32");
+	this.gbBGPalette = toTypedArray(state[index++], "int32");
+	this.gbcOBJPalette = toTypedArray(state[index++], "int32");
+	this.gbcBGPalette = toTypedArray(state[index++], "int32");
+	this.gbBGColorizedPalette = toTypedArray(state[index++], "int32");
+	this.gbOBJColorizedPalette = toTypedArray(state[index++], "int32");
+	this.cachedBGPaletteConversion = toTypedArray(state[index++], "int32");
+	this.cachedOBJPaletteConversion = toTypedArray(state[index++], "int32");
+	this.BGCHRBank1 = toTypedArray(state[index++], "uint8");
+	this.BGCHRBank2 = toTypedArray(state[index++], "uint8");
 	this.haltPostClocks = state[index++];
 	this.interruptsRequested = state[index++];
 	this.interruptsEnabled = state[index++];
@@ -1165,8 +1166,8 @@ public returnFromState(returnedFrom) {
 	this.audioClocksUntilNextEvent = state[index++];
 	this.audioClocksUntilNextEventCounter = state[index];
 	this.fromSaveState = true;
-	this.TICKTable = this.toTypedArray(TICKTable, "uint8");
-	this.SecondaryTICKTable = this.toTypedArray(SecondaryTICKTable, "uint8");
+	this.TICKTable = toTypedArray(TICKTable, "uint8");
+	this.SecondaryTICKTable = toTypedArray(SecondaryTICKTable, "uint8");
 	this.initializeReferencesFromSaveState();
 	this.memoryReadJumpCompile();
 	this.memoryWriteJumpCompile();
@@ -1206,19 +1207,19 @@ public start() {
 
 private initMemory() {
 	//Initialize the RAM:
-	this.memory = this.getTypedArray(0x10000, 0, "uint8");
-	this.frameBuffer = this.getTypedArray(23040, 0xF8F8F8, "int32");
-	this.BGCHRBank1 = this.getTypedArray(0x800, 0, "uint8");
-	this.TICKTable = this.toTypedArray(TICKTable, "uint8");
-	this.SecondaryTICKTable = this.toTypedArray(SecondaryTICKTable, "uint8");
-	this.channel3PCM = this.getTypedArray(0x20, 0, "int8");
+	this.memory = getTypedArray(0x10000, 0, "uint8");
+	this.frameBuffer = getTypedArray(23040, 0xF8F8F8, "int32");
+	this.BGCHRBank1 = getTypedArray(0x800, 0, "uint8");
+	this.TICKTable = toTypedArray(TICKTable, "uint8");
+	this.SecondaryTICKTable = toTypedArray(SecondaryTICKTable, "uint8");
+	this.channel3PCM = getTypedArray(0x20, 0, "int8");
 }
 
 private generateCacheArray(tileAmount) {
 	var tileArray = [];
 	var tileNumber = 0;
 	while (tileNumber < tileAmount) {
-		tileArray[tileNumber++] = this.getTypedArray(64, 0, "uint8");
+		tileArray[tileNumber++] = getTypedArray(64, 0, "uint8");
 	}
 	return tileArray;
 }
@@ -1409,7 +1410,7 @@ private ROMLoad() {
 	if (maxLength < 0x4000) {
 		throw(new Error("ROM image size too small."));
 	}
-	this.ROM = this.getTypedArray(maxLength, 0, "uint8");
+	this.ROM = getTypedArray(maxLength, 0, "uint8");
 	var romIndex = 0;
 	if (this.usedBootROM) {
 		if (!settings.gb_boot_rom_utilized) {
@@ -1762,18 +1763,18 @@ private setupRAM() {
 		var MBCRam = (typeof this.openMBC == "function") ? this.openMBC(this.name) : [];
 		if (MBCRam.length > 0) {
 			//Flash the SRAM into memory:
-			this.MBCRam = this.toTypedArray(MBCRam, "uint8");
+			this.MBCRam = toTypedArray(MBCRam, "uint8");
 		}
 		else {
-			this.MBCRam = this.getTypedArray(this.numRAMBanks * 0x2000, 0, "uint8");
+			this.MBCRam = getTypedArray(this.numRAMBanks * 0x2000, 0, "uint8");
 		}
 	}
 	cout("Actual bytes of MBC RAM allocated: " + (this.numRAMBanks * 0x2000), 0);
 	this.returnFromRTCState();
 	//Setup the RAM for GBC mode.
 	if (this.cGBC) {
-		this.VRAM = this.getTypedArray(0x2000, 0, "uint8");
-		this.GBCMemory = this.getTypedArray(0x7000, 0, "uint8");
+		this.VRAM = getTypedArray(0x2000, 0, "uint8");
+		this.GBCMemory = getTypedArray(0x7000, 0, "uint8");
 	}
 	this.memoryReadJumpCompile();
 	this.memoryWriteJumpCompile();
@@ -1843,7 +1844,7 @@ public initLCD() {
 		this.graphicsBlit();
 		this.canvas.style.visibility = "visible";
 		if (this.swizzledFrame == null) {
-			this.swizzledFrame = this.getTypedArray(69120, 0xFF, "uint8");
+			this.swizzledFrame = getTypedArray(69120, 0xFF, "uint8");
 		}
 		//Test the draw system and browser vblank latching:
 		this.drewFrame = true;										//Copy the latest graphics to buffer.
@@ -1918,14 +1919,14 @@ private initAudioBuffer() {
 	this.downsampleInput = 0;
 	this.bufferContainAmount = Math.max(this.baseCPUCyclesPerIteration * settings.audio_buffer_min / this.audioResamplerFirstPassFactor, 4096) << 1;
 	this.numSamplesTotal = (this.baseCPUCyclesPerIteration / this.audioResamplerFirstPassFactor) << 1;
-	this.audioBuffer = this.getTypedArray(this.numSamplesTotal, 0, "float32");
+	this.audioBuffer = getTypedArray(this.numSamplesTotal, 0, "float32");
 }
 
 private intializeWhiteNoise() {
 	//Noise Sample Tables:
 	var randomFactor = 1;
 	//15-bit LSFR Cache Generation:
-	this.LSFR15Table = this.getTypedArray(0x80000, 0, "int8");
+	this.LSFR15Table = getTypedArray(0x80000, 0, "int8");
 	var LSFR = 0x7FFF;	//Seed value has all its bits set.
 	var LSFRShifted = 0x3FFF;
 	for (var index = 0; index < 0x8000; ++index) {
@@ -1952,7 +1953,7 @@ private intializeWhiteNoise() {
 		LSFR = LSFRShifted | (((LSFRShifted ^ LSFR) & 0x1) << 14);
 	}
 	//7-bit LSFR Cache Generation:
-	this.LSFR7Table = this.getTypedArray(0x800, 0, "int8");
+	this.LSFR7Table = getTypedArray(0x800, 0, "int8");
 	LSFR = 0x7F;	//Seed value has all its bits set.
 	for (index = 0; index < 0x80; ++index) {
 		//Normalize the last LSFR value for usage:
@@ -3224,22 +3225,22 @@ private renderMidScanLine() {
 private initializeModeSpecificArrays() {
 	this.LCDCONTROL = (this.LCDisOn) ? this.LINECONTROL : this.DISPLAYOFFCONTROL;
 	if (this.cGBC) {
-		this.gbcOBJRawPalette = this.getTypedArray(0x40, 0, "uint8");
-		this.gbcBGRawPalette = this.getTypedArray(0x40, 0, "uint8");
-		this.gbcOBJPalette = this.getTypedArray(0x20, 0x1000000, "int32");
-		this.gbcBGPalette = this.getTypedArray(0x40, 0, "int32");
-		this.BGCHRBank2 = this.getTypedArray(0x800, 0, "uint8");
+		this.gbcOBJRawPalette = getTypedArray(0x40, 0, "uint8");
+		this.gbcBGRawPalette = getTypedArray(0x40, 0, "uint8");
+		this.gbcOBJPalette = getTypedArray(0x20, 0x1000000, "int32");
+		this.gbcBGPalette = getTypedArray(0x40, 0, "int32");
+		this.BGCHRBank2 = getTypedArray(0x800, 0, "uint8");
 		this.BGCHRCurrentBank = (this.currVRAMBank > 0) ? this.BGCHRBank2 : this.BGCHRBank1;
 		this.tileCache = this.generateCacheArray(0xF80);
 	}
 	else {
-		this.gbOBJPalette = this.getTypedArray(8, 0, "int32");
-		this.gbBGPalette = this.getTypedArray(4, 0, "int32");
+		this.gbOBJPalette = getTypedArray(8, 0, "int32");
+		this.gbBGPalette = getTypedArray(4, 0, "int32");
 		this.BGPalette = this.gbBGPalette;
 		this.OBJPalette = this.gbOBJPalette;
 		this.tileCache = this.generateCacheArray(0x700);
-		this.sortBuffer = this.getTypedArray(0x100, 0, "uint8");
-		this.OAMAddressCache = this.getTypedArray(10, 0, "int32");
+		this.sortBuffer = getTypedArray(0x100, 0, "uint8");
+		this.OAMAddressCache = getTypedArray(10, 0, "int32");
 	}
 	this.renderPathBuild();
 }
@@ -3249,23 +3250,23 @@ private GBCtoGBModeAdjust() {
 	this.VRAM = this.GBCMemory = this.BGCHRCurrentBank = this.BGCHRBank2 = null;
 	this.tileCache.length = 0x700;
 	if (settings.enable_colorization) {
-		this.gbBGColorizedPalette = this.getTypedArray(4, 0, "int32");
-		this.gbOBJColorizedPalette = this.getTypedArray(8, 0, "int32");
-		this.cachedBGPaletteConversion = this.getTypedArray(4, 0, "int32");
-		this.cachedOBJPaletteConversion = this.getTypedArray(8, 0, "int32");
+		this.gbBGColorizedPalette = getTypedArray(4, 0, "int32");
+		this.gbOBJColorizedPalette = getTypedArray(8, 0, "int32");
+		this.cachedBGPaletteConversion = getTypedArray(4, 0, "int32");
+		this.cachedOBJPaletteConversion = getTypedArray(8, 0, "int32");
 		this.BGPalette = this.gbBGColorizedPalette;
 		this.OBJPalette = this.gbOBJColorizedPalette;
 		this.gbOBJPalette = this.gbBGPalette = null;
 		this.getGBCColor();
 	}
 	else {
-		this.gbOBJPalette = this.getTypedArray(8, 0, "int32");
-		this.gbBGPalette = this.getTypedArray(4, 0, "int32");
+		this.gbOBJPalette = getTypedArray(8, 0, "int32");
+		this.gbBGPalette = getTypedArray(4, 0, "int32");
 		this.BGPalette = this.gbBGPalette;
 		this.OBJPalette = this.gbOBJPalette;
 	}
-	this.sortBuffer = this.getTypedArray(0x100, 0, "uint8");
-	this.OAMAddressCache = this.getTypedArray(10, 0, "int32");
+	this.sortBuffer = getTypedArray(0x100, 0, "uint8");
+	this.OAMAddressCache = getTypedArray(10, 0, "int32");
 	this.renderPathBuild();
 	this.memoryReadJumpCompile();
 	this.memoryWriteJumpCompile();
@@ -3316,8 +3317,8 @@ private initializeReferencesFromSaveState() {
 		for (tileIndex = 0x9000; tileIndex < 0x9800; tileIndex += 2) {
 			this.generateGBTileLine(tileIndex);
 		}
-		this.sortBuffer = this.getTypedArray(0x100, 0, "uint8");
-		this.OAMAddressCache = this.getTypedArray(10, 0, "int32");
+		this.sortBuffer = getTypedArray(0x100, 0, "uint8");
+		this.OAMAddressCache = getTypedArray(10, 0, "int32");
 	}
 	else {
 		this.BGCHRCurrentBank = (this.currVRAMBank > 0) ? this.BGCHRBank2 : this.BGCHRBank1;
@@ -6413,92 +6414,4 @@ private recompileBootIOWriteHandling() {
 	}
 }
 
-//Helper Functions
-private toTypedArray(baseArray, memtype) {
-	try {
-		if (settings.typed_arrays_disallow) {
-			return baseArray;
-		}
-		if (!baseArray || !baseArray.length) {
-			return [];
-		}
-		var length = baseArray.length;
-		let typedArrayTemp;
-		switch (memtype) {
-			case "uint8":
-				typedArrayTemp = new Uint8Array(length);
-				break;
-			case "int8":
-				typedArrayTemp = new Int8Array(length);
-				break;
-			case "int32":
-				typedArrayTemp = new Int32Array(length);
-				break;
-			case "float32":
-				typedArrayTemp = new Float32Array(length);
-		}
-		for (var index = 0; index < length; index++) {
-			typedArrayTemp[index] = baseArray[index];
-		}
-		return typedArrayTemp;
-	}
-	catch (error) {
-		cout("Could not convert an array to a typed array: " + error.message, 1);
-		return baseArray;
-	}
-}
-
-private fromTypedArray(baseArray) {
-	try {
-		if (!baseArray || !baseArray.length) {
-			return [];
-		}
-		var arrayTemp = [];
-		for (var index = 0; index < baseArray.length; ++index) {
-			arrayTemp[index] = baseArray[index];
-		}
-		return arrayTemp;
-	}
-	catch (error) {
-		cout("Conversion from a typed array failed: " + error.message, 1);
-		return baseArray;
-	}
-}
-
-private getTypedArray(length, defaultValue, numberType) {
-	let arrayHandle;
-	try {
-		if (settings.typed_arrays_disallow) {
-			throw(new Error("Settings forced typed arrays to be disabled."));
-		}
-		switch (numberType) {
-			case "int8":
-				arrayHandle = new Int8Array(length);
-				break;
-			case "uint8":
-				arrayHandle = new Uint8Array(length);
-				break;
-			case "int32":
-				arrayHandle = new Int32Array(length);
-				break;
-			case "float32":
-				arrayHandle = new Float32Array(length);
-		}
-		if (defaultValue != 0) {
-			var index = 0;
-			while (index < length) {
-				arrayHandle[index++] = defaultValue;
-			}
-		}
-	}
-	catch (error) {
-		cout("Could not convert an array to a typed array: " + error.message, 1);
-		arrayHandle = [];
-		var index = 0;
-		while (index < length) {
-			arrayHandle[index++] = defaultValue;
-		}
-	}
-	return arrayHandle;
-}
 }
