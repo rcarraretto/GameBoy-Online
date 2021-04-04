@@ -18,9 +18,8 @@ import { GBBOOTROM, GBCBOOTROM, ffxxDump, SecondaryTICKTable, TICKTable } from '
 
 export class GameBoyCore {
     public canvas: any;
-    public drawContext: any;
-    public ROMImage: any;
-    public pause: any;
+    private ROMImage: any;
+    private pause: any;
     public registerA: any;
     public FZero: any;
     public FSubtract: any;
@@ -33,293 +32,292 @@ export class GameBoyCore {
     public registersHL: any;
     public stackPointer: any;
     public programCounter: any;
-    public CPUCyclesTotal: any;
-    public CPUCyclesTotalBase: any;
-    public CPUCyclesTotalCurrent: any;
-    public CPUCyclesTotalRoundoff: any;
-    public baseCPUCyclesPerIteration: any;
-    public remainingClocks: any;
-    public inBootstrap: any;
+    private CPUCyclesTotal: any;
+    private CPUCyclesTotalBase: any;
+    private CPUCyclesTotalCurrent: any;
+    private CPUCyclesTotalRoundoff: any;
+    private baseCPUCyclesPerIteration: any;
+    private remainingClocks: any;
+    private inBootstrap: any;
     public usedBootROM: any;
-    public usedGBCBootROM: any;
-    public halt: any;
+    private usedGBCBootROM: any;
+    private halt: any;
     public skipPCIncrement: any;
     public stopEmulator: any;
     public IME: any;
-    public IRQLineMatched: any;
+    private IRQLineMatched: any;
     public interruptsRequested: any;
     public interruptsEnabled: any;
-    public hdmaRunning: any;
+    private hdmaRunning: any;
     public CPUTicks: any;
     public doubleSpeedShifter: any;
-    public JoyPad: any;
-    public CPUStopped: any;
+    private JoyPad: any;
+    private CPUStopped: any;
     public memoryReader: any;
     public memoryWriter: any;
     public memoryHighReader: any;
     public memoryHighWriter: any;
-    public ROM: any;
+    private ROM: any;
     public memory: any;
-    public MBCRam: any;
-    public VRAM: any;
-    public GBCMemory: any;
-    public MBC1Mode: any;
-    public MBCRAMBanksEnabled: any;
-    public currMBCRAMBank: any;
-    public currMBCRAMBankPosition: any;
+    private MBCRam: any;
+    private VRAM: any;
+    private GBCMemory: any;
+    private MBC1Mode: any;
+    private MBCRAMBanksEnabled: any;
+    private currMBCRAMBank: any;
+    private currMBCRAMBankPosition: any;
     public cGBC: any;
-    public gbcRamBank: any;
-    public gbcRamBankPosition: any;
-    public gbcRamBankPositionECHO: any;
-    public RAMBanks: any;
-    public ROMBank1offs: any;
-    public currentROMBank: any;
-    public cartridgeType: any;
+    private gbcRamBank: any;
+    private gbcRamBankPosition: any;
+    private gbcRamBankPositionECHO: any;
+    private RAMBanks: any;
+    private ROMBank1offs: any;
+    private currentROMBank: any;
+    private cartridgeType: any;
     public name: any;
-    public gameCode: any;
+    private gameCode: any;
     public fromSaveState: any;
     public savedStateFileName: any;
-    public STATTracker: any;
-    public modeSTAT: any;
-    public spriteCount: any;
-    public LYCMatchTriggerSTAT: any;
-    public mode2TriggerSTAT: any;
-    public mode1TriggerSTAT: any;
-    public mode0TriggerSTAT: any;
-    public LCDisOn: any;
-    public LINECONTROL: any;
-    public DISPLAYOFFCONTROL: any;
-    public LCDCONTROL: any;
-    public RTCisLatched: any;
-    public latchedSeconds: any;
-    public latchedMinutes: any;
-    public latchedHours: any;
-    public latchedLDays: any;
-    public latchedHDays: any;
-    public RTCSeconds: any;
-    public RTCMinutes: any;
-    public RTCHours: any;
-    public RTCDays: any;
-    public RTCDayOverFlow: any;
-    public RTCHALT: any;
-    public highX: any;
-    public lowX: any;
-    public highY: any;
-    public lowY: any;
-    public audioHandle: any;
-    public numSamplesTotal: any;
-    public dutyLookup: any;
-    public bufferContainAmount: any;
-    public LSFR15Table: any;
-    public LSFR7Table: any;
-    public noiseSampleTable: any;
-    public soundMasterEnabled: any;
-    public channel3PCM: any;
-    public VinLeftChannelMasterVolume: any;
-    public VinRightChannelMasterVolume: any;
-    public leftChannel1: any;
-    public leftChannel2: any;
-    public leftChannel3: any;
-    public leftChannel4: any;
-    public rightChannel1: any;
-    public rightChannel2: any;
-    public rightChannel3: any;
-    public rightChannel4: any;
-    public audioClocksUntilNextEvent: any;
-    public audioClocksUntilNextEventCounter: any;
-    public channel1currentSampleLeft: any;
-    public channel1currentSampleRight: any;
-    public channel2currentSampleLeft: any;
-    public channel2currentSampleRight: any;
-    public channel3currentSampleLeft: any;
-    public channel3currentSampleRight: any;
-    public channel4currentSampleLeft: any;
-    public channel4currentSampleRight: any;
-    public channel1currentSampleLeftSecondary: any;
-    public channel1currentSampleRightSecondary: any;
-    public channel2currentSampleLeftSecondary: any;
-    public channel2currentSampleRightSecondary: any;
-    public channel3currentSampleLeftSecondary: any;
-    public channel3currentSampleRightSecondary: any;
-    public channel4currentSampleLeftSecondary: any;
-    public channel4currentSampleRightSecondary: any;
-    public channel1currentSampleLeftTrimary: any;
-    public channel1currentSampleRightTrimary: any;
-    public channel2currentSampleLeftTrimary: any;
-    public channel2currentSampleRightTrimary: any;
-    public mixerOutputCache: any;
-    public emulatorSpeed: any;
-    public audioTicks: any;
-    public audioIndex: any;
-    public downsampleInput: any;
-    public audioDestinationPosition: any;
-    public rollover: any;
-    public emulatorTicks: any;
-    public DIVTicks: any;
-    public LCDTicks: any;
-    public timerTicks: any;
-    public TIMAEnabled: any;
-    public TACClocker: any;
-    public serialTimer: any;
-    public serialShiftTimer: any;
-    public lastIteration: any;
+    private STATTracker: any;
+    private modeSTAT: any;
+    private spriteCount: any;
+    private LYCMatchTriggerSTAT: any;
+    private mode2TriggerSTAT: any;
+    private mode1TriggerSTAT: any;
+    private mode0TriggerSTAT: any;
+    private LCDisOn: any;
+    private LINECONTROL: any;
+    private DISPLAYOFFCONTROL: any;
+    private LCDCONTROL: any;
+    private RTCisLatched: any;
+    private latchedSeconds: any;
+    private latchedMinutes: any;
+    private latchedHours: any;
+    private latchedLDays: any;
+    private latchedHDays: any;
+    private RTCSeconds: any;
+    private RTCMinutes: any;
+    private RTCHours: any;
+    private RTCDays: any;
+    private RTCDayOverFlow: any;
+    private RTCHALT: any;
+    private highX: any;
+    private lowX: any;
+    private highY: any;
+    private lowY: any;
+    private audioHandle: any;
+    private numSamplesTotal: any;
+    private dutyLookup: any;
+    private bufferContainAmount: any;
+    private LSFR15Table: any;
+    private LSFR7Table: any;
+    private noiseSampleTable: any;
+    private soundMasterEnabled: any;
+    private channel3PCM: any;
+    private VinLeftChannelMasterVolume: any;
+    private VinRightChannelMasterVolume: any;
+    private leftChannel1: any;
+    private leftChannel2: any;
+    private leftChannel3: any;
+    private leftChannel4: any;
+    private rightChannel1: any;
+    private rightChannel2: any;
+    private rightChannel3: any;
+    private rightChannel4: any;
+    private audioClocksUntilNextEvent: any;
+    private audioClocksUntilNextEventCounter: any;
+    private channel1currentSampleLeft: any;
+    private channel1currentSampleRight: any;
+    private channel2currentSampleLeft: any;
+    private channel2currentSampleRight: any;
+    private channel3currentSampleLeft: any;
+    private channel3currentSampleRight: any;
+    private channel4currentSampleLeft: any;
+    private channel4currentSampleRight: any;
+    private channel1currentSampleLeftSecondary: any;
+    private channel1currentSampleRightSecondary: any;
+    private channel2currentSampleLeftSecondary: any;
+    private channel2currentSampleRightSecondary: any;
+    private channel3currentSampleLeftSecondary: any;
+    private channel3currentSampleRightSecondary: any;
+    private channel4currentSampleLeftSecondary: any;
+    private channel4currentSampleRightSecondary: any;
+    private channel1currentSampleLeftTrimary: any;
+    private channel1currentSampleRightTrimary: any;
+    private channel2currentSampleLeftTrimary: any;
+    private channel2currentSampleRightTrimary: any;
+    private mixerOutputCache: any;
+    private emulatorSpeed: any;
+    private audioTicks: any;
+    private audioIndex: any;
+    private downsampleInput: any;
+    private audioDestinationPosition: any;
+    private emulatorTicks: any;
+    private DIVTicks: any;
+    private LCDTicks: any;
+    private timerTicks: any;
+    private TIMAEnabled: any;
+    private TACClocker: any;
+    private serialTimer: any;
+    private serialShiftTimer: any;
+    private lastIteration: any;
     public firstIteration: any;
-    public actualScanLine: any;
-    public lastUnrenderedLine: any;
-    public queuedScanLines: any;
-    public totalLinesPassed: any;
-    public haltPostClocks: any;
-    public cMBC1: any;
-    public cMBC2: any;
-    public cMBC3: any;
-    public cMBC5: any;
-    public cMBC7: any;
-    public cSRAM: any;
-    public cMMMO1: any;
-    public cRUMBLE: any;
-    public cCamera: any;
-    public cTAMA5: any;
-    public cHuC3: any;
-    public cHuC1: any;
+    private actualScanLine: any;
+    private lastUnrenderedLine: any;
+    private queuedScanLines: any;
+    private totalLinesPassed: any;
+    private haltPostClocks: any;
+    private cMBC1: any;
+    private cMBC2: any;
+    private cMBC3: any;
+    private cMBC5: any;
+    private cMBC7: any;
+    private cSRAM: any;
+    private cMMMO1: any;
+    private cRUMBLE: any;
+    private cCamera: any;
+    private cTAMA5: any;
+    private cHuC3: any;
+    private cHuC1: any;
     public cTIMER: any;
-    public ROMBanks: any;
-    public numRAMBanks: any;
-    public currVRAMBank: any;
-    public backgroundX: any;
-    public backgroundY: any;
-    public gfxWindowDisplay: any;
-    public gfxSpriteShow: any;
-    public gfxSpriteNormalHeight: any;
-    public bgEnabled: any;
-    public BGPriorityEnabled: any;
-    public gfxWindowCHRBankPosition: any;
-    public gfxBackgroundCHRBankPosition: any;
-    public gfxBackgroundBankOffset: any;
-    public windowY: any;
-    public windowX: any;
-    public drewBlank: any;
-    public drewFrame: any;
-    public midScanlineOffset: any;
-    public pixelEnd: any;
-    public currentX: any;
-    public BGCHRBank1: any;
-    public BGCHRBank2: any;
-    public BGCHRCurrentBank: any;
-    public tileCache: any;
-    public colors: any;
-    public OBJPalette: any;
-    public BGPalette: any;
-    public gbcOBJRawPalette: any;
-    public gbcBGRawPalette: any;
-    public gbOBJPalette: any;
-    public gbBGPalette: any;
-    public gbcOBJPalette: any;
-    public gbcBGPalette: any;
-    public gbBGColorizedPalette: any;
-    public gbOBJColorizedPalette: any;
-    public cachedBGPaletteConversion: any;
-    public cachedOBJPaletteConversion: any;
-    public updateGBBGPalette: any;
-    public updateGBOBJPalette: any;
-    public colorizedGBPalettes: any;
-    public BGLayerRender: any;
-    public WindowLayerRender: any;
-    public SpriteLayerRender: any;
-    public frameBuffer: any;
-    public swizzledFrame: any;
-    public canvasBuffer: any;
-    public pixelStart: any;
+    private ROMBanks: any;
+    private numRAMBanks: any;
+    private currVRAMBank: any;
+    private backgroundX: any;
+    private backgroundY: any;
+    private gfxWindowDisplay: any;
+    private gfxSpriteShow: any;
+    private gfxSpriteNormalHeight: any;
+    private bgEnabled: any;
+    private BGPriorityEnabled: any;
+    private gfxWindowCHRBankPosition: any;
+    private gfxBackgroundCHRBankPosition: any;
+    private gfxBackgroundBankOffset: any;
+    private windowY: any;
+    private windowX: any;
+    private drewBlank: any;
+    private drewFrame: any;
+    private midScanlineOffset: any;
+    private pixelEnd: any;
+    private currentX: any;
+    private BGCHRBank1: any;
+    private BGCHRBank2: any;
+    private BGCHRCurrentBank: any;
+    private tileCache: any;
+    private colors: any;
+    private OBJPalette: any;
+    private BGPalette: any;
+    private gbcOBJRawPalette: any;
+    private gbcBGRawPalette: any;
+    private gbOBJPalette: any;
+    private gbBGPalette: any;
+    private gbcOBJPalette: any;
+    private gbcBGPalette: any;
+    private gbBGColorizedPalette: any;
+    private gbOBJColorizedPalette: any;
+    private cachedBGPaletteConversion: any;
+    private cachedOBJPaletteConversion: any;
+    private updateGBBGPalette: any;
+    private updateGBOBJPalette: any;
+    private colorizedGBPalettes: any;
+    private BGLayerRender: any;
+    private WindowLayerRender: any;
+    private SpriteLayerRender: any;
+    private frameBuffer: any;
+    private swizzledFrame: any;
+    private canvasBuffer: any;
+    private pixelStart: any;
     public onscreenWidth: any;
     public onscreenHeight: any;
-    public offscreenWidth: any;
-    public offscreenHeight: any;
-    public offscreenRGBCount: any;
-    public resizePathClear: any;
-    public serialShiftTimerAllocated: any;
+    private offscreenWidth: any;
+    private offscreenHeight: any;
+    private offscreenRGBCount: any;
+    private resizePathClear: any;
+    private serialShiftTimerAllocated: any;
     public IRQEnableDelay: any;
     public iterations: any;
     public cBATT: any;
-    public channel1FrequencyTracker: any;
-    public channel1FrequencyCounter: any;
-    public channel1totalLength: any;
-    public channel1envelopeVolume: any;
-    public channel1envelopeType: any;
-    public channel1envelopeSweeps: any;
-    public channel1envelopeSweepsLast: any;
-    public channel1consecutive: any;
-    public channel1frequency: any;
-    public channel1SweepFault: any;
-    public channel1ShadowFrequency: any;
-    public channel1timeSweep: any;
-    public channel1lastTimeSweep: any;
-    public channel1Swept: any;
-    public channel1frequencySweepDivider: any;
-    public channel1decreaseSweep: any;
-    public channel2FrequencyTracker: any;
-    public channel2FrequencyCounter: any;
-    public channel2totalLength: any;
-    public channel2envelopeVolume: any;
-    public channel2envelopeType: any;
-    public channel2envelopeSweeps: any;
-    public channel2envelopeSweepsLast: any;
-    public channel2consecutive: any;
-    public channel2frequency: any;
-    public channel3canPlay: any;
-    public channel3totalLength: any;
-    public channel3patternType: any;
-    public channel3frequency: any;
-    public channel3consecutive: any;
-    public channel4FrequencyPeriod: any;
-    public channel4lastSampleLookup: any;
-    public channel4totalLength: any;
-    public channel4envelopeVolume: any;
-    public channel4currentVolume: any;
-    public channel4envelopeType: any;
-    public channel4envelopeSweeps: any;
-    public channel4envelopeSweepsLast: any;
-    public channel4consecutive: any;
-    public channel4BitRange: any;
-    public channel1DutyTracker: any;
-    public channel1CachedDuty: any;
-    public channel2DutyTracker: any;
-    public channel2CachedDuty: any;
-    public channel1Enabled: any;
-    public channel2Enabled: any;
-    public channel3Enabled: any;
-    public channel4Enabled: any;
-    public sequencerClocks: any;
-    public sequencePosition: any;
-    public channel3Counter: any;
-    public channel4Counter: any;
-    public cachedChannel3Sample: any;
-    public cachedChannel4Sample: any;
-    public channel3FrequencyPeriod: any;
-    public channel3lastSampleLookup: any;
-    public ROMBankEdge: any;
-    public TICKTable: any
+    private channel1FrequencyTracker: any;
+    private channel1FrequencyCounter: any;
+    private channel1totalLength: any;
+    private channel1envelopeVolume: any;
+    private channel1envelopeType: any;
+    private channel1envelopeSweeps: any;
+    private channel1envelopeSweepsLast: any;
+    private channel1consecutive: any;
+    private channel1frequency: any;
+    private channel1SweepFault: any;
+    private channel1ShadowFrequency: any;
+    private channel1timeSweep: any;
+    private channel1lastTimeSweep: any;
+    private channel1Swept: any;
+    private channel1frequencySweepDivider: any;
+    private channel1decreaseSweep: any;
+    private channel2FrequencyTracker: any;
+    private channel2FrequencyCounter: any;
+    private channel2totalLength: any;
+    private channel2envelopeVolume: any;
+    private channel2envelopeType: any;
+    private channel2envelopeSweeps: any;
+    private channel2envelopeSweepsLast: any;
+    private channel2consecutive: any;
+    private channel2frequency: any;
+    private channel3canPlay: any;
+    private channel3totalLength: any;
+    private channel3envelopeVolume: any;
+    private channel3patternType: any;
+    private channel3frequency: any;
+    private channel3consecutive: any;
+    private channel4FrequencyPeriod: any;
+    private channel4lastSampleLookup: any;
+    private channel4totalLength: any;
+    private channel4envelopeVolume: any;
+    private channel4currentVolume: any;
+    private channel4envelopeType: any;
+    private channel4envelopeSweeps: any;
+    private channel4envelopeSweepsLast: any;
+    private channel4consecutive: any;
+    private channel4BitRange: any;
+    private channel1DutyTracker: any;
+    private channel1CachedDuty: any;
+    private channel2DutyTracker: any;
+    private channel2CachedDuty: any;
+    private channel1Enabled: any;
+    private channel2Enabled: any;
+    private channel3Enabled: any;
+    private channel4Enabled: any;
+    private sequencerClocks: any;
+    private sequencePosition: any;
+    private channel3Counter: any;
+    private channel4Counter: any;
+    private cachedChannel3Sample: any;
+    private cachedChannel4Sample: any;
+    private channel3FrequencyPeriod: any;
+    private channel3lastSampleLookup: any;
+    private ROMBankEdge: any;
+    private TICKTable: any
     public SecondaryTICKTable: any;
-    public channel4VolumeShifter: any;
+    private channel4VolumeShifter: any;
     public openRTC: any;
     public openMBC: any;
-    public numROMBanks: any;
-    public clocksPerSecond: any;
-    public canvasOffscreen: any;
-    public drawContextOffscreen: any;
-    public drawContextOnscreen: any;
-    public resizer: any;
-    public audioResamplerFirstPassFactor: any;
-    public downSampleInputDivider: any;
-    public channel1canPlay: any;
-    public channel2canPlay: any;
-    public channel4canPlay: any;
-    public audioBuffer: any;
-    public sortBuffer: any;
-    public OAMAddressCache: any;
+    private numROMBanks: any;
+    private clocksPerSecond: any;
+    private canvasOffscreen: any;
+    private drawContextOffscreen: any;
+    private drawContextOnscreen: any;
+    private resizer: any;
+    private audioResamplerFirstPassFactor: any;
+    private downSampleInputDivider: any;
+    private channel1canPlay: any;
+    private channel2canPlay: any;
+    private channel4canPlay: any;
+    private audioBuffer: any;
+    private sortBuffer: any;
+    private OAMAddressCache: any;
 
     constructor(canvas = null, ROMImage = null, pause = null) {
 	//Params, etc...
 	this.canvas = canvas;						//Canvas DOM object for drawing out the graphics to.
-	this.drawContext = null;					// LCD Context
 	this.ROMImage = ROMImage;					//The game's ROM.
 	this.pause = pause;
 	//CPU Registers and Flags:
@@ -392,7 +390,7 @@ export class GameBoyCore {
 	this.mode0TriggerSTAT = false;				//Should we trigger an interrupt if in mode 0?
 	this.LCDisOn = false;						//Is the emulated LCD controller on?
 	this.LINECONTROL = [];						//Array of functions to handle each scan line we do (onscreen + offscreen)
-	this.DISPLAYOFFCONTROL = [function (_parentObj) {
+	this.DISPLAYOFFCONTROL = [function (_parentObj: GameBoyCore) {
 		//Array of line 0 function to handle the LCD controller when it's off (Do nothing!).
 	}];
 	this.LCDCONTROL = null;						//Pointer to either LINECONTROL or DISPLAYOFFCONTROL.
@@ -475,7 +473,6 @@ export class GameBoyCore {
 	this.audioIndex = 0;				//Used to keep alignment on audio generation.
 	this.downsampleInput = 0;
 	this.audioDestinationPosition = 0;	//Used to keep alignment on audio generation.
-	this.rollover = 0;					//Used to keep alignment on the number of samples to output (Realign from counter alias).
 	//Timing Variables
 	this.emulatorTicks = 0;				//Times for how many instructions to execute before ending the loop.
 	this.DIVTicks = 56;					//DIV Ticks Counter (Invisible lower 8-bit)
@@ -1048,7 +1045,7 @@ public returnFromState(returnedFrom) {
 	this.channel4VolumeShifter = (this.channel4BitRange == 0x7FFF) ? 15 : 7;
 }
 
-public returnFromRTCState() {
+private returnFromRTCState() {
 	if (typeof this.openRTC == "function" && this.cTIMER) {
 		var rtcData = this.openRTC(this.name);
 		var index = 0;
@@ -1076,7 +1073,7 @@ public start() {
 	this.run();			//Start the emulation.
 }
 
-public initMemory() {
+private initMemory() {
 	//Initialize the RAM:
 	this.memory = this.getTypedArray(0x10000, 0, "uint8");
 	this.frameBuffer = this.getTypedArray(23040, 0xF8F8F8, "int32");
@@ -1086,7 +1083,7 @@ public initMemory() {
 	this.channel3PCM = this.getTypedArray(0x20, 0, "int8");
 }
 
-public generateCacheArray(tileAmount) {
+private generateCacheArray(tileAmount) {
 	var tileArray = [];
 	var tileNumber = 0;
 	while (tileNumber < tileAmount) {
@@ -1095,7 +1092,7 @@ public generateCacheArray(tileAmount) {
 	return tileArray;
 }
 
-public initSkipBootstrap() {
+private initSkipBootstrap() {
 	//Fill in the boot ROM set register values
 	//Default values to the GB boot ROM values, then fill in the GBC boot ROM values after ROM loading
 	var index = 0xFF;
@@ -1243,7 +1240,7 @@ public initSkipBootstrap() {
 	this.currentX = 0;
 }
 
-public initBootstrap() {
+private initBootstrap() {
 	//Start as an unset device:
 	cout("Starting the selected boot ROM.", 0);
 	this.programCounter = 0;
@@ -1273,7 +1270,7 @@ public initBootstrap() {
 	this.memory[0xFF00] = 0xF;	//Set the joypad state.
 }
 
-public ROMLoad() {
+private ROMLoad() {
 	//Load the first two ROM banks (0x0000 - 0x7FFF) into regular gameboy memory:
 	this.ROM = [];
 	this.usedBootROM = settings.enable_gbc_bios && ((!settings.gb_boot_rom_utilized && GBCBOOTROM.length == 0x800) || (settings.gb_boot_rom_utilized && GBBOOTROM.length == 0x100));
@@ -1339,7 +1336,7 @@ public getROMImage() {
 	return this.ROMImage;
 }
 
-public interpretCartridge() {
+private interpretCartridge() {
 	// ROM name
 	for (var index = 0x134; index < 0x13F; index++) {
 		if (this.ROMImage.charCodeAt(index) > 0) {
@@ -1571,7 +1568,7 @@ public interpretCartridge() {
 	this.ROMImage = "";	//Memory consumption reduction.
 }
 
-public disableBootROM() {
+private disableBootROM() {
 	//Remove any traces of the boot ROM from ROM memory.
 	for (var index = 0; index < 0x100; ++index) {
 		this.memory[index] = this.ROM[index];	//Replace the GameBoy or GameBoy Color boot ROM with the game ROM.
@@ -1594,7 +1591,7 @@ public disableBootROM() {
 	}
 }
 
-public initializeTiming() {
+private initializeTiming() {
 	//Emulator Timing:
 	this.clocksPerSecond = this.emulatorSpeed * 0x400000;
 	this.baseCPUCyclesPerIteration = this.clocksPerSecond / 1000 * settings.loop_interval;
@@ -1611,7 +1608,7 @@ public setSpeed(speed) {
 	}
 }
 
-public setupRAM() {
+private setupRAM() {
 	//Setup the auxilliary/switchable RAM:
 	if (this.cMBC2) {
 		this.numRAMBanks = 1 / 16;
@@ -1651,11 +1648,11 @@ public setupRAM() {
 	this.memoryWriteJumpCompile();
 }
 
-public MBCRAMUtilized() {
+private MBCRAMUtilized() {
 	return this.cMBC1 || this.cMBC2 || this.cMBC3 || this.cMBC5 || this.cMBC7 || this.cRUMBLE;
 }
 
-public recomputeDimension() {
+private recomputeDimension() {
 	//Cache some dimension info:
 	this.onscreenWidth = this.canvas.width;
 	this.onscreenHeight = this.canvas.height;
@@ -1726,7 +1723,7 @@ public initLCD() {
 	}
 }
 
-public graphicsBlit() {
+private graphicsBlit() {
 	if (this.offscreenWidth == this.onscreenWidth && this.offscreenHeight == this.onscreenHeight) {
 		this.drawContextOnscreen.putImageData(this.canvasBuffer, 0, 0);
 	}
@@ -1784,7 +1781,7 @@ public changeVolume() {
 	}
 }
 
-public initAudioBuffer() {
+private initAudioBuffer() {
 	this.audioIndex = 0;
 	this.audioDestinationPosition = 0;
 	this.downsampleInput = 0;
@@ -1793,7 +1790,7 @@ public initAudioBuffer() {
 	this.audioBuffer = this.getTypedArray(this.numSamplesTotal, 0, "float32");
 }
 
-public intializeWhiteNoise() {
+private intializeWhiteNoise() {
 	//Noise Sample Tables:
 	var randomFactor = 1;
 	//15-bit LSFR Cache Generation:
@@ -1853,7 +1850,7 @@ public intializeWhiteNoise() {
 	this.noiseSampleTable = this.LSFR15Table;
 }
 
-public audioUnderrunAdjustment() {
+private audioUnderrunAdjustment() {
 	if (settings.enable_sound) {
 		var underrunAmount = this.audioHandle.remainingBuffer();
 		if (typeof underrunAmount == "number") {
@@ -1865,7 +1862,7 @@ public audioUnderrunAdjustment() {
 	}
 }
 
-public initializeAudioStartState() {
+private initializeAudioStartState() {
 	this.channel1FrequencyTracker = 0x2000;
 	this.channel1DutyTracker = 0;
 	this.channel1CachedDuty = this.dutyLookup[2];
@@ -1941,7 +1938,7 @@ public initializeAudioStartState() {
 	this.noiseSampleTable = this.LSFR15Table;
 }
 
-public outputAudio() {
+private outputAudio() {
 	this.audioBuffer[this.audioDestinationPosition++] = (this.downsampleInput >>> 16) * this.downSampleInputDivider - 1;
 	this.audioBuffer[this.audioDestinationPosition++] = (this.downsampleInput & 0xFFFF) * this.downSampleInputDivider - 1;
 	if (this.audioDestinationPosition == this.numSamplesTotal) {
@@ -1952,7 +1949,7 @@ public outputAudio() {
 }
 
 //Below are the audio generation functions timed against the CPU:
-public generateAudio(numSamples) {
+private generateAudio(numSamples) {
 	var multiplier = 0;
 	if (this.soundMasterEnabled && !this.CPUStopped) {
 		for (var clockUpTo = 0; numSamples > 0;) {
@@ -1994,7 +1991,7 @@ public generateAudio(numSamples) {
 }
 
 //Generate audio, but don't actually output it (Used for when sound is disabled by user/browser):
-public generateAudioFake(numSamples) {
+private generateAudioFake(numSamples) {
 	if (this.soundMasterEnabled && !this.CPUStopped) {
 		for (var clockUpTo = 0; numSamples > 0;) {
 			clockUpTo = Math.min(this.audioClocksUntilNextEventCounter, this.sequencerClocks, numSamples);
@@ -2012,7 +2009,7 @@ public generateAudioFake(numSamples) {
 	}
 }
 
-public audioJIT() {
+private audioJIT() {
 	//Audio Sample Generation Timing:
 	if (settings.enable_sound) {
 		this.generateAudio(this.audioTicks);
@@ -2023,7 +2020,7 @@ public audioJIT() {
 	this.audioTicks = 0;
 }
 
-public audioComputeSequencer() {
+private audioComputeSequencer() {
 	switch (this.sequencePosition++) {
 		case 0:
 			this.clockAudioLength();
@@ -2045,7 +2042,7 @@ public audioComputeSequencer() {
 	}
 }
 
-public clockAudioLength() {
+private clockAudioLength() {
 	//Channel 1:
 	if (this.channel1totalLength > 1) {
 		--this.channel1totalLength;
@@ -2084,7 +2081,7 @@ public clockAudioLength() {
 	}
 }
 
-public clockAudioSweep() {
+private clockAudioSweep() {
 	//Channel 1:
 	if (!this.channel1SweepFault && this.channel1timeSweep > 0) {
 		if (--this.channel1timeSweep == 0) {
@@ -2093,7 +2090,7 @@ public clockAudioSweep() {
 	}
 }
 
-public runAudioSweep() {
+private runAudioSweep() {
 	//Channel 1:
 	if (this.channel1lastTimeSweep > 0) {
 		if (this.channel1frequencySweepDivider > 0) {
@@ -2132,7 +2129,7 @@ public runAudioSweep() {
 	}
 }
 
-public channel1AudioSweepPerformDummy() {
+private channel1AudioSweepPerformDummy() {
 	//Channel 1:
 	if (this.channel1frequencySweepDivider > 0) {
 		if (!this.channel1decreaseSweep) {
@@ -2154,7 +2151,7 @@ public channel1AudioSweepPerformDummy() {
 	}
 }
 
-public clockAudioEnvelope() {
+private clockAudioEnvelope() {
 	//Channel 1:
 	if (this.channel1envelopeSweepsLast > -1) {
 		if (this.channel1envelopeSweeps > 0) {
@@ -2235,7 +2232,7 @@ public clockAudioEnvelope() {
 	}
 }
 
-public computeAudioChannels() {
+private computeAudioChannels() {
 	//Clock down the four audio channels to the next closest audio event:
 	this.channel1FrequencyCounter -= this.audioClocksUntilNextEvent;
 	this.channel2FrequencyCounter -= this.audioClocksUntilNextEvent;
@@ -2271,24 +2268,24 @@ public computeAudioChannels() {
 	this.audioClocksUntilNextEventCounter = this.audioClocksUntilNextEvent = Math.min(this.channel1FrequencyCounter, this.channel2FrequencyCounter, this.channel3Counter, this.channel4Counter);
 }
 
-public channel1EnableCheck() {
+private channel1EnableCheck() {
 	this.channel1Enabled = ((this.channel1consecutive || this.channel1totalLength > 0) && !this.channel1SweepFault && this.channel1canPlay);
 	this.channel1OutputLevelSecondaryCache();
 }
 
-public channel1VolumeEnableCheck() {
+private channel1VolumeEnableCheck() {
 	this.channel1canPlay = (this.memory[0xFF12] > 7);
 	this.channel1EnableCheck();
 	this.channel1OutputLevelSecondaryCache();
 }
 
-public channel1OutputLevelCache() {
+private channel1OutputLevelCache() {
 	this.channel1currentSampleLeft = (this.leftChannel1) ? this.channel1envelopeVolume : 0;
 	this.channel1currentSampleRight = (this.rightChannel1) ? this.channel1envelopeVolume : 0;
 	this.channel1OutputLevelSecondaryCache();
 }
 
-public channel1OutputLevelSecondaryCache() {
+private channel1OutputLevelSecondaryCache() {
 	if (this.channel1Enabled) {
 		this.channel1currentSampleLeftSecondary = this.channel1currentSampleLeft;
 		this.channel1currentSampleRightSecondary = this.channel1currentSampleRight;
@@ -2300,7 +2297,7 @@ public channel1OutputLevelSecondaryCache() {
 	this.channel1OutputLevelTrimaryCache();
 }
 
-public channel1OutputLevelTrimaryCache() {
+private channel1OutputLevelTrimaryCache() {
 	if (this.channel1CachedDuty[this.channel1DutyTracker] && settings.channels[0]) {
 		this.channel1currentSampleLeftTrimary = this.channel1currentSampleLeftSecondary;
 		this.channel1currentSampleRightTrimary = this.channel1currentSampleRightSecondary;
@@ -2312,24 +2309,24 @@ public channel1OutputLevelTrimaryCache() {
 	this.mixerOutputLevelCache();
 }
 
-public channel2EnableCheck() {
+private channel2EnableCheck() {
 	this.channel2Enabled = ((this.channel2consecutive || this.channel2totalLength > 0) && this.channel2canPlay);
 	this.channel2OutputLevelSecondaryCache();
 }
 
-public channel2VolumeEnableCheck() {
+private channel2VolumeEnableCheck() {
 	this.channel2canPlay = (this.memory[0xFF17] > 7);
 	this.channel2EnableCheck();
 	this.channel2OutputLevelSecondaryCache();
 }
 
-public channel2OutputLevelCache() {
+private channel2OutputLevelCache() {
 	this.channel2currentSampleLeft = (this.leftChannel2) ? this.channel2envelopeVolume : 0;
 	this.channel2currentSampleRight = (this.rightChannel2) ? this.channel2envelopeVolume : 0;
 	this.channel2OutputLevelSecondaryCache();
 }
 
-public channel2OutputLevelSecondaryCache() {
+private channel2OutputLevelSecondaryCache() {
 	if (this.channel2Enabled) {
 		this.channel2currentSampleLeftSecondary = this.channel2currentSampleLeft;
 		this.channel2currentSampleRightSecondary = this.channel2currentSampleRight;
@@ -2341,7 +2338,7 @@ public channel2OutputLevelSecondaryCache() {
 	this.channel2OutputLevelTrimaryCache();
 }
 
-public channel2OutputLevelTrimaryCache() {
+private channel2OutputLevelTrimaryCache() {
 	if (this.channel2CachedDuty[this.channel2DutyTracker] && settings.channels[1]) {
 		this.channel2currentSampleLeftTrimary = this.channel2currentSampleLeftSecondary;
 		this.channel2currentSampleRightTrimary = this.channel2currentSampleRightSecondary;
@@ -2353,18 +2350,18 @@ public channel2OutputLevelTrimaryCache() {
 	this.mixerOutputLevelCache();
 }
 
-public channel3EnableCheck() {
+private channel3EnableCheck() {
 	this.channel3Enabled = (/*this.channel3canPlay && */(this.channel3consecutive || this.channel3totalLength > 0));
 	this.channel3OutputLevelSecondaryCache();
 }
 
-public channel3OutputLevelCache() {
+private channel3OutputLevelCache() {
 	this.channel3currentSampleLeft = (this.leftChannel3) ? this.cachedChannel3Sample : 0;
 	this.channel3currentSampleRight = (this.rightChannel3) ? this.cachedChannel3Sample : 0;
 	this.channel3OutputLevelSecondaryCache();
 }
 
-public channel3OutputLevelSecondaryCache() {
+private channel3OutputLevelSecondaryCache() {
 	if (this.channel3Enabled && settings.channels[2]) {
 		this.channel3currentSampleLeftSecondary = this.channel3currentSampleLeft;
 		this.channel3currentSampleRightSecondary = this.channel3currentSampleRight;
@@ -2376,24 +2373,24 @@ public channel3OutputLevelSecondaryCache() {
 	this.mixerOutputLevelCache();
 }
 
-public channel4EnableCheck() {
+private channel4EnableCheck() {
 	this.channel4Enabled = ((this.channel4consecutive || this.channel4totalLength > 0) && this.channel4canPlay);
 	this.channel4OutputLevelSecondaryCache();
 }
 
-public channel4VolumeEnableCheck() {
+private channel4VolumeEnableCheck() {
 	this.channel4canPlay = (this.memory[0xFF21] > 7);
 	this.channel4EnableCheck();
 	this.channel4OutputLevelSecondaryCache();
 }
 
-public channel4OutputLevelCache() {
+private channel4OutputLevelCache() {
 	this.channel4currentSampleLeft = (this.leftChannel4) ? this.cachedChannel4Sample : 0;
 	this.channel4currentSampleRight = (this.rightChannel4) ? this.cachedChannel4Sample : 0;
 	this.channel4OutputLevelSecondaryCache();
 }
 
-public channel4OutputLevelSecondaryCache() {
+private channel4OutputLevelSecondaryCache() {
 	if (this.channel4Enabled && settings.channels[3]) {
 		this.channel4currentSampleLeftSecondary = this.channel4currentSampleLeft;
 		this.channel4currentSampleRightSecondary = this.channel4currentSampleRight;
@@ -2405,17 +2402,17 @@ public channel4OutputLevelSecondaryCache() {
 	this.mixerOutputLevelCache();
 }
 
-public mixerOutputLevelCache() {
+private mixerOutputLevelCache() {
 	this.mixerOutputCache = ((((this.channel1currentSampleLeftTrimary + this.channel2currentSampleLeftTrimary + this.channel3currentSampleLeftSecondary + this.channel4currentSampleLeftSecondary) * this.VinLeftChannelMasterVolume) << 16) |
 	((this.channel1currentSampleRightTrimary + this.channel2currentSampleRightTrimary + this.channel3currentSampleRightSecondary + this.channel4currentSampleRightSecondary) * this.VinRightChannelMasterVolume));
 }
 
-public channel3UpdateCache() {
+private channel3UpdateCache() {
 	this.cachedChannel3Sample = this.channel3PCM[this.channel3lastSampleLookup] >> this.channel3patternType;
 	this.channel3OutputLevelCache();
 }
 
-public channel3WriteRAM(address, data) {
+private channel3WriteRAM(address, data) {
 	if (this.channel3canPlay) {
 		this.audioJIT();
 		//address = this.channel3lastSampleLookup >> 1;
@@ -2426,7 +2423,7 @@ public channel3WriteRAM(address, data) {
 	this.channel3PCM[address | 1] = data & 0xF;
 }
 
-public channel4UpdateCache() {
+private channel4UpdateCache() {
 	this.cachedChannel4Sample = this.noiseSampleTable[this.channel4currentVolume | this.channel4lastSampleLookup];
 	this.channel4OutputLevelCache();
 }
@@ -2470,7 +2467,7 @@ public run() {
 	}
 }
 
-public executeIteration() {
+private executeIteration() {
 	//Iterate the interpreter loop:
 	var opcodeToExecute = 0;
 	var timedTicks = 0;
@@ -2543,7 +2540,7 @@ public executeIteration() {
 	}
 }
 
-public iterationEndRoutine() {
+private iterationEndRoutine() {
 	if ((this.stopEmulator & 0x1) == 0) {
 		this.audioJIT();	//Make sure we at least output once per iteration.
 		//Update DIV Alignment (Integer overflow safety):
@@ -2566,18 +2563,18 @@ public handleSTOP() {
 	}
 }
 
-public recalculateIterationClockLimit() {
+private recalculateIterationClockLimit() {
 	var endModulus = this.CPUCyclesTotalCurrent % 4;
 	this.CPUCyclesTotal = this.CPUCyclesTotalBase + this.CPUCyclesTotalCurrent - endModulus;
 	this.CPUCyclesTotalCurrent = endModulus;
 }
 
-public recalculateIterationClockLimitForAudio(audioClocking) {
+private recalculateIterationClockLimitForAudio(audioClocking) {
 	this.CPUCyclesTotal += Math.min((audioClocking >> 2) << 2, this.CPUCyclesTotalBase << 1);
 }
 
 //OAM Search Period
-public scanLineMode2() {
+private scanLineMode2() {
 	if (this.STATTracker != 1) {
 		if (this.mode2TriggerSTAT) {
 			this.interruptsRequested |= 0x2;
@@ -2589,7 +2586,7 @@ public scanLineMode2() {
 }
 
 //Scan Line Drawing Period
-public scanLineMode3() {
+private scanLineMode3() {
 	if (this.modeSTAT != 3) {
 		if (this.STATTracker == 0 && this.mode2TriggerSTAT) {
 			this.interruptsRequested |= 0x2;
@@ -2601,7 +2598,7 @@ public scanLineMode3() {
 }
 
 //Horizontal Blanking Period
-public scanLineMode0() {
+private scanLineMode0() {
 	if (this.modeSTAT != 0) {
 		if (this.STATTracker != 2) {
 			if (this.STATTracker == 0) {
@@ -2629,7 +2626,7 @@ public scanLineMode0() {
 	}
 }
 
-public clocksUntilLYCMatch() {
+private clocksUntilLYCMatch() {
 	if (this.memory[0xFF45] != 0) {
 		if (this.memory[0xFF45] > this.actualScanLine) {
 			return 456 * (this.memory[0xFF45] - this.actualScanLine);
@@ -2639,7 +2636,7 @@ public clocksUntilLYCMatch() {
 	return (456 * ((this.actualScanLine == 153 && this.memory[0xFF44] == 0) ? 154 : (153 - this.actualScanLine))) + 8;
 }
 
-public clocksUntilMode0() {
+private clocksUntilMode0() {
 	switch (this.modeSTAT) {
 		case 0:
 			if (this.actualScanLine == 143) {
@@ -2658,7 +2655,7 @@ public clocksUntilMode0() {
 	}
 }
 
-public updateSpriteCount(line) {
+private updateSpriteCount(line) {
 	this.spriteCount = 252;
 	if (this.cGBC && this.gfxSpriteShow) {										//Is the window enabled and are we in CGB mode?
 		var lineAdjusted = line + 0x10;
@@ -2674,7 +2671,7 @@ public updateSpriteCount(line) {
 }
 
 //LYC Register Compare
-public matchLYC() {
+private matchLYC() {
 	if (this.memory[0xFF44] == this.memory[0xFF45]) {
 		this.memory[0xFF41] |= 0x04;
 		if (this.LYCMatchTriggerSTAT) {
@@ -2687,7 +2684,7 @@ public matchLYC() {
 	}
 }
 
-public updateCore() {
+private updateCore() {
 	//Update the clocking for the LCD emulation:
 	this.LCDTicks += this.CPUTicks >> this.doubleSpeedShifter;	//LCD Timing
 	this.LCDCONTROL[this.actualScanLine](this);					//Scan Line and STAT Mode Control
@@ -2724,7 +2721,7 @@ public updateCore() {
 	}
 }
 
-public updateCoreFull() {
+private updateCoreFull() {
 	//Update the state machine:
 	this.updateCore();
 	//End of iteration routine:
@@ -2733,13 +2730,13 @@ public updateCoreFull() {
 	}
 }
 
-public initializeLCDController() {
+private initializeLCDController() {
 	//Display on hanlding:
 	var line = 0;
 	while (line < 154) {
 		if (line < 143) {
 			//We're on a normal scan line:
-			this.LINECONTROL[line] = function (parentObj) {
+			this.LINECONTROL[line] = function (parentObj: GameBoyCore) {
 				if (parentObj.LCDTicks < 80) {
 					parentObj.scanLineMode2();
 				}
@@ -2789,7 +2786,7 @@ public initializeLCDController() {
 		}
 		else if (line == 143) {
 			//We're on the last visible scan line of the LCD screen:
-			this.LINECONTROL[143] = function (parentObj) {
+			this.LINECONTROL[143] = function (parentObj: GameBoyCore) {
 				if (parentObj.LCDTicks < 80) {
 					parentObj.scanLineMode2();
 				}
@@ -2856,7 +2853,7 @@ public initializeLCDController() {
 		}
 		else if (line < 153) {
 			//In VBlank
-			this.LINECONTROL[line] = function (parentObj) {
+			this.LINECONTROL[line] = function (parentObj: GameBoyCore) {
 				if (parentObj.LCDTicks >= 456) {
 					//We're on a new scan line:
 					parentObj.LCDTicks -= 456;
@@ -2878,7 +2875,7 @@ public initializeLCDController() {
 		}
 		else {
 			//VBlank Ending (We're on the last actual scan line)
-			this.LINECONTROL[153] = function (parentObj) {
+			this.LINECONTROL[153] = function (parentObj: GameBoyCore) {
 				if (parentObj.LCDTicks >= 8) {
 					if (parentObj.STATTracker != 4 && parentObj.memory[0xFF44] == 153) {
 						parentObj.memory[0xFF44] = 0;	//LY register resets to 0 early.
@@ -2908,7 +2905,7 @@ public initializeLCDController() {
 	}
 }
 
-public DisplayShowOff() {
+private DisplayShowOff() {
 	if (this.drewBlank == 0) {
 		//Output a blank screen to the output framebuffer:
 		this.clearFrameBuffer();
@@ -2917,7 +2914,7 @@ public DisplayShowOff() {
 	this.drewBlank = 2;
 }
 
-public executeHDMA() {
+private executeHDMA() {
 	this.DMAWrite(1);
 	if (this.halt) {
 		if ((this.LCDTicks - this.spriteCount) < ((4 >> this.doubleSpeedShifter) | 0x20)) {
@@ -2938,7 +2935,7 @@ public executeHDMA() {
 	}
 }
 
-public clockUpdate() {
+private clockUpdate() {
 	if (this.cTIMER) {
 		var dateObj = new Date();
 		var newTime = dateObj.getTime();
@@ -2967,19 +2964,19 @@ public clockUpdate() {
 	}
 }
 
-public prepareFrame() {
+private prepareFrame() {
 	//Copy the internal frame buffer to the output buffer:
 	this.swizzleFrameBuffer();
 	this.drewFrame = true;
 }
 
-public requestDraw() {
+private requestDraw() {
 	if (this.drewFrame) {
 		this.dispatchDraw();
 	}
 }
 
-public dispatchDraw() {
+private dispatchDraw() {
 	if (this.offscreenRGBCount > 0) {
 		//We actually updated the graphics internally, so copy out:
 		if (this.offscreenRGBCount == 92160) {
@@ -2991,7 +2988,7 @@ public dispatchDraw() {
 	}
 }
 
-public processDraw(frameBuffer) {
+private processDraw(frameBuffer) {
 	var canvasRGBALength = this.offscreenRGBCount;
 	var canvasData = this.canvasBuffer.data;
 	var bufferIndex = 0;
@@ -3004,7 +3001,7 @@ public processDraw(frameBuffer) {
 	this.drewFrame = false;
 }
 
-public swizzleFrameBuffer() {
+private swizzleFrameBuffer() {
 	//Convert our dirty 24-bit (24-bit, with internal render flags above it) framebuffer to an 8-bit buffer with separate indices for the RGB channels:
 	var frameBuffer = this.frameBuffer;
 	var swizzledFrame = this.swizzledFrame;
@@ -3016,7 +3013,7 @@ public swizzleFrameBuffer() {
 	}
 }
 
-public clearFrameBuffer() {
+private clearFrameBuffer() {
 	var bufferIndex = 0;
 	var frameBuffer = this.swizzledFrame;
 	if (this.cGBC || this.colorizedGBPalettes) {
@@ -3033,7 +3030,7 @@ public clearFrameBuffer() {
 	}
 }
 
-public resizeFrameBuffer() {
+private resizeFrameBuffer() {
 	//Resize in javascript with resize.js:
 	if (this.resizePathClear) {
 		this.resizePathClear = false;
@@ -3041,13 +3038,13 @@ public resizeFrameBuffer() {
 	}
 }
 
-public compileResizeFrameBufferFunction() {
+private compileResizeFrameBufferFunction() {
 	if (this.offscreenRGBCount > 0) {
 		this.resizer = new Resize(160, 144, this.offscreenWidth, this.offscreenHeight, false, settings.resize_smoothing);
 	}
 }
 
-public renderScanLine(scanlineToRender) {
+private renderScanLine(scanlineToRender) {
 	this.pixelStart = scanlineToRender * 160;
 	if (this.bgEnabled) {
 		this.pixelEnd = 160;
@@ -3066,7 +3063,7 @@ public renderScanLine(scanlineToRender) {
 	this.midScanlineOffset = -1;
 }
 
-public renderMidScanLine() {
+private renderMidScanLine() {
 	if (this.actualScanLine < 144 && this.modeSTAT == 3) {
 		//TODO: Get this accurate:
 		if (this.midScanlineOffset == -1) {
@@ -3093,7 +3090,7 @@ public renderMidScanLine() {
 	}
 }
 
-public initializeModeSpecificArrays() {
+private initializeModeSpecificArrays() {
 	this.LCDCONTROL = (this.LCDisOn) ? this.LINECONTROL : this.DISPLAYOFFCONTROL;
 	if (this.cGBC) {
 		this.gbcOBJRawPalette = this.getTypedArray(0x40, 0, "uint8");
@@ -3116,7 +3113,7 @@ public initializeModeSpecificArrays() {
 	this.renderPathBuild();
 }
 
-public GBCtoGBModeAdjust() {
+private GBCtoGBModeAdjust() {
 	cout("Stepping down from GBC mode.", 0);
 	this.VRAM = this.GBCMemory = this.BGCHRCurrentBank = this.BGCHRBank2 = null;
 	this.tileCache.length = 0x700;
@@ -3143,7 +3140,7 @@ public GBCtoGBModeAdjust() {
 	this.memoryWriteJumpCompile();
 }
 
-public renderPathBuild() {
+private renderPathBuild() {
 	if (!this.cGBC) {
 		this.BGLayerRender = this.BGGBLayerRender;
 		this.WindowLayerRender = this.WindowGBLayerRender;
@@ -3155,7 +3152,7 @@ public renderPathBuild() {
 	}
 }
 
-public priorityFlaggingPathRebuild() {
+private priorityFlaggingPathRebuild() {
 	if (this.BGPriorityEnabled) {
 		this.BGLayerRender = this.BGGBCLayerRender;
 		this.WindowLayerRender = this.WindowGBCLayerRender;
@@ -3166,7 +3163,7 @@ public priorityFlaggingPathRebuild() {
 	}
 }
 
-public initializeReferencesFromSaveState() {
+private initializeReferencesFromSaveState() {
 	this.LCDCONTROL = (this.LCDisOn) ? this.LINECONTROL : this.DISPLAYOFFCONTROL;
 	var tileIndex = 0;
 	if (!this.cGBC) {
@@ -3202,7 +3199,7 @@ public initializeReferencesFromSaveState() {
 	this.renderPathBuild();
 }
 
-public RGBTint(value) {
+private RGBTint(value) {
 	//Adjustment for the GBC's tinting (According to Gambatte):
 	var r = value & 0x1F;
 	var g = (value >> 5) & 0x1F;
@@ -3210,7 +3207,7 @@ public RGBTint(value) {
 	return ((r * 13 + g * 2 + b) >> 1) << 16 | (g * 3 + b) << 9 | (r * 3 + g * 2 + b * 11) >> 1;
 }
 
-public getGBCColor() {
+private getGBCColor() {
 	//GBC Colorization of DMG ROMs:
 	//BG
 	for (var counter = 0; counter < 4; counter++) {
@@ -3234,14 +3231,14 @@ public getGBCColor() {
 	this.colorizedGBPalettes = true;
 }
 
-public updateGBRegularBGPalette(data) {
+private updateGBRegularBGPalette(data) {
 	this.gbBGPalette[0] = this.colors[data & 0x03] | 0x2000000;
 	this.gbBGPalette[1] = this.colors[(data >> 2) & 0x03];
 	this.gbBGPalette[2] = this.colors[(data >> 4) & 0x03];
 	this.gbBGPalette[3] = this.colors[data >> 6];
 }
 
-public updateGBColorizedBGPalette(data) {
+private updateGBColorizedBGPalette(data) {
 	//GB colorization:
 	this.gbBGColorizedPalette[0] = this.cachedBGPaletteConversion[data & 0x03] | 0x2000000;
 	this.gbBGColorizedPalette[1] = this.cachedBGPaletteConversion[(data >> 2) & 0x03];
@@ -3249,20 +3246,20 @@ public updateGBColorizedBGPalette(data) {
 	this.gbBGColorizedPalette[3] = this.cachedBGPaletteConversion[data >> 6];
 }
 
-public updateGBRegularOBJPalette(index, data) {
+private updateGBRegularOBJPalette(index, data) {
 	this.gbOBJPalette[index | 1] = this.colors[(data >> 2) & 0x03];
 	this.gbOBJPalette[index | 2] = this.colors[(data >> 4) & 0x03];
 	this.gbOBJPalette[index | 3] = this.colors[data >> 6];
 }
 
-public updateGBColorizedOBJPalette(index, data) {
+private updateGBColorizedOBJPalette(index, data) {
 	//GB colorization:
 	this.gbOBJColorizedPalette[index | 1] = this.cachedOBJPaletteConversion[index | ((data >> 2) & 0x03)];
 	this.gbOBJColorizedPalette[index | 2] = this.cachedOBJPaletteConversion[index | ((data >> 4) & 0x03)];
 	this.gbOBJColorizedPalette[index | 3] = this.cachedOBJPaletteConversion[index | (data >> 6)];
 }
 
-public updateGBCBGPalette(index, data) {
+private updateGBCBGPalette(index, data) {
 	if (this.gbcBGRawPalette[index] != data) {
 		this.midScanLineJIT();
 		//Update the color palette for BG tiles since it changed:
@@ -3284,7 +3281,7 @@ public updateGBCBGPalette(index, data) {
 	}
 }
 
-public updateGBCOBJPalette(index, data) {
+private updateGBCOBJPalette(index, data) {
 	if (this.gbcOBJRawPalette[index] != data) {
 		//Update the color palette for OBJ tiles since it changed:
 		this.gbcOBJRawPalette[index] = data;
@@ -3296,7 +3293,7 @@ public updateGBCOBJPalette(index, data) {
 	}
 }
 
-public BGGBLayerRender(scanlineToRender) {
+private BGGBLayerRender(scanlineToRender) {
 	var scrollYAdjusted = (this.backgroundY + scanlineToRender) & 0xFF;						//The line of the BG we're at.
 	var tileYLine = (scrollYAdjusted & 7) << 3;
 	var tileYDown = this.gfxBackgroundCHRBankPosition | ((scrollYAdjusted & 0xF8) << 2);	//The row of cached tiles we're fetching from.
@@ -3385,7 +3382,7 @@ public BGGBLayerRender(scanlineToRender) {
 	}
 }
 
-public BGGBCLayerRender(scanlineToRender) {
+private BGGBCLayerRender(scanlineToRender) {
 	var scrollYAdjusted = (this.backgroundY + scanlineToRender) & 0xFF;						//The line of the BG we're at.
 	var tileYLine = (scrollYAdjusted & 7) << 3;
 	var tileYDown = this.gfxBackgroundCHRBankPosition | ((scrollYAdjusted & 0xF8) << 2);	//The row of cached tiles we're fetching from.
@@ -3484,7 +3481,7 @@ public BGGBCLayerRender(scanlineToRender) {
 	}
 }
 
-public BGGBCLayerRenderNoPriorityFlagging(scanlineToRender) {
+private BGGBCLayerRenderNoPriorityFlagging(scanlineToRender) {
 	var scrollYAdjusted = (this.backgroundY + scanlineToRender) & 0xFF;						//The line of the BG we're at.
 	var tileYLine = (scrollYAdjusted & 7) << 3;
 	var tileYDown = this.gfxBackgroundCHRBankPosition | ((scrollYAdjusted & 0xF8) << 2);	//The row of cached tiles we're fetching from.
@@ -3583,7 +3580,7 @@ public BGGBCLayerRenderNoPriorityFlagging(scanlineToRender) {
 	}
 }
 
-public WindowGBLayerRender(scanlineToRender) {
+private WindowGBLayerRender(scanlineToRender) {
 	if (this.gfxWindowDisplay) {									//Is the window enabled?
 		var scrollYAdjusted = scanlineToRender - this.windowY;		//The line of the BG we're at.
 		if (scrollYAdjusted >= 0) {
@@ -3648,7 +3645,7 @@ public WindowGBLayerRender(scanlineToRender) {
 	}
 }
 
-public WindowGBCLayerRender(scanlineToRender) {
+private WindowGBCLayerRender(scanlineToRender) {
 	if (this.gfxWindowDisplay) {									//Is the window enabled?
 		var scrollYAdjusted = scanlineToRender - this.windowY;		//The line of the BG we're at.
 		if (scrollYAdjusted >= 0) {
@@ -3719,7 +3716,7 @@ public WindowGBCLayerRender(scanlineToRender) {
 	}
 }
 
-public WindowGBCLayerRenderNoPriorityFlagging(scanlineToRender) {
+private WindowGBCLayerRenderNoPriorityFlagging(scanlineToRender) {
 	if (this.gfxWindowDisplay) {									//Is the window enabled?
 		var scrollYAdjusted = scanlineToRender - this.windowY;		//The line of the BG we're at.
 		if (scrollYAdjusted >= 0) {
@@ -3790,7 +3787,7 @@ public WindowGBCLayerRenderNoPriorityFlagging(scanlineToRender) {
 	}
 }
 
-public SpriteGBLayerRender(scanlineToRender) {
+private SpriteGBLayerRender(scanlineToRender) {
 	if (this.gfxSpriteShow) {										//Are sprites enabled?
 		var lineAdjusted = scanlineToRender + 0x10;
 		var OAMAddress = 0xFE00;
@@ -3881,7 +3878,7 @@ public SpriteGBLayerRender(scanlineToRender) {
 	}
 }
 
-public findLowestSpriteDrawable(scanlineToRender, drawableRange) {
+private findLowestSpriteDrawable(scanlineToRender, drawableRange) {
 	var address = 0xFE00;
 	var spriteCount = 0;
 	var diff = 0;
@@ -3895,7 +3892,7 @@ public findLowestSpriteDrawable(scanlineToRender, drawableRange) {
 	return spriteCount;
 }
 
-public SpriteGBCLayerRender(scanlineToRender) {
+private SpriteGBCLayerRender(scanlineToRender) {
 	if (this.gfxSpriteShow) {										//Are sprites enabled?
 		var OAMAddress = 0xFE00;
 		var lineAdjusted = scanlineToRender + 0x10;
@@ -3976,7 +3973,7 @@ public SpriteGBCLayerRender(scanlineToRender) {
 }
 
 //Generate only a single tile line for the GB tile cache mode:
-public generateGBTileLine(address) {
+private generateGBTileLine(address) {
 	var lineCopy = (this.memory[0x1 | address] << 8) | this.memory[0x9FFE & address];
 	var tileBlock = this.tileCache[(address & 0x1FF0) >> 4];
 	address = (address & 0xE) << 2;
@@ -3991,7 +3988,7 @@ public generateGBTileLine(address) {
 }
 
 //Generate only a single tile line for the GBC tile cache mode (Bank 1):
-public generateGBCTileLineBank1(address) {
+private generateGBCTileLineBank1(address) {
 	var lineCopy = (this.memory[0x1 | address] << 8) | this.memory[0x9FFE & address];
 	address &= 0x1FFE;
 	var tileBlock1 = this.tileCache[address >> 4];
@@ -4011,7 +4008,7 @@ public generateGBCTileLineBank1(address) {
 }
 
 //Generate all the flip combinations for a full GBC VRAM bank 1 tile:
-public generateGBCTileBank1(vramAddress) {
+private generateGBCTileBank1(vramAddress) {
 	var address = vramAddress >> 4;
 	var tileBlock1 = this.tileCache[address];
 	var tileBlock2 = this.tileCache[0x200 | address];
@@ -4038,7 +4035,7 @@ public generateGBCTileBank1(vramAddress) {
 }
 
 //Generate only a single tile line for the GBC tile cache mode (Bank 2):
-public generateGBCTileLineBank2(address) {
+private generateGBCTileLineBank2(address) {
 	var lineCopy = (this.VRAM[0x1 | address] << 8) | this.VRAM[0x1FFE & address];
 	var tileBlock1 = this.tileCache[0x800 | (address >> 4)];
 	var tileBlock2 = this.tileCache[0xA00 | (address >> 4)];
@@ -4057,7 +4054,7 @@ public generateGBCTileLineBank2(address) {
 }
 
 //Generate all the flip combinations for a full GBC VRAM bank 2 tile:
-public generateGBCTileBank2(vramAddress) {
+private generateGBCTileBank2(vramAddress) {
 	var address = vramAddress >> 4;
 	var tileBlock1 = this.tileCache[0x800 | address];
 	var tileBlock2 = this.tileCache[0xA00 | address];
@@ -4083,7 +4080,7 @@ public generateGBCTileBank2(vramAddress) {
 }
 
 //Generate only a single tile line for the GB tile cache mode (OAM accessible range):
-public generateGBOAMTileLine(address) {
+private generateGBOAMTileLine(address) {
 	var lineCopy = (this.memory[0x1 | address] << 8) | this.memory[0x9FFE & address];
 	address &= 0x1FFE;
 	var tileBlock1 = this.tileCache[address >> 4];
@@ -4102,20 +4099,20 @@ public generateGBOAMTileLine(address) {
 	tileBlock4[addressFlipped | 7] = tileBlock2[address | 7] = tileBlock3[addressFlipped] = tileBlock1[address] = ((lineCopy & 0x8000) >> 14) | ((lineCopy & 0x80) >> 7);
 }
 
-public graphicsJIT() {
+private graphicsJIT() {
 	if (this.LCDisOn) {
 		this.totalLinesPassed = 0;			//Mark frame for ensuring a JIT pass for the next framebuffer output.
 		this.graphicsJITScanlineGroup();
 	}
 }
 
-public graphicsJITVBlank() {
+private graphicsJITVBlank() {
 	//JIT the graphics to v-blank framing:
 	this.totalLinesPassed += this.queuedScanLines;
 	this.graphicsJITScanlineGroup();
 }
 
-public graphicsJITScanlineGroup() {
+private graphicsJITScanlineGroup() {
 	//Normal rendering JIT, where we try to do groups of scanlines at once:
 	while (this.queuedScanLines > 0) {
 		this.renderScanLine(this.lastUnrenderedLine);
@@ -4129,7 +4126,7 @@ public graphicsJITScanlineGroup() {
 	}
 }
 
-public incrementScanLineQueue() {
+private incrementScanLineQueue() {
 	if (this.queuedScanLines < 144) {
 		++this.queuedScanLines;
 	}
@@ -4145,13 +4142,13 @@ public incrementScanLineQueue() {
 	}
 }
 
-public midScanLineJIT() {
+private midScanLineJIT() {
 	this.graphicsJIT();
 	this.renderMidScanLine();
 }
 
 //Check for the highest priority IRQ to fire:
-public launchIRQ() {
+private launchIRQ() {
 	var bitShift = 0;
 	var testbit = 1;
 	do {
@@ -4180,7 +4177,7 @@ public launchIRQ() {
 /*
 	Check for IRQs to be fired while not in HALT:
 */
-public checkIRQMatching() {
+private checkIRQMatching() {
 	if (this.IME) {
 		this.IRQLineMatched = this.interruptsEnabled & this.interruptsRequested & 0x1F;
 	}
@@ -4282,7 +4279,7 @@ public memoryHighRead(address) {
 	return this.memoryHighReader[address](this, address);	//This seems to be faster than the usual if/else.
 }
 
-public memoryReadJumpCompile() {
+private memoryReadJumpCompile() {
 	//Faster in some browsers, since we are doing less conditionals overall by implementing them in advance.
 	for (var index = 0x0000; index <= 0xFFFF; index++) {
 		if (index < 0x4000) {
@@ -4340,25 +4337,25 @@ public memoryReadJumpCompile() {
 			switch (index) {
 				case 0xFF00:
 					//JOYPAD:
-					this.memoryHighReader[0] = this.memoryReader[0xFF00] = function (parentObj, _address) {
+					this.memoryHighReader[0] = this.memoryReader[0xFF00] = function (parentObj: GameBoyCore, _address) {
 						return 0xC0 | parentObj.memory[0xFF00];	//Top nibble returns as set.
 					}
 					break;
 				case 0xFF01:
 					//SB
-					this.memoryHighReader[0x01] = this.memoryReader[0xFF01] = function (parentObj, _address) {
+					this.memoryHighReader[0x01] = this.memoryReader[0xFF01] = function (parentObj: GameBoyCore, _address) {
 						return (parentObj.memory[0xFF02] < 0x80) ? parentObj.memory[0xFF01] : 0xFF;
 					}
 					break;
 				case 0xFF02:
 					//SC
 					if (this.cGBC) {
-						this.memoryHighReader[0x02] = this.memoryReader[0xFF02] = function (parentObj, _address) {
+						this.memoryHighReader[0x02] = this.memoryReader[0xFF02] = function (parentObj: GameBoyCore, _address) {
 							return ((parentObj.serialTimer <= 0) ? 0x7C : 0xFC) | parentObj.memory[0xFF02];
 						}
 					}
 					else {
-						this.memoryHighReader[0x02] = this.memoryReader[0xFF02] = function (parentObj, _address) {
+						this.memoryHighReader[0x02] = this.memoryReader[0xFF02] = function (parentObj: GameBoyCore, _address) {
 							return ((parentObj.serialTimer <= 0) ? 0x7E : 0xFE) | parentObj.memory[0xFF02];
 						}
 					}
@@ -4368,7 +4365,7 @@ public memoryReadJumpCompile() {
 					break;
 				case 0xFF04:
 					//DIV
-					this.memoryHighReader[0x04] = this.memoryReader[0xFF04] = function (parentObj, _address) {
+					this.memoryHighReader[0x04] = this.memoryReader[0xFF04] = function (parentObj: GameBoyCore, _address) {
 						parentObj.memory[0xFF04] = (parentObj.memory[0xFF04] + (parentObj.DIVTicks >> 8)) & 0xFF;
 						parentObj.DIVTicks &= 0xFF;
 						return parentObj.memory[0xFF04];
@@ -4381,7 +4378,7 @@ public memoryReadJumpCompile() {
 					this.memoryReader[index] = this.memoryReadNormal;
 					break;
 				case 0xFF07:
-					this.memoryHighReader[0x07] = this.memoryReader[0xFF07] = function (parentObj, _address) {
+					this.memoryHighReader[0x07] = this.memoryReader[0xFF07] = function (parentObj: GameBoyCore, _address) {
 						return 0xF8 | parentObj.memory[0xFF07];
 					}
 					break;
@@ -4396,17 +4393,17 @@ public memoryReadJumpCompile() {
 					break;
 				case 0xFF0F:
 					//IF
-					this.memoryHighReader[0x0F] = this.memoryReader[0xFF0F] = function (parentObj, _address) {
+					this.memoryHighReader[0x0F] = this.memoryReader[0xFF0F] = function (parentObj: GameBoyCore, _address) {
 						return 0xE0 | parentObj.interruptsRequested;
 					}
 					break;
 				case 0xFF10:
-					this.memoryHighReader[0x10] = this.memoryReader[0xFF10] = function (parentObj, _address) {
+					this.memoryHighReader[0x10] = this.memoryReader[0xFF10] = function (parentObj: GameBoyCore, _address) {
 						return 0x80 | parentObj.memory[0xFF10];
 					}
 					break;
 				case 0xFF11:
-					this.memoryHighReader[0x11] = this.memoryReader[0xFF11] = function (parentObj, _address) {
+					this.memoryHighReader[0x11] = this.memoryReader[0xFF11] = function (parentObj: GameBoyCore, _address) {
 						return 0x3F | parentObj.memory[0xFF11];
 					}
 					break;
@@ -4418,7 +4415,7 @@ public memoryReadJumpCompile() {
 					this.memoryHighReader[0x13] = this.memoryReader[0xFF13] = this.memoryReadBAD;
 					break;
 				case 0xFF14:
-					this.memoryHighReader[0x14] = this.memoryReader[0xFF14] = function (parentObj, _address) {
+					this.memoryHighReader[0x14] = this.memoryReader[0xFF14] = function (parentObj: GameBoyCore, _address) {
 						return 0xBF | parentObj.memory[0xFF14];
 					}
 					break;
@@ -4427,7 +4424,7 @@ public memoryReadJumpCompile() {
 					this.memoryReader[0xFF15] = this.memoryReadBAD;
 					break;
 				case 0xFF16:
-					this.memoryHighReader[0x16] = this.memoryReader[0xFF16] = function (parentObj, _address) {
+					this.memoryHighReader[0x16] = this.memoryReader[0xFF16] = function (parentObj: GameBoyCore, _address) {
 						return 0x3F | parentObj.memory[0xFF16];
 					}
 					break;
@@ -4439,12 +4436,12 @@ public memoryReadJumpCompile() {
 					this.memoryHighReader[0x18] = this.memoryReader[0xFF18] = this.memoryReadBAD;
 					break;
 				case 0xFF19:
-					this.memoryHighReader[0x19] = this.memoryReader[0xFF19] = function (parentObj, _address) {
+					this.memoryHighReader[0x19] = this.memoryReader[0xFF19] = function (parentObj: GameBoyCore, _address) {
 						return 0xBF | parentObj.memory[0xFF19];
 					}
 					break;
 				case 0xFF1A:
-					this.memoryHighReader[0x1A] = this.memoryReader[0xFF1A] = function (parentObj, _address) {
+					this.memoryHighReader[0x1A] = this.memoryReader[0xFF1A] = function (parentObj: GameBoyCore, _address) {
 						return 0x7F | parentObj.memory[0xFF1A];
 					}
 					break;
@@ -4452,7 +4449,7 @@ public memoryReadJumpCompile() {
 					this.memoryHighReader[0x1B] = this.memoryReader[0xFF1B] = this.memoryReadBAD;
 					break;
 				case 0xFF1C:
-					this.memoryHighReader[0x1C] = this.memoryReader[0xFF1C] = function (parentObj, _address) {
+					this.memoryHighReader[0x1C] = this.memoryReader[0xFF1C] = function (parentObj: GameBoyCore, _address) {
 						return 0x9F | parentObj.memory[0xFF1C];
 					}
 					break;
@@ -4460,7 +4457,7 @@ public memoryReadJumpCompile() {
 					this.memoryHighReader[0x1D] = this.memoryReader[0xFF1D] = this.memoryReadBAD;
 					break;
 				case 0xFF1E:
-					this.memoryHighReader[0x1E] = this.memoryReader[0xFF1E] = function (parentObj, _address) {
+					this.memoryHighReader[0x1E] = this.memoryReader[0xFF1E] = function (parentObj: GameBoyCore, _address) {
 						return 0xBF | parentObj.memory[0xFF1E];
 					}
 					break;
@@ -4474,7 +4471,7 @@ public memoryReadJumpCompile() {
 					this.memoryReader[index] = this.memoryReadNormal;
 					break;
 				case 0xFF23:
-					this.memoryHighReader[0x23] = this.memoryReader[0xFF23] = function (parentObj, _address) {
+					this.memoryHighReader[0x23] = this.memoryReader[0xFF23] = function (parentObj: GameBoyCore, _address) {
 						return 0xBF | parentObj.memory[0xFF23];
 					}
 					break;
@@ -4484,7 +4481,7 @@ public memoryReadJumpCompile() {
 					this.memoryReader[index] = this.memoryReadNormal;
 					break;
 				case 0xFF26:
-					this.memoryHighReader[0x26] = this.memoryReader[0xFF26] = function (parentObj, _address) {
+					this.memoryHighReader[0x26] = this.memoryReader[0xFF26] = function (parentObj: GameBoyCore, _address) {
 						parentObj.audioJIT();
 						return 0x70 | parentObj.memory[0xFF26];
 					}
@@ -4516,10 +4513,10 @@ public memoryReadJumpCompile() {
 				case 0xFF3D:
 				case 0xFF3E:
 				case 0xFF3F:
-					this.memoryReader[index] = function (parentObj, address) {
+					this.memoryReader[index] = function (parentObj: GameBoyCore, address) {
 						return (parentObj.channel3canPlay) ? parentObj.memory[0xFF00 | (parentObj.channel3lastSampleLookup >> 1)] : parentObj.memory[address];
 					}
-					this.memoryHighReader[index & 0xFF] = function (parentObj, address) {
+					this.memoryHighReader[index & 0xFF] = function (parentObj: GameBoyCore, address) {
 						return (parentObj.channel3canPlay) ? parentObj.memory[0xFF00 | (parentObj.channel3lastSampleLookup >> 1)] : parentObj.memory[0xFF00 | address];
 					}
 					break;
@@ -4528,22 +4525,22 @@ public memoryReadJumpCompile() {
 					this.memoryReader[0xFF40] = this.memoryReadNormal;
 					break;
 				case 0xFF41:
-					this.memoryHighReader[0x41] = this.memoryReader[0xFF41] = function (parentObj, _address) {
+					this.memoryHighReader[0x41] = this.memoryReader[0xFF41] = function (parentObj: GameBoyCore, _address) {
 						return 0x80 | parentObj.memory[0xFF41] | parentObj.modeSTAT;
 					}
 					break;
 				case 0xFF42:
-					this.memoryHighReader[0x42] = this.memoryReader[0xFF42] = function (parentObj, _address) {
+					this.memoryHighReader[0x42] = this.memoryReader[0xFF42] = function (parentObj: GameBoyCore, _address) {
 						return parentObj.backgroundY;
 					}
 					break;
 				case 0xFF43:
-					this.memoryHighReader[0x43] = this.memoryReader[0xFF43] = function (parentObj, _address) {
+					this.memoryHighReader[0x43] = this.memoryReader[0xFF43] = function (parentObj: GameBoyCore, _address) {
 						return parentObj.backgroundX;
 					}
 					break;
 				case 0xFF44:
-					this.memoryHighReader[0x44] = this.memoryReader[0xFF44] = function (parentObj, _address) {
+					this.memoryHighReader[0x44] = this.memoryReader[0xFF44] = function (parentObj: GameBoyCore, _address) {
 						return ((parentObj.LCDisOn) ? parentObj.memory[0xFF44] : 0);
 					}
 					break;
@@ -4557,7 +4554,7 @@ public memoryReadJumpCompile() {
 					break;
 				case 0xFF4A:
 					//WY
-					this.memoryHighReader[0x4A] = this.memoryReader[0xFF4A] = function (parentObj, _address) {
+					this.memoryHighReader[0x4A] = this.memoryReader[0xFF4A] = function (parentObj: GameBoyCore, _address) {
 						return parentObj.windowY;
 					}
 					break;
@@ -4576,7 +4573,7 @@ public memoryReadJumpCompile() {
 					this.memoryHighReader[0x4E] = this.memoryReader[0xFF4E] = this.memoryReadBAD;
 					break;
 				case 0xFF4F:
-					this.memoryHighReader[0x4F] = this.memoryReader[0xFF4F] = function (parentObj, _address) {
+					this.memoryHighReader[0x4F] = this.memoryReader[0xFF4F] = function (parentObj: GameBoyCore, _address) {
 						return parentObj.currVRAMBank;
 					}
 					break;
@@ -4590,7 +4587,7 @@ public memoryReadJumpCompile() {
 					break;
 				case 0xFF55:
 					if (this.cGBC) {
-						this.memoryHighReader[0x55] = this.memoryReader[0xFF55] = function (parentObj, _address) {
+						this.memoryHighReader[0x55] = this.memoryReader[0xFF55] = function (parentObj: GameBoyCore, _address) {
 							if (!parentObj.LCDisOn && parentObj.hdmaRunning) {	//Undocumented behavior alert: HDMA becomes GDMA when LCD is off (Worms Armageddon Fix).
 								//DMA
 								parentObj.DMAWrite((parentObj.memory[0xFF55] & 0x7F) + 1);
@@ -4607,7 +4604,7 @@ public memoryReadJumpCompile() {
 					break;
 				case 0xFF56:
 					if (this.cGBC) {
-						this.memoryHighReader[0x56] = this.memoryReader[0xFF56] = function (parentObj, _address) {
+						this.memoryHighReader[0x56] = this.memoryReader[0xFF56] = function (parentObj: GameBoyCore, _address) {
 							//Return IR "not connected" status:
 							return 0x3C | ((parentObj.memory[0xFF56] >= 0xC0) ? (0x2 | (parentObj.memory[0xFF56] & 0xC1)) : (parentObj.memory[0xFF56] & 0xC3));
 						}
@@ -4645,7 +4642,7 @@ public memoryReadJumpCompile() {
 					break;
 				case 0xFF6C:
 					if (this.cGBC) {
-						this.memoryHighReader[0x6C] = this.memoryReader[0xFF6C] = function (parentObj, _address) {
+						this.memoryHighReader[0x6C] = this.memoryReader[0xFF6C] = function (parentObj: GameBoyCore, _address) {
 							return 0xFE | parentObj.memory[0xFF6C];
 						}
 					}
@@ -4661,7 +4658,7 @@ public memoryReadJumpCompile() {
 				case 0xFF70:
 					if (this.cGBC) {
 						//SVBK
-						this.memoryHighReader[0x70] = this.memoryReader[0xFF70] = function (parentObj, _address) {
+						this.memoryHighReader[0x70] = this.memoryReader[0xFF70] = function (parentObj: GameBoyCore, _address) {
 							return 0x40 | parentObj.memory[0xFF70];
 						}
 					}
@@ -4685,20 +4682,20 @@ public memoryReadJumpCompile() {
 					}
 					break;
 				case 0xFF75:
-					this.memoryHighReader[0x75] = this.memoryReader[0xFF75] = function (parentObj, _address) {
+					this.memoryHighReader[0x75] = this.memoryReader[0xFF75] = function (parentObj: GameBoyCore, _address) {
 						return 0x8F | parentObj.memory[0xFF75];
 					}
 					break;
                 case 0xFF76:
                     //Undocumented realtime PCM amplitude readback:
-                    this.memoryHighReader[0x76] = this.memoryReader[0xFF76] = function (parentObj, _address) {
+                    this.memoryHighReader[0x76] = this.memoryReader[0xFF76] = function (parentObj: GameBoyCore, _address) {
                         parentObj.audioJIT();
                         return (parentObj.channel2envelopeVolume << 4) | parentObj.channel1envelopeVolume;
                     }
                     break;
                 case 0xFF77:
                     //Undocumented realtime PCM amplitude readback:
-                    this.memoryHighReader[0x77] = this.memoryReader[0xFF77] = function (parentObj, _address) {
+                    this.memoryHighReader[0x77] = this.memoryReader[0xFF77] = function (parentObj: GameBoyCore, _address) {
                         parentObj.audioJIT();
                         return (parentObj.channel4envelopeVolume << 4) | parentObj.channel3envelopeVolume;
                     }
@@ -4715,7 +4712,7 @@ public memoryReadJumpCompile() {
 					break;
 				case 0xFFFF:
 					//IE
-					this.memoryHighReader[0xFF] = this.memoryReader[0xFFFF] = function (parentObj, _address) {
+					this.memoryHighReader[0xFF] = this.memoryReader[0xFFFF] = function (parentObj: GameBoyCore, _address) {
 						return parentObj.interruptsEnabled;
 					}
 					break;
@@ -4730,19 +4727,19 @@ public memoryReadJumpCompile() {
 	}
 }
 
-public memoryReadNormal(parentObj, address) {
+private memoryReadNormal(parentObj: GameBoyCore, address) {
 	return parentObj.memory[address];
 }
 
-public memoryHighReadNormal(parentObj, address) {
+private memoryHighReadNormal(parentObj: GameBoyCore, address) {
 	return parentObj.memory[0xFF00 | address];
 }
 
-public memoryReadROM(parentObj, address) {
+private memoryReadROM(parentObj: GameBoyCore, address) {
 	return parentObj.ROM[parentObj.currentROMBank + address];
 }
 
-public memoryReadMBC(parentObj, address) {
+private memoryReadMBC(parentObj: GameBoyCore, address) {
 	//Switchable RAM
 	if (parentObj.MBCRAMBanksEnabled || settings.mbc_enable_override) {
 		return parentObj.MBCRam[address + parentObj.currMBCRAMBankPosition];
@@ -4751,7 +4748,7 @@ public memoryReadMBC(parentObj, address) {
 	return 0xFF;
 }
 
-public memoryReadMBC7(parentObj, address) {
+private memoryReadMBC7(parentObj: GameBoyCore, address) {
 	//Switchable RAM
 	if (parentObj.MBCRAMBanksEnabled || settings.mbc_enable_override) {
 		switch (address) {
@@ -4782,7 +4779,7 @@ public memoryReadMBC7(parentObj, address) {
 	return 0xFF;
 }
 
-public memoryReadMBC3(parentObj, address) {
+private memoryReadMBC3(parentObj: GameBoyCore, address) {
 	//Switchable RAM
 	if (parentObj.MBCRAMBanksEnabled || settings.mbc_enable_override) {
 		switch (parentObj.currMBCRAMBank) {
@@ -4812,47 +4809,47 @@ public memoryReadMBC3(parentObj, address) {
 	return 0xFF;
 }
 
-public memoryReadGBCMemory(parentObj, address) {
+private memoryReadGBCMemory(parentObj: GameBoyCore, address) {
 	return parentObj.GBCMemory[address + parentObj.gbcRamBankPosition];
 }
 
-public memoryReadOAM(parentObj, address) {
+private memoryReadOAM(parentObj: GameBoyCore, address) {
 	return (parentObj.modeSTAT > 1) ?  0xFF : parentObj.memory[address];
 }
 
-public memoryReadECHOGBCMemory(parentObj, address) {
+private memoryReadECHOGBCMemory(parentObj: GameBoyCore, address) {
 	return parentObj.GBCMemory[address + parentObj.gbcRamBankPositionECHO];
 }
 
-public memoryReadECHONormal(parentObj, address) {
+private memoryReadECHONormal(parentObj: GameBoyCore, address) {
 	return parentObj.memory[address - 0x2000];
 }
 
-public memoryReadBAD(_parentObj, _address) {
+private memoryReadBAD(_parentObj: GameBoyCore, _address) {
 	return 0xFF;
 }
 
-public VRAMDATAReadCGBCPU(parentObj, address) {
+private VRAMDATAReadCGBCPU(parentObj: GameBoyCore, address) {
 	//CPU Side Reading The VRAM (Optimized for GameBoy Color)
 	return (parentObj.modeSTAT > 2) ? 0xFF : ((parentObj.currVRAMBank == 0) ? parentObj.memory[address] : parentObj.VRAM[address & 0x1FFF]);
 }
 
-public VRAMDATAReadDMGCPU(parentObj, address) {
+private VRAMDATAReadDMGCPU(parentObj: GameBoyCore, address) {
 	//CPU Side Reading The VRAM (Optimized for classic GameBoy)
 	return (parentObj.modeSTAT > 2) ? 0xFF : parentObj.memory[address];
 }
 
-public VRAMCHRReadCGBCPU(parentObj, address) {
+private VRAMCHRReadCGBCPU(parentObj: GameBoyCore, address) {
 	//CPU Side Reading the Character Data Map:
 	return (parentObj.modeSTAT > 2) ? 0xFF : parentObj.BGCHRCurrentBank[address & 0x7FF];
 }
 
-public VRAMCHRReadDMGCPU(parentObj, address) {
+private VRAMCHRReadDMGCPU(parentObj: GameBoyCore, address) {
 	//CPU Side Reading the Character Data Map:
 	return (parentObj.modeSTAT > 2) ? 0xFF : parentObj.BGCHRBank1[address & 0x7FF];
 }
 
-public setCurrentMBC1ROMBank() {
+private setCurrentMBC1ROMBank() {
 	//Read the cartridge ROM data from RAM memory:
 	switch (this.ROMBank1offs) {
 		case 0x00:
@@ -4867,13 +4864,13 @@ public setCurrentMBC1ROMBank() {
 	}
 }
 
-public setCurrentMBC2AND3ROMBank() {
+private setCurrentMBC2AND3ROMBank() {
 	//Read the cartridge ROM data from RAM memory:
 	//Only map bank 0 to bank 1 here (MBC2 is like MBC1, but can only do 16 banks, so only the bank 0 quirk appears for MBC2):
 	this.currentROMBank = Math.max((this.ROMBank1offs % this.ROMBankEdge) - 1, 0) << 14;
 }
 
-public setCurrentMBC5ROMBank() {
+private setCurrentMBC5ROMBank() {
 	//Read the cartridge ROM data from RAM memory:
 	this.currentROMBank = ((this.ROMBank1offs % this.ROMBankEdge) - 1) << 14;
 }
@@ -4890,7 +4887,7 @@ public memoryHighWrite(address, data) {
 	this.memoryHighWriter[address](this, address, data);
 }
 
-public memoryWriteJumpCompile() {
+private memoryWriteJumpCompile() {
 	//Faster in some browsers, since we are doing less conditionals overall by implementing them in advance.
 	for (var index = 0x0000; index <= 0xFFFF; index++) {
 		if (index < 0x8000) {
@@ -5027,18 +5024,18 @@ public memoryWriteJumpCompile() {
 	this.registerWriteJumpCompile();				//Compile the I/O write functions separately...
 }
 
-public MBCWriteEnable(parentObj, _address, data) {
+private MBCWriteEnable(parentObj: GameBoyCore, _address, data) {
 	//MBC RAM Bank Enable/Disable:
 	parentObj.MBCRAMBanksEnabled = ((data & 0x0F) == 0x0A);	//If lower nibble is 0x0A, then enable, otherwise disable.
 }
 
-public MBC1WriteROMBank(parentObj, _address, data) {
+private MBC1WriteROMBank(parentObj: GameBoyCore, _address, data) {
 	//MBC1 ROM bank switching:
 	parentObj.ROMBank1offs = (parentObj.ROMBank1offs & 0x60) | (data & 0x1F);
 	parentObj.setCurrentMBC1ROMBank();
 }
 
-public MBC1WriteRAMBank(parentObj, _address, data) {
+private MBC1WriteRAMBank(parentObj: GameBoyCore, _address, data) {
 	//MBC1 RAM bank switching
 	if (parentObj.MBC1Mode) {
 		//4/32 Mode
@@ -5052,7 +5049,7 @@ public MBC1WriteRAMBank(parentObj, _address, data) {
 	}
 }
 
-public MBC1WriteType(parentObj, _address, data) {
+private MBC1WriteType(parentObj: GameBoyCore, _address, data) {
 	//MBC1 mode setting:
 	parentObj.MBC1Mode = ((data & 0x1) == 0x1);
 	if (parentObj.MBC1Mode) {
@@ -5065,19 +5062,19 @@ public MBC1WriteType(parentObj, _address, data) {
 	}
 }
 
-public MBC2WriteROMBank(parentObj, _address, data) {
+private MBC2WriteROMBank(parentObj: GameBoyCore, _address, data) {
 	//MBC2 ROM bank switching:
 	parentObj.ROMBank1offs = data & 0x0F;
 	parentObj.setCurrentMBC2AND3ROMBank();
 }
 
-public MBC3WriteROMBank(parentObj, _address, data) {
+private MBC3WriteROMBank(parentObj: GameBoyCore, _address, data) {
 	//MBC3 ROM bank switching:
 	parentObj.ROMBank1offs = data & 0x7F;
 	parentObj.setCurrentMBC2AND3ROMBank();
 }
 
-public MBC3WriteRAMBank(parentObj, _address, data) {
+private MBC3WriteRAMBank(parentObj: GameBoyCore, _address, data) {
 	parentObj.currMBCRAMBank = data;
 	if (data < 4) {
 		//MBC3 RAM bank switching
@@ -5085,7 +5082,7 @@ public MBC3WriteRAMBank(parentObj, _address, data) {
 	}
 }
 
-public MBC3WriteRTCLatch(parentObj, _address, data) {
+private MBC3WriteRTCLatch(parentObj: GameBoyCore, _address, data) {
 	if (data == 0) {
 		parentObj.RTCisLatched = false;
 	}
@@ -5100,56 +5097,56 @@ public MBC3WriteRTCLatch(parentObj, _address, data) {
 	}
 }
 
-public MBC5WriteROMBankLow(parentObj, _address, data) {
+private MBC5WriteROMBankLow(parentObj: GameBoyCore, _address, data) {
 	//MBC5 ROM bank switching:
 	parentObj.ROMBank1offs = (parentObj.ROMBank1offs & 0x100) | data;
 	parentObj.setCurrentMBC5ROMBank();
 }
 
-public MBC5WriteROMBankHigh(parentObj, _address, data) {
+private MBC5WriteROMBankHigh(parentObj: GameBoyCore, _address, data) {
 	//MBC5 ROM bank switching (by least significant bit):
 	parentObj.ROMBank1offs  = ((data & 0x01) << 8) | (parentObj.ROMBank1offs & 0xFF);
 	parentObj.setCurrentMBC5ROMBank();
 }
 
-public MBC5WriteRAMBank(parentObj, _address, data) {
+private MBC5WriteRAMBank(parentObj: GameBoyCore, _address, data) {
 	//MBC5 RAM bank switching
 	parentObj.currMBCRAMBank = data & 0xF;
 	parentObj.currMBCRAMBankPosition = (parentObj.currMBCRAMBank << 13) - 0xA000;
 }
 
-public RUMBLEWriteRAMBank(parentObj, _address, data) {
+private RUMBLEWriteRAMBank(parentObj: GameBoyCore, _address, data) {
 	//MBC5 RAM bank switching
 	//Like MBC5, but bit 3 of the lower nibble is used for rumbling and bit 2 is ignored.
 	parentObj.currMBCRAMBank = data & 0x03;
 	parentObj.currMBCRAMBankPosition = (parentObj.currMBCRAMBank << 13) - 0xA000;
 }
 
-public HuC3WriteRAMBank(parentObj, _address, data) {
+private HuC3WriteRAMBank(parentObj: GameBoyCore, _address, data) {
 	//HuC3 RAM bank switching
 	parentObj.currMBCRAMBank = data & 0x03;
 	parentObj.currMBCRAMBankPosition = (parentObj.currMBCRAMBank << 13) - 0xA000;
 }
 
-public cartIgnoreWrite(_parentObj, _address, _data) {
+private cartIgnoreWrite(_parentObj: GameBoyCore, _address, _data) {
 	//We might have encountered illegal RAM writing or such, so just do nothing...
 }
 
-public memoryWriteNormal(parentObj, address, data) {
+private memoryWriteNormal(parentObj: GameBoyCore, address, data) {
 	parentObj.memory[address] = data;
 }
 
-public memoryHighWriteNormal(parentObj, address, data) {
+private memoryHighWriteNormal(parentObj: GameBoyCore, address, data) {
 	parentObj.memory[0xFF00 | address] = data;
 }
 
-public memoryWriteMBCRAM(parentObj, address, data) {
+private memoryWriteMBCRAM(parentObj: GameBoyCore, address, data) {
 	if (parentObj.MBCRAMBanksEnabled || settings.mbc_enable_override) {
 		parentObj.MBCRam[address + parentObj.currMBCRAMBankPosition] = data;
 	}
 }
 
-public memoryWriteMBC3RAM(parentObj, address, data) {
+private memoryWriteMBC3RAM(parentObj: GameBoyCore, address, data) {
 	if (parentObj.MBCRAMBanksEnabled || settings.mbc_enable_override) {
 		switch (parentObj.currMBCRAMBank) {
 			case 0x00:
@@ -5187,7 +5184,7 @@ public memoryWriteMBC3RAM(parentObj, address, data) {
 				break;
 			case 0x0C:
 				parentObj.RTCDayOverFlow = (data > 0x7F);
-				parentObj.RTCHalt = (data & 0x40) == 0x40;
+				parentObj.RTCHALT = (data & 0x40) == 0x40;
 				parentObj.RTCDays = ((data & 0x1) << 8) | (parentObj.RTCDays & 0xFF);
 				break;
 			default:
@@ -5196,11 +5193,11 @@ public memoryWriteMBC3RAM(parentObj, address, data) {
 	}
 }
 
-public memoryWriteGBCRAM(parentObj, address, data) {
+private memoryWriteGBCRAM(parentObj: GameBoyCore, address, data) {
 	parentObj.GBCMemory[address + parentObj.gbcRamBankPosition] = data;
 }
 
-public memoryWriteOAMRAM(parentObj, address, data) {
+private memoryWriteOAMRAM(parentObj: GameBoyCore, address, data) {
 	if (parentObj.modeSTAT < 2) {		//OAM RAM cannot be written to in mode 2 & 3
 		if (parentObj.memory[address] != data) {
 			parentObj.graphicsJIT();
@@ -5209,15 +5206,15 @@ public memoryWriteOAMRAM(parentObj, address, data) {
 	}
 }
 
-public memoryWriteECHOGBCRAM(parentObj, address, data) {
+private memoryWriteECHOGBCRAM(parentObj: GameBoyCore, address, data) {
 	parentObj.GBCMemory[address + parentObj.gbcRamBankPositionECHO] = data;
 }
 
-public memoryWriteECHONormal(parentObj, address, data) {
+private memoryWriteECHONormal(parentObj: GameBoyCore, address, data) {
 	parentObj.memory[address - 0x2000] = data;
 }
 
-public VRAMGBDATAWrite(parentObj, address, data) {
+private VRAMGBDATAWrite(parentObj: GameBoyCore, address, data) {
 	if (parentObj.modeSTAT < 3) {	//VRAM cannot be written to during mode 3
 		if (parentObj.memory[address] != data) {
 			//JIT the graphics render queue:
@@ -5228,7 +5225,7 @@ public VRAMGBDATAWrite(parentObj, address, data) {
 	}
 }
 
-public VRAMGBDATAUpperWrite(parentObj, address, data) {
+private VRAMGBDATAUpperWrite(parentObj: GameBoyCore, address, data) {
 	if (parentObj.modeSTAT < 3) {	//VRAM cannot be written to during mode 3
 		if (parentObj.memory[address] != data) {
 			//JIT the graphics render queue:
@@ -5239,7 +5236,7 @@ public VRAMGBDATAUpperWrite(parentObj, address, data) {
 	}
 }
 
-public VRAMGBCDATAWrite(parentObj, address, data) {
+private VRAMGBCDATAWrite(parentObj: GameBoyCore, address, data) {
 	if (parentObj.modeSTAT < 3) {	//VRAM cannot be written to during mode 3
 		if (parentObj.currVRAMBank == 0) {
 			if (parentObj.memory[address] != data) {
@@ -5261,7 +5258,7 @@ public VRAMGBCDATAWrite(parentObj, address, data) {
 	}
 }
 
-public VRAMGBCHRMAPWrite(parentObj, address, data) {
+private VRAMGBCHRMAPWrite(parentObj: GameBoyCore, address, data) {
 	if (parentObj.modeSTAT < 3) {	//VRAM cannot be written to during mode 3
 		address &= 0x7FF;
 		if (parentObj.BGCHRBank1[address] != data) {
@@ -5272,7 +5269,7 @@ public VRAMGBCHRMAPWrite(parentObj, address, data) {
 	}
 }
 
-public VRAMGBCCHRMAPWrite(parentObj, address, data) {
+private VRAMGBCCHRMAPWrite(parentObj: GameBoyCore, address, data) {
 	if (parentObj.modeSTAT < 3) {	//VRAM cannot be written to during mode 3
 		address &= 0x7FF;
 		if (parentObj.BGCHRCurrentBank[address] != data) {
@@ -5283,7 +5280,7 @@ public VRAMGBCCHRMAPWrite(parentObj, address, data) {
 	}
 }
 
-public DMAWrite(tilesToTransfer) {
+private DMAWrite(tilesToTransfer) {
 	if (!this.halt) {
 		//Clock the CPU for the DMA transfer (CPU is halted during the transfer):
 		this.CPUTicks += 4 | ((tilesToTransfer << 5) << this.doubleSpeedShifter);
@@ -5400,14 +5397,14 @@ public DMAWrite(tilesToTransfer) {
 	memory[0xFF54] = destination & 0xF0;
 }
 
-public registerWriteJumpCompile() {
+private registerWriteJumpCompile() {
 	//I/O Registers (GB + GBC):
 	//JoyPad
-	this.memoryHighWriter[0] = this.memoryWriter[0xFF00] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0] = this.memoryWriter[0xFF00] = function (parentObj: GameBoyCore, _address, data) {
 		parentObj.memory[0xFF00] = (data & 0x30) | ((((data & 0x20) == 0) ? (parentObj.JoyPad >> 4) : 0xF) & (((data & 0x10) == 0) ? (parentObj.JoyPad & 0xF) : 0xF));
 	}
 	//SB (Serial Transfer Data)
-	this.memoryHighWriter[0x1] = this.memoryWriter[0xFF01] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x1] = this.memoryWriter[0xFF01] = function (parentObj: GameBoyCore, _address, data) {
 		if (parentObj.memory[0xFF02] < 0x80) {	//Cannot write while a serial transfer is active.
 			parentObj.memory[0xFF01] = data;
 		}
@@ -5418,20 +5415,20 @@ public registerWriteJumpCompile() {
 	//Unmapped I/O:
 	this.memoryHighWriter[0x3] = this.memoryWriter[0xFF03] = this.cartIgnoreWrite;
 	//DIV
-	this.memoryHighWriter[0x4] = this.memoryWriter[0xFF04] = function (parentObj, _address, _data) {
+	this.memoryHighWriter[0x4] = this.memoryWriter[0xFF04] = function (parentObj: GameBoyCore, _address, _data) {
 		parentObj.DIVTicks &= 0xFF;	//Update DIV for realignment.
 		parentObj.memory[0xFF04] = 0;
 	}
 	//TIMA
-	this.memoryHighWriter[0x5] = this.memoryWriter[0xFF05] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x5] = this.memoryWriter[0xFF05] = function (parentObj: GameBoyCore, _address, data) {
 		parentObj.memory[0xFF05] = data;
 	}
 	//TMA
-	this.memoryHighWriter[0x6] = this.memoryWriter[0xFF06] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x6] = this.memoryWriter[0xFF06] = function (parentObj: GameBoyCore, _address, data) {
 		parentObj.memory[0xFF06] = data;
 	}
 	//TAC
-	this.memoryHighWriter[0x7] = this.memoryWriter[0xFF07] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x7] = this.memoryWriter[0xFF07] = function (parentObj: GameBoyCore, _address, data) {
 		parentObj.memory[0xFF07] = data & 0x07;
 		parentObj.TIMAEnabled = (data & 0x04) == 0x04;
 		parentObj.TACClocker = Math.pow(4, ((data & 0x3) != 0) ? (data & 0x3) : 4) << 2;	//TODO: Find a way to not make a conditional in here...
@@ -5445,12 +5442,12 @@ public registerWriteJumpCompile() {
 	this.memoryHighWriter[0xD] = this.memoryWriter[0xFF0D] = this.cartIgnoreWrite;
 	this.memoryHighWriter[0xE] = this.memoryWriter[0xFF0E] = this.cartIgnoreWrite;
 	//IF (Interrupt Request)
-	this.memoryHighWriter[0xF] = this.memoryWriter[0xFF0F] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0xF] = this.memoryWriter[0xFF0F] = function (parentObj: GameBoyCore, _address, data) {
 		parentObj.interruptsRequested = data;
 		parentObj.checkIRQMatching();
 	}
 	//NR10:
-	this.memoryHighWriter[0x10] = this.memoryWriter[0xFF10] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x10] = this.memoryWriter[0xFF10] = function (parentObj: GameBoyCore, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			if (parentObj.channel1decreaseSweep && (data & 0x08) == 0) {
@@ -5466,7 +5463,7 @@ public registerWriteJumpCompile() {
 		}
 	}
 	//NR11:
-	this.memoryHighWriter[0x11] = this.memoryWriter[0xFF11] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x11] = this.memoryWriter[0xFF11] = function (parentObj: GameBoyCore, _address, data) {
 		if (parentObj.soundMasterEnabled || !parentObj.cGBC) {
 			if (parentObj.soundMasterEnabled) {
 				parentObj.audioJIT();
@@ -5481,7 +5478,7 @@ public registerWriteJumpCompile() {
 		}
 	}
 	//NR12:
-	this.memoryHighWriter[0x12] = this.memoryWriter[0xFF12] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x12] = this.memoryWriter[0xFF12] = function (parentObj: GameBoyCore, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			if (parentObj.channel1Enabled && parentObj.channel1envelopeSweeps == 0) {
@@ -5508,7 +5505,7 @@ public registerWriteJumpCompile() {
 		}
 	}
 	//NR13:
-	this.memoryHighWriter[0x13] = this.memoryWriter[0xFF13] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x13] = this.memoryWriter[0xFF13] = function (parentObj: GameBoyCore, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			parentObj.channel1frequency = (parentObj.channel1frequency & 0x700) | data;
@@ -5516,7 +5513,7 @@ public registerWriteJumpCompile() {
 		}
 	}
 	//NR14:
-	this.memoryHighWriter[0x14] = this.memoryWriter[0xFF14] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x14] = this.memoryWriter[0xFF14] = function (parentObj: GameBoyCore, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			parentObj.channel1consecutive = ((data & 0x40) == 0x0);
@@ -5556,7 +5553,7 @@ public registerWriteJumpCompile() {
 	//NR20 (Unused I/O):
 	this.memoryHighWriter[0x15] = this.memoryWriter[0xFF15] = this.cartIgnoreWrite;
 	//NR21:
-	this.memoryHighWriter[0x16] = this.memoryWriter[0xFF16] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x16] = this.memoryWriter[0xFF16] = function (parentObj: GameBoyCore, _address, data) {
 		if (parentObj.soundMasterEnabled || !parentObj.cGBC) {
 			if (parentObj.soundMasterEnabled) {
 				parentObj.audioJIT();
@@ -5571,7 +5568,7 @@ public registerWriteJumpCompile() {
 		}
 	}
 	//NR22:
-	this.memoryHighWriter[0x17] = this.memoryWriter[0xFF17] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x17] = this.memoryWriter[0xFF17] = function (parentObj: GameBoyCore, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			if (parentObj.channel2Enabled && parentObj.channel2envelopeSweeps == 0) {
@@ -5598,7 +5595,7 @@ public registerWriteJumpCompile() {
 		}
 	}
 	//NR23:
-	this.memoryHighWriter[0x18] = this.memoryWriter[0xFF18] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x18] = this.memoryWriter[0xFF18] = function (parentObj: GameBoyCore, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			parentObj.channel2frequency = (parentObj.channel2frequency & 0x700) | data;
@@ -5606,7 +5603,7 @@ public registerWriteJumpCompile() {
 		}
 	}
 	//NR24:
-	this.memoryHighWriter[0x19] = this.memoryWriter[0xFF19] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x19] = this.memoryWriter[0xFF19] = function (parentObj: GameBoyCore, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			if (data > 0x7F) {
@@ -5630,7 +5627,7 @@ public registerWriteJumpCompile() {
 		}
 	}
 	//NR30:
-	this.memoryHighWriter[0x1A] = this.memoryWriter[0xFF1A] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x1A] = this.memoryWriter[0xFF1A] = function (parentObj: GameBoyCore, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			if (!parentObj.channel3canPlay && data >= 0x80) {
@@ -5646,7 +5643,7 @@ public registerWriteJumpCompile() {
 		}
 	}
 	//NR31:
-	this.memoryHighWriter[0x1B] = this.memoryWriter[0xFF1B] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x1B] = this.memoryWriter[0xFF1B] = function (parentObj: GameBoyCore, _address, data) {
 		if (parentObj.soundMasterEnabled || !parentObj.cGBC) {
 			if (parentObj.soundMasterEnabled) {
 				parentObj.audioJIT();
@@ -5656,7 +5653,7 @@ public registerWriteJumpCompile() {
 		}
 	}
 	//NR32:
-	this.memoryHighWriter[0x1C] = this.memoryWriter[0xFF1C] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x1C] = this.memoryWriter[0xFF1C] = function (parentObj: GameBoyCore, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			data &= 0x60;
@@ -5665,7 +5662,7 @@ public registerWriteJumpCompile() {
 		}
 	}
 	//NR33:
-	this.memoryHighWriter[0x1D] = this.memoryWriter[0xFF1D] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x1D] = this.memoryWriter[0xFF1D] = function (parentObj: GameBoyCore, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			parentObj.channel3frequency = (parentObj.channel3frequency & 0x700) | data;
@@ -5673,7 +5670,7 @@ public registerWriteJumpCompile() {
 		}
 	}
 	//NR34:
-	this.memoryHighWriter[0x1E] = this.memoryWriter[0xFF1E] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x1E] = this.memoryWriter[0xFF1E] = function (parentObj: GameBoyCore, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			if (data > 0x7F) {
@@ -5695,7 +5692,7 @@ public registerWriteJumpCompile() {
 	//NR40 (Unused I/O):
 	this.memoryHighWriter[0x1F] = this.memoryWriter[0xFF1F] = this.cartIgnoreWrite;
 	//NR41:
-	this.memoryHighWriter[0x20] = this.memoryWriter[0xFF20] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x20] = this.memoryWriter[0xFF20] = function (parentObj: GameBoyCore, _address, data) {
 		if (parentObj.soundMasterEnabled || !parentObj.cGBC) {
 			if (parentObj.soundMasterEnabled) {
 				parentObj.audioJIT();
@@ -5705,7 +5702,7 @@ public registerWriteJumpCompile() {
 		}
 	}
 	//NR42:
-	this.memoryHighWriter[0x21] = this.memoryWriter[0xFF21] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x21] = this.memoryWriter[0xFF21] = function (parentObj: GameBoyCore, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			if (parentObj.channel4Enabled && parentObj.channel4envelopeSweeps == 0) {
@@ -5733,7 +5730,7 @@ public registerWriteJumpCompile() {
 		}
 	}
 	//NR43:
-	this.memoryHighWriter[0x22] = this.memoryWriter[0xFF22] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x22] = this.memoryWriter[0xFF22] = function (parentObj: GameBoyCore, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			parentObj.channel4FrequencyPeriod = Math.max((data & 0x7) << 4, 8) << (data >> 4);
@@ -5750,7 +5747,7 @@ public registerWriteJumpCompile() {
 		}
 	}
 	//NR44:
-	this.memoryHighWriter[0x23] = this.memoryWriter[0xFF23] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x23] = this.memoryWriter[0xFF23] = function (parentObj: GameBoyCore, _address, data) {
 		if (parentObj.soundMasterEnabled) {
 			parentObj.audioJIT();
 			parentObj.memory[0xFF23] = data;
@@ -5771,7 +5768,7 @@ public registerWriteJumpCompile() {
 		}
 	}
 	//NR50:
-	this.memoryHighWriter[0x24] = this.memoryWriter[0xFF24] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x24] = this.memoryWriter[0xFF24] = function (parentObj: GameBoyCore, _address, data) {
 		if (parentObj.soundMasterEnabled && parentObj.memory[0xFF24] != data) {
 			parentObj.audioJIT();
 			parentObj.memory[0xFF24] = data;
@@ -5781,7 +5778,7 @@ public registerWriteJumpCompile() {
 		}
 	}
 	//NR51:
-	this.memoryHighWriter[0x25] = this.memoryWriter[0xFF25] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x25] = this.memoryWriter[0xFF25] = function (parentObj: GameBoyCore, _address, data) {
 		if (parentObj.soundMasterEnabled && parentObj.memory[0xFF25] != data) {
 			parentObj.audioJIT();
 			parentObj.memory[0xFF25] = data;
@@ -5800,7 +5797,7 @@ public registerWriteJumpCompile() {
 		}
 	}
 	//NR52:
-	this.memoryHighWriter[0x26] = this.memoryWriter[0xFF26] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x26] = this.memoryWriter[0xFF26] = function (parentObj: GameBoyCore, _address, data) {
 		parentObj.audioJIT();
 		if (!parentObj.soundMasterEnabled && data > 0x7F) {
 			parentObj.memory[0xFF26] = 0x80;
@@ -5827,70 +5824,70 @@ public registerWriteJumpCompile() {
 	this.memoryHighWriter[0x2E] = this.memoryWriter[0xFF2E] = this.cartIgnoreWrite;
 	this.memoryHighWriter[0x2F] = this.memoryWriter[0xFF2F] = this.cartIgnoreWrite;
 	//WAVE PCM RAM:
-	this.memoryHighWriter[0x30] = this.memoryWriter[0xFF30] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x30] = this.memoryWriter[0xFF30] = function (parentObj: GameBoyCore, _address, data) {
 		parentObj.channel3WriteRAM(0, data);
 	}
-	this.memoryHighWriter[0x31] = this.memoryWriter[0xFF31] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x31] = this.memoryWriter[0xFF31] = function (parentObj: GameBoyCore, _address, data) {
 		parentObj.channel3WriteRAM(0x1, data);
 	}
-	this.memoryHighWriter[0x32] = this.memoryWriter[0xFF32] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x32] = this.memoryWriter[0xFF32] = function (parentObj: GameBoyCore, _address, data) {
 		parentObj.channel3WriteRAM(0x2, data);
 	}
-	this.memoryHighWriter[0x33] = this.memoryWriter[0xFF33] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x33] = this.memoryWriter[0xFF33] = function (parentObj: GameBoyCore, _address, data) {
 		parentObj.channel3WriteRAM(0x3, data);
 	}
-	this.memoryHighWriter[0x34] = this.memoryWriter[0xFF34] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x34] = this.memoryWriter[0xFF34] = function (parentObj: GameBoyCore, _address, data) {
 		parentObj.channel3WriteRAM(0x4, data);
 	}
-	this.memoryHighWriter[0x35] = this.memoryWriter[0xFF35] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x35] = this.memoryWriter[0xFF35] = function (parentObj: GameBoyCore, _address, data) {
 		parentObj.channel3WriteRAM(0x5, data);
 	}
-	this.memoryHighWriter[0x36] = this.memoryWriter[0xFF36] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x36] = this.memoryWriter[0xFF36] = function (parentObj: GameBoyCore, _address, data) {
 		parentObj.channel3WriteRAM(0x6, data);
 	}
-	this.memoryHighWriter[0x37] = this.memoryWriter[0xFF37] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x37] = this.memoryWriter[0xFF37] = function (parentObj: GameBoyCore, _address, data) {
 		parentObj.channel3WriteRAM(0x7, data);
 	}
-	this.memoryHighWriter[0x38] = this.memoryWriter[0xFF38] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x38] = this.memoryWriter[0xFF38] = function (parentObj: GameBoyCore, _address, data) {
 		parentObj.channel3WriteRAM(0x8, data);
 	}
-	this.memoryHighWriter[0x39] = this.memoryWriter[0xFF39] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x39] = this.memoryWriter[0xFF39] = function (parentObj: GameBoyCore, _address, data) {
 		parentObj.channel3WriteRAM(0x9, data);
 	}
-	this.memoryHighWriter[0x3A] = this.memoryWriter[0xFF3A] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x3A] = this.memoryWriter[0xFF3A] = function (parentObj: GameBoyCore, _address, data) {
 		parentObj.channel3WriteRAM(0xA, data);
 	}
-	this.memoryHighWriter[0x3B] = this.memoryWriter[0xFF3B] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x3B] = this.memoryWriter[0xFF3B] = function (parentObj: GameBoyCore, _address, data) {
 		parentObj.channel3WriteRAM(0xB, data);
 	}
-	this.memoryHighWriter[0x3C] = this.memoryWriter[0xFF3C] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x3C] = this.memoryWriter[0xFF3C] = function (parentObj: GameBoyCore, _address, data) {
 		parentObj.channel3WriteRAM(0xC, data);
 	}
-	this.memoryHighWriter[0x3D] = this.memoryWriter[0xFF3D] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x3D] = this.memoryWriter[0xFF3D] = function (parentObj: GameBoyCore, _address, data) {
 		parentObj.channel3WriteRAM(0xD, data);
 	}
-	this.memoryHighWriter[0x3E] = this.memoryWriter[0xFF3E] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x3E] = this.memoryWriter[0xFF3E] = function (parentObj: GameBoyCore, _address, data) {
 		parentObj.channel3WriteRAM(0xE, data);
 	}
-	this.memoryHighWriter[0x3F] = this.memoryWriter[0xFF3F] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x3F] = this.memoryWriter[0xFF3F] = function (parentObj: GameBoyCore, _address, data) {
 		parentObj.channel3WriteRAM(0xF, data);
 	}
 	//SCY
-	this.memoryHighWriter[0x42] = this.memoryWriter[0xFF42] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x42] = this.memoryWriter[0xFF42] = function (parentObj: GameBoyCore, _address, data) {
 		if (parentObj.backgroundY != data) {
 			parentObj.midScanLineJIT();
 			parentObj.backgroundY = data;
 		}
 	}
 	//SCX
-	this.memoryHighWriter[0x43] = this.memoryWriter[0xFF43] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x43] = this.memoryWriter[0xFF43] = function (parentObj: GameBoyCore, _address, data) {
 		if (parentObj.backgroundX != data) {
 			parentObj.midScanLineJIT();
 			parentObj.backgroundX = data;
 		}
 	}
 	//LY
-	this.memoryHighWriter[0x44] = this.memoryWriter[0xFF44] = function (parentObj, _address, _data) {
+	this.memoryHighWriter[0x44] = this.memoryWriter[0xFF44] = function (parentObj: GameBoyCore, _address, _data) {
 		//Read Only:
 		if (parentObj.LCDisOn) {
 			//Gambatte says to do this:
@@ -5900,7 +5897,7 @@ public registerWriteJumpCompile() {
 		}
 	}
 	//LYC
-	this.memoryHighWriter[0x45] = this.memoryWriter[0xFF45] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x45] = this.memoryWriter[0xFF45] = function (parentObj: GameBoyCore, _address, data) {
 		if (parentObj.memory[0xFF45] != data) {
 			parentObj.memory[0xFF45] = data;
 			if (parentObj.LCDisOn) {
@@ -5909,33 +5906,33 @@ public registerWriteJumpCompile() {
 		}
 	}
 	//WY
-	this.memoryHighWriter[0x4A] = this.memoryWriter[0xFF4A] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x4A] = this.memoryWriter[0xFF4A] = function (parentObj: GameBoyCore, _address, data) {
 		if (parentObj.windowY != data) {
 			parentObj.midScanLineJIT();
 			parentObj.windowY = data;
 		}
 	}
 	//WX
-	this.memoryHighWriter[0x4B] = this.memoryWriter[0xFF4B] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x4B] = this.memoryWriter[0xFF4B] = function (parentObj: GameBoyCore, _address, data) {
 		if (parentObj.memory[0xFF4B] != data) {
 			parentObj.midScanLineJIT();
 			parentObj.memory[0xFF4B] = data;
 			parentObj.windowX = data - 7;
 		}
 	}
-	this.memoryHighWriter[0x72] = this.memoryWriter[0xFF72] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x72] = this.memoryWriter[0xFF72] = function (parentObj: GameBoyCore, _address, data) {
 		parentObj.memory[0xFF72] = data;
 	}
-	this.memoryHighWriter[0x73] = this.memoryWriter[0xFF73] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x73] = this.memoryWriter[0xFF73] = function (parentObj: GameBoyCore, _address, data) {
 		parentObj.memory[0xFF73] = data;
 	}
-	this.memoryHighWriter[0x75] = this.memoryWriter[0xFF75] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0x75] = this.memoryWriter[0xFF75] = function (parentObj: GameBoyCore, _address, data) {
 		parentObj.memory[0xFF75] = data;
 	}
 	this.memoryHighWriter[0x76] = this.memoryWriter[0xFF76] = this.cartIgnoreWrite;
 	this.memoryHighWriter[0x77] = this.memoryWriter[0xFF77] = this.cartIgnoreWrite;
 	//IE (Interrupt Enable)
-	this.memoryHighWriter[0xFF] = this.memoryWriter[0xFFFF] = function (parentObj, _address, data) {
+	this.memoryHighWriter[0xFF] = this.memoryWriter[0xFFFF] = function (parentObj: GameBoyCore, _address, data) {
 		parentObj.interruptsEnabled = data;
 		parentObj.checkIRQMatching();
 	}
@@ -5943,11 +5940,11 @@ public registerWriteJumpCompile() {
 	this.recompileBootIOWriteHandling();
 }
 
-public recompileModelSpecificIOWriteHandling() {
+private recompileModelSpecificIOWriteHandling() {
 	if (this.cGBC) {
 		//GameBoy Color Specific I/O:
 		//SC (Serial Transfer Control Register)
-		this.memoryHighWriter[0x2] = this.memoryWriter[0xFF02] = function (parentObj, _address, data) {
+		this.memoryHighWriter[0x2] = this.memoryWriter[0xFF02] = function (parentObj: GameBoyCore, _address, data) {
 			if (((data & 0x1) == 0x1)) {
 				//Internal clock:
 				parentObj.memory[0xFF02] = (data & 0x7F);
@@ -5960,7 +5957,7 @@ public recompileModelSpecificIOWriteHandling() {
 				parentObj.serialShiftTimer = parentObj.serialShiftTimerAllocated = parentObj.serialTimer = 0;	//Zero the timers, since we're emulating as if nothing is connected.
 			}
 		}
-		this.memoryHighWriter[0x40] = this.memoryWriter[0xFF40] = function (parentObj, _address, data) {
+		this.memoryHighWriter[0x40] = this.memoryWriter[0xFF40] = function (parentObj: GameBoyCore, _address, data) {
 			if (parentObj.memory[0xFF40] != data) {
 				parentObj.midScanLineJIT();
 				var temp_var = (data > 0x7F);
@@ -5993,14 +5990,14 @@ public recompileModelSpecificIOWriteHandling() {
 				parentObj.memory[0xFF40] = data;
 			}
 		}
-		this.memoryHighWriter[0x41] = this.memoryWriter[0xFF41] = function (parentObj, _address, data) {
+		this.memoryHighWriter[0x41] = this.memoryWriter[0xFF41] = function (parentObj: GameBoyCore, _address, data) {
 			parentObj.LYCMatchTriggerSTAT = ((data & 0x40) == 0x40);
 			parentObj.mode2TriggerSTAT = ((data & 0x20) == 0x20);
 			parentObj.mode1TriggerSTAT = ((data & 0x10) == 0x10);
 			parentObj.mode0TriggerSTAT = ((data & 0x08) == 0x08);
 			parentObj.memory[0xFF41] = data & 0x78;
 		}
-		this.memoryHighWriter[0x46] = this.memoryWriter[0xFF46] = function (parentObj, address, data) {
+		this.memoryHighWriter[0x46] = this.memoryWriter[0xFF46] = function (parentObj: GameBoyCore, address, data) {
 			parentObj.memory[0xFF46] = data;
 			if (data < 0xE0) {
 				data <<= 8;
@@ -6031,10 +6028,10 @@ public recompileModelSpecificIOWriteHandling() {
 			}
 		}
 		//KEY1
-		this.memoryHighWriter[0x4D] = this.memoryWriter[0xFF4D] = function (parentObj, _address, data) {
+		this.memoryHighWriter[0x4D] = this.memoryWriter[0xFF4D] = function (parentObj: GameBoyCore, _address, data) {
 			parentObj.memory[0xFF4D] = (data & 0x7F) | (parentObj.memory[0xFF4D] & 0x80);
 		}
-		this.memoryHighWriter[0x4F] = this.memoryWriter[0xFF4F] = function (parentObj, _address, data) {
+		this.memoryHighWriter[0x4F] = this.memoryWriter[0xFF4F] = function (parentObj: GameBoyCore, _address, data) {
 			parentObj.currVRAMBank = data & 0x01;
 			if (parentObj.currVRAMBank > 0) {
 				parentObj.BGCHRCurrentBank = parentObj.BGCHRBank2;
@@ -6044,27 +6041,27 @@ public recompileModelSpecificIOWriteHandling() {
 			}
 			//Only writable by GBC.
 		}
-		this.memoryHighWriter[0x51] = this.memoryWriter[0xFF51] = function (parentObj, _address, data) {
+		this.memoryHighWriter[0x51] = this.memoryWriter[0xFF51] = function (parentObj: GameBoyCore, _address, data) {
 			if (!parentObj.hdmaRunning) {
 				parentObj.memory[0xFF51] = data;
 			}
 		}
-		this.memoryHighWriter[0x52] = this.memoryWriter[0xFF52] = function (parentObj, _address, data) {
+		this.memoryHighWriter[0x52] = this.memoryWriter[0xFF52] = function (parentObj: GameBoyCore, _address, data) {
 			if (!parentObj.hdmaRunning) {
 				parentObj.memory[0xFF52] = data & 0xF0;
 			}
 		}
-		this.memoryHighWriter[0x53] = this.memoryWriter[0xFF53] = function (parentObj, _address, data) {
+		this.memoryHighWriter[0x53] = this.memoryWriter[0xFF53] = function (parentObj: GameBoyCore, _address, data) {
 			if (!parentObj.hdmaRunning) {
 				parentObj.memory[0xFF53] = data & 0x1F;
 			}
 		}
-		this.memoryHighWriter[0x54] = this.memoryWriter[0xFF54] = function (parentObj, _address, data) {
+		this.memoryHighWriter[0x54] = this.memoryWriter[0xFF54] = function (parentObj: GameBoyCore, _address, data) {
 			if (!parentObj.hdmaRunning) {
 				parentObj.memory[0xFF54] = data & 0xF0;
 			}
 		}
-		this.memoryHighWriter[0x55] = this.memoryWriter[0xFF55] = function (parentObj, _address, data) {
+		this.memoryHighWriter[0x55] = this.memoryWriter[0xFF55] = function (parentObj: GameBoyCore, _address, data) {
 			if (!parentObj.hdmaRunning) {
 				if ((data & 0x80) == 0) {
 					//DMA
@@ -6086,11 +6083,11 @@ public recompileModelSpecificIOWriteHandling() {
 				parentObj.memory[0xFF55] = data & 0x7F;
 			}
 		}
-		this.memoryHighWriter[0x68] = this.memoryWriter[0xFF68] = function (parentObj, _address, data) {
+		this.memoryHighWriter[0x68] = this.memoryWriter[0xFF68] = function (parentObj: GameBoyCore, _address, data) {
 			parentObj.memory[0xFF69] = parentObj.gbcBGRawPalette[data & 0x3F];
 			parentObj.memory[0xFF68] = data;
 		}
-		this.memoryHighWriter[0x69] = this.memoryWriter[0xFF69] = function (parentObj, _address, data) {
+		this.memoryHighWriter[0x69] = this.memoryWriter[0xFF69] = function (parentObj: GameBoyCore, _address, data) {
 			parentObj.updateGBCBGPalette(parentObj.memory[0xFF68] & 0x3F, data);
 			if (parentObj.memory[0xFF68] > 0x7F) { // high bit = autoincrement
 				var next = ((parentObj.memory[0xFF68] + 1) & 0x3F);
@@ -6101,11 +6098,11 @@ public recompileModelSpecificIOWriteHandling() {
 				parentObj.memory[0xFF69] = data;
 			}
 		}
-		this.memoryHighWriter[0x6A] = this.memoryWriter[0xFF6A] = function (parentObj, _address, data) {
+		this.memoryHighWriter[0x6A] = this.memoryWriter[0xFF6A] = function (parentObj: GameBoyCore, _address, data) {
 			parentObj.memory[0xFF6B] = parentObj.gbcOBJRawPalette[data & 0x3F];
 			parentObj.memory[0xFF6A] = data;
 		}
-		this.memoryHighWriter[0x6B] = this.memoryWriter[0xFF6B] = function (parentObj, _address, data) {
+		this.memoryHighWriter[0x6B] = this.memoryWriter[0xFF6B] = function (parentObj: GameBoyCore, _address, data) {
 			parentObj.updateGBCOBJPalette(parentObj.memory[0xFF6A] & 0x3F, data);
 			if (parentObj.memory[0xFF6A] > 0x7F) { // high bit = autoincrement
 				var next = ((parentObj.memory[0xFF6A] + 1) & 0x3F);
@@ -6117,7 +6114,7 @@ public recompileModelSpecificIOWriteHandling() {
 			}
 		}
 		//SVBK
-		this.memoryHighWriter[0x70] = this.memoryWriter[0xFF70] = function (parentObj, _address, data) {
+		this.memoryHighWriter[0x70] = this.memoryWriter[0xFF70] = function (parentObj: GameBoyCore, _address, data) {
 			var addressCheck = (parentObj.memory[0xFF51] << 8) | parentObj.memory[0xFF52];	//Cannot change the RAM bank while WRAM is the source of a running HDMA.
 			if (!parentObj.hdmaRunning || addressCheck < 0xD000 || addressCheck >= 0xE000) {
 				parentObj.gbcRamBank = Math.max(data & 0x07, 1);	//Bank range is from 1-7
@@ -6126,14 +6123,14 @@ public recompileModelSpecificIOWriteHandling() {
 			}
 			parentObj.memory[0xFF70] = data;	//Bit 6 cannot be written to.
 		}
-		this.memoryHighWriter[0x74] = this.memoryWriter[0xFF74] = function (parentObj, _address, data) {
+		this.memoryHighWriter[0x74] = this.memoryWriter[0xFF74] = function (parentObj: GameBoyCore, _address, data) {
 			parentObj.memory[0xFF74] = data;
 		}
 	}
 	else {
 		//Fill in the GameBoy Color I/O registers as normal RAM for GameBoy compatibility:
 		//SC (Serial Transfer Control Register)
-		this.memoryHighWriter[0x2] = this.memoryWriter[0xFF02] = function (parentObj, _address, data) {
+		this.memoryHighWriter[0x2] = this.memoryWriter[0xFF02] = function (parentObj: GameBoyCore, _address, data) {
 			if (((data & 0x1) == 0x1)) {
 				//Internal clock:
 				parentObj.memory[0xFF02] = (data & 0x7F);
@@ -6146,7 +6143,7 @@ public recompileModelSpecificIOWriteHandling() {
 				parentObj.serialShiftTimer = parentObj.serialShiftTimerAllocated = parentObj.serialTimer = 0;	//Zero the timers, since we're emulating as if nothing is connected.
 			}
 		}
-		this.memoryHighWriter[0x40] = this.memoryWriter[0xFF40] = function (parentObj, _address, data) {
+		this.memoryHighWriter[0x40] = this.memoryWriter[0xFF40] = function (parentObj: GameBoyCore, _address, data) {
 			if (parentObj.memory[0xFF40] != data) {
 				parentObj.midScanLineJIT();
 				var temp_var = (data > 0x7F);
@@ -6178,7 +6175,7 @@ public recompileModelSpecificIOWriteHandling() {
 				parentObj.memory[0xFF40] = data;
 			}
 		}
-		this.memoryHighWriter[0x41] = this.memoryWriter[0xFF41] = function (parentObj, _address, data) {
+		this.memoryHighWriter[0x41] = this.memoryWriter[0xFF41] = function (parentObj: GameBoyCore, _address, data) {
 			parentObj.LYCMatchTriggerSTAT = ((data & 0x40) == 0x40);
 			parentObj.mode2TriggerSTAT = ((data & 0x20) == 0x20);
 			parentObj.mode1TriggerSTAT = ((data & 0x10) == 0x10);
@@ -6189,7 +6186,7 @@ public recompileModelSpecificIOWriteHandling() {
 				parentObj.checkIRQMatching();
 			}
 		}
-		this.memoryHighWriter[0x46] = this.memoryWriter[0xFF46] = function (parentObj, address, data) {
+		this.memoryHighWriter[0x46] = this.memoryWriter[0xFF46] = function (parentObj: GameBoyCore, address, data) {
 			parentObj.memory[0xFF46] = data;
 			if (data > 0x7F && data < 0xE0) {	//DMG cannot DMA from the ROM banks.
 				data <<= 8;
@@ -6219,28 +6216,28 @@ public recompileModelSpecificIOWriteHandling() {
 				parentObj.modeSTAT = stat;
 			}
 		}
-		this.memoryHighWriter[0x47] = this.memoryWriter[0xFF47] = function (parentObj, _address, data) {
+		this.memoryHighWriter[0x47] = this.memoryWriter[0xFF47] = function (parentObj: GameBoyCore, _address, data) {
 			if (parentObj.memory[0xFF47] != data) {
 				parentObj.midScanLineJIT();
 				parentObj.updateGBBGPalette(data);
 				parentObj.memory[0xFF47] = data;
 			}
 		}
-		this.memoryHighWriter[0x48] = this.memoryWriter[0xFF48] = function (parentObj, _address, data) {
+		this.memoryHighWriter[0x48] = this.memoryWriter[0xFF48] = function (parentObj: GameBoyCore, _address, data) {
 			if (parentObj.memory[0xFF48] != data) {
 				parentObj.midScanLineJIT();
 				parentObj.updateGBOBJPalette(0, data);
 				parentObj.memory[0xFF48] = data;
 			}
 		}
-		this.memoryHighWriter[0x49] = this.memoryWriter[0xFF49] = function (parentObj, _address, data) {
+		this.memoryHighWriter[0x49] = this.memoryWriter[0xFF49] = function (parentObj: GameBoyCore, _address, data) {
 			if (parentObj.memory[0xFF49] != data) {
 				parentObj.midScanLineJIT();
 				parentObj.updateGBOBJPalette(4, data);
 				parentObj.memory[0xFF49] = data;
 			}
 		}
-		this.memoryHighWriter[0x4D] = this.memoryWriter[0xFF4D] = function (parentObj, _address, data) {
+		this.memoryHighWriter[0x4D] = this.memoryWriter[0xFF4D] = function (parentObj: GameBoyCore, _address, data) {
 			parentObj.memory[0xFF4D] = data;
 		}
 		this.memoryHighWriter[0x4F] = this.memoryWriter[0xFF4F] = this.cartIgnoreWrite;	//Not writable in DMG mode.
@@ -6255,17 +6252,17 @@ public recompileModelSpecificIOWriteHandling() {
 	}
 }
 
-public recompileBootIOWriteHandling() {
+private recompileBootIOWriteHandling() {
 	//Boot I/O Registers:
 	if (this.inBootstrap) {
-		this.memoryHighWriter[0x50] = this.memoryWriter[0xFF50] = function (parentObj, _address, data) {
+		this.memoryHighWriter[0x50] = this.memoryWriter[0xFF50] = function (parentObj: GameBoyCore, _address, data) {
 			cout("Boot ROM reads blocked: Bootstrap process has ended.", 0);
 			parentObj.inBootstrap = false;
 			parentObj.disableBootROM();			//Fill in the boot ROM ranges with ROM  bank 0 ROM ranges
 			parentObj.memory[0xFF50] = data;	//Bits are sustained in memory?
 		}
 		if (this.cGBC) {
-			this.memoryHighWriter[0x6C] = this.memoryWriter[0xFF6C] = function (parentObj, _address, data) {
+			this.memoryHighWriter[0x6C] = this.memoryWriter[0xFF6C] = function (parentObj: GameBoyCore, _address, data) {
 				if (parentObj.inBootstrap) {
 					parentObj.cGBC = ((data & 0x1) == 0);
 					//Exception to the GBC identifying code:
@@ -6286,7 +6283,7 @@ public recompileBootIOWriteHandling() {
 }
 
 //Helper Functions
-public toTypedArray(baseArray, memtype) {
+private toTypedArray(baseArray, memtype) {
 	try {
 		if (settings.typed_arrays_disallow) {
 			return baseArray;
@@ -6320,7 +6317,7 @@ public toTypedArray(baseArray, memtype) {
 	}
 }
 
-public fromTypedArray(baseArray) {
+private fromTypedArray(baseArray) {
 	try {
 		if (!baseArray || !baseArray.length) {
 			return [];
@@ -6337,7 +6334,7 @@ public fromTypedArray(baseArray) {
 	}
 }
 
-public getTypedArray(length, defaultValue, numberType) {
+private getTypedArray(length, defaultValue, numberType) {
 	let arrayHandle;
 	try {
 		if (settings.typed_arrays_disallow) {

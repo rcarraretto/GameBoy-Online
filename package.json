@@ -21,6 +21,7 @@
   },
   "scripts": {
     "dev": "webpack-dev-server --open",
-    "test": "TS_NODE_FILES=true mocha \"test/**/*.test.ts\""
+    "test": "TS_NODE_FILES=true mocha \"test/**/*.test.ts\"",
+    "check:types": "npx tsc --noEmit --project tsconfig.json"
   }
 }
