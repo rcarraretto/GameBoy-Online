@@ -1,11 +1,11 @@
 import { XAudioServer } from './XAudioServer';
-import { Resize } from './resize';
 import { cout } from './terminal';
 import { settings } from './settings';
 import { OPCODE } from './opcodes';
 import { GBBOOTROM, GBCBOOTROM, ffxxDump, SecondaryTICKTable, TICKTable } from './constants';
 import { CachedDuty } from './types';
 import { getTypedArray, toTypedArray, fromTypedArray } from './typed-array';
+import { GameBoyScreen } from './GameBoyScreen';
 
  /*
   JavaScript GameBoy Color Emulator
@@ -19,7 +19,7 @@ import { getTypedArray, toTypedArray, fromTypedArray } from './typed-array';
 */
 
 export class GameBoyCore {
-    public canvas: HTMLCanvasElement;
+    private screen: GameBoyScreen;
     private ROMImage: string;
     private pause: () => void;
     public registerA: number;
@@ -315,8 +315,6 @@ export class GameBoyCore {
     private windowX: number;
     // To prevent the repeating of drawing a blank screen
     private drewBlank: number;
-    // Throttle how many draws we can do to once per iteration
-    private drewFrame: boolean;
     // mid-scanline rendering offset
     private midScanlineOffset: number;
     // track the x-coord limit for line rendering (mid-scanline usage)
@@ -352,18 +350,8 @@ export class GameBoyCore {
     private SpriteLayerRender: (number) => void;
     // The internal frame-buffer
     private frameBuffer: any[]
-    // The secondary gfx buffer that holds the converted RGBA values
-    private swizzledFrame: any[]
-    // imageData handle
-    private canvasBuffer: ImageData;
     // Temp variable for holding the current working framebuffer offset
     private pixelStart: number;
-    public onscreenWidth: number;
-    public onscreenHeight: number;
-    private offscreenWidth: number;
-    private offscreenHeight: number;
-    private offscreenRGBCount: number;
-    private resizePathClear: boolean;
     // Serial Transfer Shift Timer Refill
     private serialShiftTimerAllocated: number;
     // Are the interrupts on queue to be enabled?
@@ -438,18 +426,14 @@ export class GameBoyCore {
     public openMBC: (string) => any;
     private numROMBanks: number;
     private clocksPerSecond: number;
-    private canvasOffscreen: HTMLCanvasElement;
-    private drawContextOffscreen: CanvasRenderingContext2D;
-    private drawContextOnscreen: CanvasRenderingContext2D;
-    private resizer: any;
     private audioResamplerFirstPassFactor: number;
     private downSampleInputDivider: number;
     private audioBuffer: any[];
     private sortBuffer: any[];
     private OAMAddressCache: any[];
 
-    constructor(canvas: HTMLCanvasElement = null, ROMImage: string = null, pause: () => void = null) {
-	this.canvas = canvas;
+    constructor(ROMImage: string = null, screen: GameBoyScreen = null, pause: () => void = null) {
+	this.screen = screen;
 	this.ROMImage = ROMImage;
 	this.pause = pause;
 	//CPU Registers and Flags:
@@ -662,7 +646,6 @@ export class GameBoyCore {
 	this.windowY = 0;
 	this.windowX = 0;
 	this.drewBlank = 0;
-	this.drewFrame = false;
 	this.midScanlineOffset = -1;
 	this.pixelEnd = 0;
 	this.currentX = 0;
@@ -693,14 +676,7 @@ export class GameBoyCore {
 	this.WindowLayerRender = null;
 	this.SpriteLayerRender = null;
 	this.frameBuffer = [];
-	this.swizzledFrame = null;
-	this.canvasBuffer = null;
 	this.pixelStart = 0;
-	//Variables used for scaling in JS:
-	this.onscreenWidth = this.offscreenWidth = 160;
-	this.onscreenHeight = this.offscreenHeight = 144;
-	this.offscreenRGBCount = this.onscreenWidth * this.onscreenHeight * 4;
-	this.resizePathClear = true;
 	//Initialize the white noise cache tables ahead of time:
 	this.intializeWhiteNoise();
     }
@@ -1171,7 +1147,6 @@ public returnFromState(returnedFrom) {
 	this.initializeReferencesFromSaveState();
 	this.memoryReadJumpCompile();
 	this.memoryWriteJumpCompile();
-	this.initLCD();
 	this.initSound();
 	this.noiseSampleTable = (this.channel4BitRange == 0x7FFF) ? this.LSFR15Table : this.LSFR7Table;
 	this.channel4VolumeShifter = (this.channel4BitRange == 0x7FFF) ? 15 : 7;
@@ -1200,7 +1175,6 @@ private returnFromRTCState() {
 public start() {
 	this.initMemory();	//Write the startup memory.
 	this.ROMLoad();		//Load the ROM into memory and get cartridge information from it.
-	this.initLCD();		//Initialize the graphics.
 	this.initSound();	//Sound object initialization.
 	this.run();			//Start the emulation.
 }
@@ -1782,87 +1756,6 @@ private setupRAM() {
 
 private MBCRAMUtilized() {
 	return this.cMBC1 || this.cMBC2 || this.cMBC3 || this.cMBC5 || this.cMBC7 || this.cRUMBLE;
-}
-
-private recomputeDimension() {
-	//Cache some dimension info:
-	this.onscreenWidth = this.canvas.width;
-	this.onscreenHeight = this.canvas.height;
-	if (navigator.userAgent.toLowerCase().indexOf("gecko") != -1 && navigator.userAgent.toLowerCase().indexOf("like gecko") == -1) {
-		//Firefox slowness hack:
-		this.canvas.width = this.onscreenWidth = (!settings.software_resizing) ? 160 : this.canvas.width;
-		this.canvas.height = this.onscreenHeight = (!settings.software_resizing) ? 144 : this.canvas.height;
-	}
-	else {
-		this.onscreenWidth = this.canvas.width;
-		this.onscreenHeight = this.canvas.height;
-	}
-	this.offscreenWidth = (!settings.software_resizing) ? 160 : this.canvas.width;
-	this.offscreenHeight = (!settings.software_resizing) ? 144 : this.canvas.height;
-	this.offscreenRGBCount = this.offscreenWidth * this.offscreenHeight * 4;
-}
-
-public initLCD() {
-	this.recomputeDimension();
-	if (this.offscreenRGBCount != 92160) {
-		//Only create the resizer handle if we need it:
-		this.compileResizeFrameBufferFunction();
-	}
-	else {
-		//Resizer not needed:
-		this.resizer = null;
-	}
-	try {
-		this.canvasOffscreen = document.createElement("canvas");
-		this.canvasOffscreen.width = this.offscreenWidth;
-		this.canvasOffscreen.height = this.offscreenHeight;
-		this.drawContextOffscreen = this.canvasOffscreen.getContext("2d");
-		this.drawContextOnscreen = this.canvas.getContext("2d");
-		this.canvas.setAttribute("style", (this.canvas.getAttribute("style") || "") + "; image-rendering: " + ((settings.resize_smoothing) ? "auto" : "-webkit-optimize-contrast") + ";" +
-		"image-rendering: " + ((settings.resize_smoothing) ? "optimizeQuality" : "-o-crisp-edges") + ";" +
-		"image-rendering: " + ((settings.resize_smoothing) ? "optimizeQuality" : "-moz-crisp-edges") + ";" +
-		"-ms-interpolation-mode: " + ((settings.resize_smoothing) ? "bicubic" : "nearest-neighbor") + ";");
-		(this.drawContextOffscreen as any).webkitImageSmoothingEnabled  = settings.resize_smoothing;
-		(this.drawContextOffscreen as any).mozImageSmoothingEnabled = settings.resize_smoothing;
-		(this.drawContextOnscreen as any).webkitImageSmoothingEnabled  = settings.resize_smoothing;
-		(this.drawContextOnscreen as any).mozImageSmoothingEnabled = settings.resize_smoothing;
-		//Get a CanvasPixelArray buffer:
-		try {
-			this.canvasBuffer = this.drawContextOffscreen.createImageData(this.offscreenWidth, this.offscreenHeight);
-		}
-		catch (error) {
-			cout("Falling back to the getImageData initialization (Error \"" + error.message + "\").", 1);
-			this.canvasBuffer = this.drawContextOffscreen.getImageData(0, 0, this.offscreenWidth, this.offscreenHeight);
-		}
-		var index = this.offscreenRGBCount;
-		while (index > 0) {
-			this.canvasBuffer.data[index -= 4] = 0xF8;
-			this.canvasBuffer.data[index + 1] = 0xF8;
-			this.canvasBuffer.data[index + 2] = 0xF8;
-			this.canvasBuffer.data[index + 3] = 0xFF;
-		}
-		this.graphicsBlit();
-		this.canvas.style.visibility = "visible";
-		if (this.swizzledFrame == null) {
-			this.swizzledFrame = getTypedArray(69120, 0xFF, "uint8");
-		}
-		//Test the draw system and browser vblank latching:
-		this.drewFrame = true;										//Copy the latest graphics to buffer.
-		this.requestDraw();
-	}
-	catch (error) {
-		throw(new Error("HTML5 Canvas support required: " + error.message + "file: " + error.fileName + ", line: " + error.lineNumber));
-	}
-}
-
-private graphicsBlit() {
-	if (this.offscreenWidth == this.onscreenWidth && this.offscreenHeight == this.onscreenHeight) {
-		this.drawContextOnscreen.putImageData(this.canvasBuffer, 0, 0);
-	}
-	else {
-		this.drawContextOffscreen.putImageData(this.canvasBuffer, 0, 0);
-		this.drawContextOnscreen.drawImage(this.canvasOffscreen, 0, 0, this.onscreenWidth, this.onscreenHeight);
-	}
 }
 
 public JoyPadEvent(key, down) {
@@ -2583,7 +2476,7 @@ public run() {
 					}
 				}
 				//Request the graphics target to be updated:
-				this.requestDraw();
+				this.screen.requestDraw();
 			}
 			else {
 				this.audioUnderrunAdjustment();
@@ -2972,7 +2865,7 @@ private initializeLCDController() {
 							//Make sure our gfx are up-to-date:
 							parentObj.graphicsJITVBlank();
 							//Draw the frame:
-							parentObj.prepareFrame();
+							parentObj.screen.prepareFrame(parentObj.frameBuffer);
 						}
 					}
 					else {
@@ -3040,8 +2933,7 @@ private initializeLCDController() {
 private DisplayShowOff() {
 	if (this.drewBlank == 0) {
 		//Output a blank screen to the output framebuffer:
-		this.clearFrameBuffer();
-		this.drewFrame = true;
+		this.screen.clearFrameBuffer(this.cGBC || this.colorizedGBPalettes);
 	}
 	this.drewBlank = 2;
 }
@@ -3093,86 +2985,6 @@ private clockUpdate() {
 				}
 			}
 		}
-	}
-}
-
-private prepareFrame() {
-	//Copy the internal frame buffer to the output buffer:
-	this.swizzleFrameBuffer();
-	this.drewFrame = true;
-}
-
-private requestDraw() {
-	if (this.drewFrame) {
-		this.dispatchDraw();
-	}
-}
-
-private dispatchDraw() {
-	if (this.offscreenRGBCount > 0) {
-		//We actually updated the graphics internally, so copy out:
-		if (this.offscreenRGBCount == 92160) {
-			this.processDraw(this.swizzledFrame);
-		}
-		else {
-			this.resizeFrameBuffer();
-		}
-	}
-}
-
-private processDraw(frameBuffer) {
-	var canvasRGBALength = this.offscreenRGBCount;
-	var canvasData = this.canvasBuffer.data;
-	var bufferIndex = 0;
-	for (var canvasIndex = 0; canvasIndex < canvasRGBALength; ++canvasIndex) {
-		canvasData[canvasIndex++] = frameBuffer[bufferIndex++];
-		canvasData[canvasIndex++] = frameBuffer[bufferIndex++];
-		canvasData[canvasIndex++] = frameBuffer[bufferIndex++];
-	}
-	this.graphicsBlit();
-	this.drewFrame = false;
-}
-
-private swizzleFrameBuffer() {
-	//Convert our dirty 24-bit (24-bit, with internal render flags above it) framebuffer to an 8-bit buffer with separate indices for the RGB channels:
-	var frameBuffer = this.frameBuffer;
-	var swizzledFrame = this.swizzledFrame;
-	var bufferIndex = 0;
-	for (var canvasIndex = 0; canvasIndex < 69120;) {
-		swizzledFrame[canvasIndex++] = (frameBuffer[bufferIndex] >> 16) & 0xFF;		//Red
-		swizzledFrame[canvasIndex++] = (frameBuffer[bufferIndex] >> 8) & 0xFF;		//Green
-		swizzledFrame[canvasIndex++] = frameBuffer[bufferIndex++] & 0xFF;			//Blue
-	}
-}
-
-private clearFrameBuffer() {
-	var bufferIndex = 0;
-	var frameBuffer = this.swizzledFrame;
-	if (this.cGBC || this.colorizedGBPalettes) {
-		while (bufferIndex < 69120) {
-			frameBuffer[bufferIndex++] = 248;
-		}
-	}
-	else {
-		while (bufferIndex < 69120) {
-			frameBuffer[bufferIndex++] = 239;
-			frameBuffer[bufferIndex++] = 255;
-			frameBuffer[bufferIndex++] = 222;
-		}
-	}
-}
-
-private resizeFrameBuffer() {
-	//Resize in javascript with resize.js:
-	if (this.resizePathClear) {
-		this.resizePathClear = false;
-		this.resizer.resize(this.swizzledFrame);
-	}
-}
-
-private compileResizeFrameBufferFunction() {
-	if (this.offscreenRGBCount > 0) {
-		this.resizer = new Resize(160, 144, this.offscreenWidth, this.offscreenHeight, false, settings.resize_smoothing);
 	}
 }
 

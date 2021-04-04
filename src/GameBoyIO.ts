@@ -3,25 +3,31 @@ import { cout } from './terminal';
 import { GameBoyCore } from './GameBoyCore'
 import { settings } from './settings';
 import { arrayToBase64, base64ToArray, to_little_endian_dword, base64, to_byte } from './base64';
+import { GameBoyScreen } from './GameBoyScreen';
 
 // GameBoyCore object
 var gameboy: GameBoyCore = null;
 // GameBoyCore Timer
 var gbRunInterval = null;
 
+var screen: GameBoyScreen = null;
+
 export function GameBoyEmulatorInitialized() {
 	return (typeof gameboy == "object" && gameboy != null);
 }
 
 export const getGameboy = () => gameboy;
+export const getScreen = () => screen;
 
 export function start(canvas: HTMLCanvasElement, ROM: string) {
 	clearLastEmulation();
 	autoSave();	//If we are about to load a new game, then save the last one...
-	gameboy = new GameBoyCore(canvas, ROM, pause);
+	screen = new GameBoyScreen(canvas);
+	gameboy = new GameBoyCore(ROM, screen, pause);
 	gameboy.openMBC = openSRAM;
 	gameboy.openRTC = openRTC;
 	gameboy.start();
+	screen.initLCD();
 	run();
 }
 
@@ -198,9 +204,11 @@ export function openState(filename, canvas) {
 			try {
 				clearLastEmulation();
 				cout("Attempting to run a saved emulation state.", 0);
-				gameboy = new GameBoyCore(canvas, "", pause);
+				screen = new GameBoyScreen(canvas)
+				gameboy = new GameBoyCore("", screen, pause);
 				gameboy.savedStateFileName = filename;
 				gameboy.returnFromState(findValue(filename));
+				screen.initLCD();
 				run();
 			}
 			catch (error) {
@@ -406,28 +414,18 @@ export function GameBoyGyroSignalHandler(e) {
 //The emulator will call this to sort out the canvas properties for (re)initialization.
 function initNewCanvas() {
 	if (GameBoyEmulatorInitialized()) {
-		gameboy.canvas.width = gameboy.canvas.clientWidth;
-		gameboy.canvas.height = gameboy.canvas.clientHeight;
+		screen.initNewCanvas();
 	}
 }
 
 //Call this when resizing the canvas:
 export function initNewCanvasSize() {
 	if (GameBoyEmulatorInitialized()) {
-		if (!settings.software_resizing) {
-			if (gameboy.onscreenWidth != 160 || gameboy.onscreenHeight != 144) {
-				initLCD();
-			}
-		}
-		else {
-			if (gameboy.onscreenWidth != gameboy.canvas.clientWidth || gameboy.onscreenHeight != gameboy.canvas.clientHeight) {
-				initLCD();
-			}
-		}
+		screen.initNewCanvasSize(settings.software_resizing);
 	}
 }
 
 export function initLCD() {
     initNewCanvas();
-    gameboy.initLCD();
+    screen.initLCD();
 };

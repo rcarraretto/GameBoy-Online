@@ -362,13 +362,13 @@ function initPlayer() {
 function fullscreenPlayer() {
 	if (io.GameBoyEmulatorInitialized()) {
 		if (!inFullscreen) {
-			io.getGameboy().canvas = fullscreenCanvas;
+			io.getScreen().setCanvas(fullscreenCanvas);
 			fullscreenCanvas.className = (showAsMinimal) ? "minimum" : "maximum";
 			document.getElementById("fullscreenContainer").style.display = "block";
 			windowStacks[0].hide();
 		}
 		else {
-			io.getGameboy().canvas = mainCanvas;
+			io.getScreen().setCanvas(mainCanvas);
 			document.getElementById("fullscreenContainer").style.display = "none";
 			windowStacks[0].show();
 		}
