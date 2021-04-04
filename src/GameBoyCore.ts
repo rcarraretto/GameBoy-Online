@@ -4,6 +4,7 @@ import { cout } from './terminal';
 import { settings } from './settings';
 import { OPCODE } from './opcodes';
 import { GBBOOTROM, GBCBOOTROM, ffxxDump, SecondaryTICKTable, TICKTable } from './constants';
+import { CachedDuty } from './types';
 
  /*
   JavaScript GameBoy Color Emulator
@@ -17,275 +18,409 @@ import { GBBOOTROM, GBCBOOTROM, ffxxDump, SecondaryTICKTable, TICKTable } from '
 */
 
 export class GameBoyCore {
-    public canvas: any;
-    private ROMImage: any;
-    private pause: any;
-    public registerA: any;
-    public FZero: any;
-    public FSubtract: any;
-    public FHalfCarry: any;
-    public FCarry: any;
-    public registerB: any;
-    public registerC: any;
-    public registerD: any;
-    public registerE: any;
-    public registersHL: any;
-    public stackPointer: any;
-    public programCounter: any;
-    private CPUCyclesTotal: any;
-    private CPUCyclesTotalBase: any;
-    private CPUCyclesTotalCurrent: any;
-    private CPUCyclesTotalRoundoff: any;
-    private baseCPUCyclesPerIteration: any;
-    private remainingClocks: any;
-    private inBootstrap: any;
-    public usedBootROM: any;
-    private usedGBCBootROM: any;
-    private halt: any;
-    public skipPCIncrement: any;
-    public stopEmulator: any;
-    public IME: any;
-    private IRQLineMatched: any;
-    public interruptsRequested: any;
-    public interruptsEnabled: any;
-    private hdmaRunning: any;
-    public CPUTicks: any;
-    public doubleSpeedShifter: any;
-    private JoyPad: any;
-    private CPUStopped: any;
-    public memoryReader: any;
-    public memoryWriter: any;
-    public memoryHighReader: any;
-    public memoryHighWriter: any;
-    private ROM: any;
-    public memory: any;
-    private MBCRam: any;
-    private VRAM: any;
-    private GBCMemory: any;
-    private MBC1Mode: any;
-    private MBCRAMBanksEnabled: any;
-    private currMBCRAMBank: any;
-    private currMBCRAMBankPosition: any;
-    public cGBC: any;
-    private gbcRamBank: any;
-    private gbcRamBankPosition: any;
-    private gbcRamBankPositionECHO: any;
-    private RAMBanks: any;
-    private ROMBank1offs: any;
-    private currentROMBank: any;
-    private cartridgeType: any;
-    public name: any;
-    private gameCode: any;
-    public fromSaveState: any;
-    public savedStateFileName: any;
-    private STATTracker: any;
-    private modeSTAT: any;
-    private spriteCount: any;
-    private LYCMatchTriggerSTAT: any;
-    private mode2TriggerSTAT: any;
-    private mode1TriggerSTAT: any;
-    private mode0TriggerSTAT: any;
-    private LCDisOn: any;
-    private LINECONTROL: any;
-    private DISPLAYOFFCONTROL: any;
-    private LCDCONTROL: any;
-    private RTCisLatched: any;
-    private latchedSeconds: any;
-    private latchedMinutes: any;
-    private latchedHours: any;
-    private latchedLDays: any;
-    private latchedHDays: any;
-    private RTCSeconds: any;
-    private RTCMinutes: any;
-    private RTCHours: any;
-    private RTCDays: any;
-    private RTCDayOverFlow: any;
-    private RTCHALT: any;
-    private highX: any;
-    private lowX: any;
-    private highY: any;
-    private lowY: any;
+    public canvas: HTMLCanvasElement;
+    private ROMImage: string;
+    private pause: () => void;
+    public registerA: number;
+    public registerB: number;
+    public registerC: number;
+    public registerD: number;
+    public registerE: number;
+    // Register F - Result was zero
+    public FZero: boolean;
+    // Register F - Subtraction was executed
+    public FSubtract: boolean;
+    // Register F - Half carry or half borrow
+    public FHalfCarry: boolean;
+    // Register F - Carry or borrow
+    public FCarry: boolean;
+    public registersHL: number;
+    public stackPointer: number;
+    public programCounter: number;
+    // Relative CPU clocking to speed set, rounded appropriately
+    private CPUCyclesTotal: number;
+    // Relative CPU clocking to speed set base
+    private CPUCyclesTotalBase: number;
+    // Relative CPU clocking to speed set, the directly used value
+    private CPUCyclesTotalCurrent: number;
+    // Clocking per iteration rounding catch
+    private CPUCyclesTotalRoundoff: number;
+    // CPU clocks per iteration at 1x speed
+    private baseCPUCyclesPerIteration: number;
+    // HALT clocking overrun carry over
+    private remainingClocks: number;
+    // Whether we're in the GBC boot ROM
+    private inBootstrap: boolean;
+    // Updated upon ROM loading...
+    public usedBootROM: boolean;
+    // Did we boot to the GBC boot ROM?
+    private usedGBCBootROM: boolean;
+    // Has the CPU been suspended until the next interrupt?
+    private halt: boolean;
+    // Did we trip the DMG Halt bug?
+    public skipPCIncrement: boolean;
+    // Has the emulation been paused or a frame has ended?
+    public stopEmulator: number;
+    // Are interrupts enabled?
+    public IME: boolean;
+    // CPU IRQ assertion
+    private IRQLineMatched: number;
+    // IF Register
+    public interruptsRequested: number;
+    // IE Register
+    public interruptsEnabled: number;
+    // HDMA Transfer Flag - GBC only
+    private hdmaRunning: boolean;
+    // The number of clock cycles emulated
+    public CPUTicks: number;
+    // GBC double speed clocking shifter
+    public doubleSpeedShifter: number;
+    // Joypad State (two four-bit states actually)
+    private JoyPad: number;
+    // CPU STOP status
+    private CPUStopped: boolean;
+    // Array of functions mapped to read back memory
+    public memoryReader: any[];
+    // Array of functions mapped to write to memory
+    public memoryWriter: any[];
+    // Array of functions mapped to read back 0xFFXX memory
+    public memoryHighReader: any[];
+    // Array of functions mapped to write to 0xFFXX memory
+    public memoryHighWriter: any[];
+    // The full ROM file dumped to an array
+    private ROM: any[];
+    // Main Core Memory
+    public memory: any[];
+    // Switchable RAM (Used by games for more RAM) for the main memory range 0xA000 - 0xC000
+    private MBCRam: any[];
+    // Extra VRAM bank for GBC
+    private VRAM: any[];
+    // GBC main RAM Banks
+    private GBCMemory: any[];
+    // MBC1 Type (4/32, 16/8)
+    private MBC1Mode: boolean;
+    // MBC RAM Access Control
+    private MBCRAMBanksEnabled: boolean;
+    // MBC Currently Indexed RAM Bank
+    private currMBCRAMBank: number;
+    // MBC Position Adder;
+    private currMBCRAMBankPosition: number;
+    // GameBoy Color detection
+    public cGBC: boolean;
+    // Currently Switched GameBoy Color ram bank
+    private gbcRamBank: number;
+    // GBC RAM offset from address start
+    private gbcRamBankPosition: number;
+    // GBC RAM (ECHO mirroring) offset from address start
+    private gbcRamBankPositionECHO: number;
+    // Used to map the RAM banks to maximum size the MBC used can do
+    private RAMBanks: number[];
+    // Offset of the ROM bank switching
+    private ROMBank1offs: number;
+    // The parsed current ROM bank selection
+    private currentROMBank: number;
+    // Cartridge Type
+    private cartridgeType: number;
+    // Name of the game
+    public name: string;
+    // Game code (Suffix for older games)
+    private gameCode: string;
+    // Indicate if the game was loaded from a save state
+    public fromSaveState: boolean;
+    // When loaded in as a save state, this will not be empty
+    public savedStateFileName: string;
+    // Tracker for STAT triggering
+    private STATTracker: number;
+    // The scan line mode (for lines 1-144 it's 2-3-0, for 145-154 it's 1)
+    private modeSTAT: number;
+    // Mode 3 extra clocking counter (Depends on how many sprites are on the current line)
+    private spriteCount: number;
+    // Should we trigger an interrupt if LY==LYC?
+    private LYCMatchTriggerSTAT: boolean;
+    // Should we trigger an interrupt if in mode 2?
+    private mode2TriggerSTAT: boolean;
+    // Should we trigger an interrupt if in mode 1?
+    private mode1TriggerSTAT: boolean;
+    // Should we trigger an interrupt if in mode 0?
+    private mode0TriggerSTAT: boolean;
+    // Is the emulated LCD controller on?
+    private LCDisOn: boolean;
+    // Array of functions to handle each scan line we do (onscreen + offscreen)
+    private LINECONTROL: any[];
+    private DISPLAYOFFCONTROL: any[];
+    // Pointer to either LINECONTROL or DISPLAYOFFCONTROL
+    private LCDCONTROL: any[];
+    private RTCisLatched: boolean;
+    // RTC latched seconds
+    private latchedSeconds: number;
+    // RTC latched minutes
+    private latchedMinutes: number;
+    // RTC latched hours
+    private latchedHours: number;
+    // RTC latched lower 8-bits of the day counter
+    private latchedLDays: number;
+    // RTC latched high-bit of the day counter
+    private latchedHDays: number;
+    // RTC seconds counter
+    private RTCSeconds: number;
+    // RTC minutes counter
+    private RTCMinutes: number;
+    // RTC hours counter
+    private RTCHours: number;
+    // RTC days counter
+    private RTCDays: number;
+    // Did the RTC overflow and wrap the day counter?
+    private RTCDayOverFlow: boolean;
+    // Is the RTC allowed to clock up?
+    private RTCHALT: boolean;
+    private highX: number;
+    private lowX: number;
+    private highY: number;
+    private lowY: number;
+    // XAudioJS handle
     private audioHandle: any;
-    private numSamplesTotal: any;
-    private dutyLookup: any;
-    private bufferContainAmount: any;
-    private LSFR15Table: any;
-    private LSFR7Table: any;
-    private noiseSampleTable: any;
-    private soundMasterEnabled: any;
-    private channel3PCM: any;
-    private VinLeftChannelMasterVolume: any;
-    private VinRightChannelMasterVolume: any;
-    private leftChannel1: any;
-    private leftChannel2: any;
-    private leftChannel3: any;
-    private leftChannel4: any;
-    private rightChannel1: any;
-    private rightChannel2: any;
-    private rightChannel3: any;
-    private rightChannel4: any;
-    private audioClocksUntilNextEvent: any;
-    private audioClocksUntilNextEventCounter: any;
-    private channel1currentSampleLeft: any;
-    private channel1currentSampleRight: any;
-    private channel2currentSampleLeft: any;
-    private channel2currentSampleRight: any;
-    private channel3currentSampleLeft: any;
-    private channel3currentSampleRight: any;
-    private channel4currentSampleLeft: any;
-    private channel4currentSampleRight: any;
-    private channel1currentSampleLeftSecondary: any;
-    private channel1currentSampleRightSecondary: any;
-    private channel2currentSampleLeftSecondary: any;
-    private channel2currentSampleRightSecondary: any;
-    private channel3currentSampleLeftSecondary: any;
-    private channel3currentSampleRightSecondary: any;
-    private channel4currentSampleLeftSecondary: any;
-    private channel4currentSampleRightSecondary: any;
-    private channel1currentSampleLeftTrimary: any;
-    private channel1currentSampleRightTrimary: any;
-    private channel2currentSampleLeftTrimary: any;
-    private channel2currentSampleRightTrimary: any;
-    private mixerOutputCache: any;
-    private emulatorSpeed: any;
-    private audioTicks: any;
-    private audioIndex: any;
-    private downsampleInput: any;
-    private audioDestinationPosition: any;
-    private emulatorTicks: any;
-    private DIVTicks: any;
-    private LCDTicks: any;
-    private timerTicks: any;
-    private TIMAEnabled: any;
-    private TACClocker: any;
-    private serialTimer: any;
-    private serialShiftTimer: any;
-    private lastIteration: any;
-    public firstIteration: any;
-    private actualScanLine: any;
-    private lastUnrenderedLine: any;
-    private queuedScanLines: any;
-    private totalLinesPassed: any;
-    private haltPostClocks: any;
-    private cMBC1: any;
-    private cMBC2: any;
-    private cMBC3: any;
-    private cMBC5: any;
-    private cMBC7: any;
-    private cSRAM: any;
-    private cMMMO1: any;
-    private cRUMBLE: any;
-    private cCamera: any;
-    private cTAMA5: any;
-    private cHuC3: any;
-    private cHuC1: any;
-    public cTIMER: any;
-    private ROMBanks: any;
-    private numRAMBanks: any;
-    private currVRAMBank: any;
-    private backgroundX: any;
-    private backgroundY: any;
-    private gfxWindowDisplay: any;
-    private gfxSpriteShow: any;
-    private gfxSpriteNormalHeight: any;
-    private bgEnabled: any;
-    private BGPriorityEnabled: any;
-    private gfxWindowCHRBankPosition: any;
-    private gfxBackgroundCHRBankPosition: any;
-    private gfxBackgroundBankOffset: any;
-    private windowY: any;
-    private windowX: any;
-    private drewBlank: any;
-    private drewFrame: any;
-    private midScanlineOffset: any;
-    private pixelEnd: any;
-    private currentX: any;
-    private BGCHRBank1: any;
-    private BGCHRBank2: any;
-    private BGCHRCurrentBank: any;
-    private tileCache: any;
-    private colors: any;
-    private OBJPalette: any;
-    private BGPalette: any;
-    private gbcOBJRawPalette: any;
-    private gbcBGRawPalette: any;
-    private gbOBJPalette: any;
-    private gbBGPalette: any;
-    private gbcOBJPalette: any;
-    private gbcBGPalette: any;
-    private gbBGColorizedPalette: any;
-    private gbOBJColorizedPalette: any;
-    private cachedBGPaletteConversion: any;
-    private cachedOBJPaletteConversion: any;
-    private updateGBBGPalette: any;
-    private updateGBOBJPalette: any;
-    private colorizedGBPalettes: any;
-    private BGLayerRender: any;
-    private WindowLayerRender: any;
-    private SpriteLayerRender: any;
-    private frameBuffer: any;
-    private swizzledFrame: any;
-    private canvasBuffer: any;
-    private pixelStart: any;
-    public onscreenWidth: any;
-    public onscreenHeight: any;
-    private offscreenWidth: any;
-    private offscreenHeight: any;
-    private offscreenRGBCount: any;
-    private resizePathClear: any;
-    private serialShiftTimerAllocated: any;
-    public IRQEnableDelay: any;
-    public iterations: any;
-    public cBATT: any;
-    private channel1FrequencyTracker: any;
-    private channel1FrequencyCounter: any;
-    private channel1totalLength: any;
-    private channel1envelopeVolume: any;
-    private channel1envelopeType: any;
-    private channel1envelopeSweeps: any;
-    private channel1envelopeSweepsLast: any;
-    private channel1consecutive: any;
-    private channel1frequency: any;
-    private channel1SweepFault: any;
-    private channel1ShadowFrequency: any;
-    private channel1timeSweep: any;
-    private channel1lastTimeSweep: any;
-    private channel1Swept: any;
-    private channel1frequencySweepDivider: any;
-    private channel1decreaseSweep: any;
-    private channel2FrequencyTracker: any;
-    private channel2FrequencyCounter: any;
-    private channel2totalLength: any;
-    private channel2envelopeVolume: any;
-    private channel2envelopeType: any;
-    private channel2envelopeSweeps: any;
-    private channel2envelopeSweepsLast: any;
-    private channel2consecutive: any;
-    private channel2frequency: any;
-    private channel3canPlay: any;
-    private channel3totalLength: any;
-    private channel3envelopeVolume: any;
-    private channel3patternType: any;
-    private channel3frequency: any;
-    private channel3consecutive: any;
-    private channel4FrequencyPeriod: any;
-    private channel4lastSampleLookup: any;
-    private channel4totalLength: any;
-    private channel4envelopeVolume: any;
-    private channel4currentVolume: any;
-    private channel4envelopeType: any;
-    private channel4envelopeSweeps: any;
-    private channel4envelopeSweepsLast: any;
-    private channel4consecutive: any;
-    private channel4BitRange: any;
-    private channel1DutyTracker: any;
-    private channel1CachedDuty: any;
-    private channel2DutyTracker: any;
-    private channel2CachedDuty: any;
-    private channel1Enabled: any;
-    private channel2Enabled: any;
-    private channel3Enabled: any;
-    private channel4Enabled: any;
+    // Length of the sound buffers
+    private numSamplesTotal: number;
+    private dutyLookup: CachedDuty[];
+    // Buffer maintenance metric
+    private bufferContainAmount: number;
+    private LSFR15Table: any[];
+    private LSFR7Table: any[];
+    private noiseSampleTable: any[];
+    private soundMasterEnabled: boolean;
+    // Channel 3 adjusted sample buffer
+    private channel3PCM: any[];
+    // Computed post-mixing volume
+    private VinLeftChannelMasterVolume: number;
+    // Computed post-mixing volume
+    private VinRightChannelMasterVolume: number;
+    private leftChannel1: boolean;
+    private leftChannel2: boolean;
+    private leftChannel3: boolean;
+    private leftChannel4: boolean;
+    private rightChannel1: boolean;
+    private rightChannel2: boolean;
+    private rightChannel3: boolean;
+    private rightChannel4: boolean;
+    private audioClocksUntilNextEvent: number;
+    private audioClocksUntilNextEventCounter: number;
+    private channel1currentSampleLeft: number;
+    private channel1currentSampleRight: number;
+    private channel2currentSampleLeft: number;
+    private channel2currentSampleRight: number;
+    private channel3currentSampleLeft: number;
+    private channel3currentSampleRight: number;
+    private channel4currentSampleLeft: number;
+    private channel4currentSampleRight: number;
+    private channel1currentSampleLeftSecondary: number;
+    private channel1currentSampleRightSecondary: number;
+    private channel2currentSampleLeftSecondary: number;
+    private channel2currentSampleRightSecondary: number;
+    private channel3currentSampleLeftSecondary: number;
+    private channel3currentSampleRightSecondary: number;
+    private channel4currentSampleLeftSecondary: number;
+    private channel4currentSampleRightSecondary: number;
+    private channel1currentSampleLeftTrimary: number;
+    private channel1currentSampleRightTrimary: number;
+    private channel2currentSampleLeftTrimary: number;
+    private channel2currentSampleRightTrimary: number;
+    private mixerOutputCache: number;
+    private emulatorSpeed: number;
+    // Used to sample the audio system every x CPU instructions
+    private audioTicks: number;
+    // Used to keep alignment on audio generation
+    private audioIndex: number;
+    private downsampleInput: number;
+    // Used to keep alignment on audio generation
+    private audioDestinationPosition: number;
+    // Times for how many instructions to execute before ending the loop
+    private emulatorTicks: number;
+    // DIV Ticks Counter (Invisible lower 8-bit)
+    private DIVTicks: number;
+    // Counter for how many instructions have been executed on a scanline so far
+    private LCDTicks: number;
+    // Counter for the TIMA timer
+    private timerTicks: number;
+    private TIMAEnabled: boolean;
+    // Timer Max Ticks
+    private TACClocker: number;
+    // Serial IRQ Timer
+    private serialTimer: number;
+    // Serial Transfer Shift Timer
+    private serialShiftTimer: number;
+    // The last time we iterated the main loop
+    private lastIteration: number;
+    public firstIteration: number;
+    private actualScanLine: number;
+    // Last rendered scan line
+    private lastUnrenderedLine: number;
+    private queuedScanLines: number;
+    private totalLinesPassed: number;
+    // Post-Halt clocking
+    private haltPostClocks: number;
+    // Does the cartridge use MBC1?
+    private cMBC1: boolean;
+    // Does the cartridge use MBC2?
+    private cMBC2: boolean;
+    // Does the cartridge use MBC3?
+    private cMBC3: boolean;
+    // Does the cartridge use MBC5?
+    private cMBC5: boolean;
+    // Does the cartridge use MBC7?
+    private cMBC7: boolean;
+    // Does the cartridge use save RAM?
+    private cSRAM: boolean;
+    private cMMMO1: boolean;
+    // Does the cartridge use the RUMBLE addressing (modified MBC5)?
+    private cRUMBLE: boolean
+    // Is the cartridge actually a GameBoy Camera?
+    private cCamera: boolean;
+    // Does the cartridge use TAMA5? (Tamagotchi Cartridge)
+    private cTAMA5: boolean;
+    // Does the cartridge use HuC3 (Hudson Soft / modified MBC3)?
+    private cHuC3: boolean;
+    // Does the cartridge use HuC1 (Hudson Soft / modified MBC1)?
+    private cHuC1: boolean;
+    // Does the cartridge have an RTC?
+    public cTIMER: boolean;
+    private ROMBanks: number[];
+    // How many RAM banks were actually allocated?
+    private numRAMBanks: number;
+    // Current VRAM bank for GBC
+    private currVRAMBank: number;
+    // Register SCX (X-Scroll)
+    private backgroundX: number;
+    // Register SCY (Y-Scroll)
+    private backgroundY: number;
+    // Is the windows enabled?
+    private gfxWindowDisplay: boolean;
+    // Are sprites enabled?
+    private gfxSpriteShow: boolean;
+    // Are we doing 8x8 or 8x16 sprites?
+    private gfxSpriteNormalHeight: boolean;
+    // Is the BG enabled?
+    private bgEnabled: boolean;
+    // Can we flag the BG for priority over sprites?
+    private BGPriorityEnabled: boolean;
+    // The current bank of the character map the window uses
+    private gfxWindowCHRBankPosition: number;
+    // The current bank of the character map the BG uses
+    private gfxBackgroundCHRBankPosition: number;
+    // Fast mapping of the tile numbering
+    private gfxBackgroundBankOffset: number;
+    // Current Y offset of the window
+    private windowY: number;
+    // Current X offset of the window
+    private windowX: number;
+    // To prevent the repeating of drawing a blank screen
+    private drewBlank: number;
+    // Throttle how many draws we can do to once per iteration
+    private drewFrame: boolean;
+    // mid-scanline rendering offset
+    private midScanlineOffset: number;
+    // track the x-coord limit for line rendering (mid-scanline usage)
+    private pixelEnd: number;
+    // The x-coord we left off at for mid-scanline rendering
+    private currentX: number;
+    private BGCHRBank1: any[];
+    private BGCHRBank2: any[];
+    private BGCHRCurrentBank: any[];
+    private tileCache: any[];
+    // "Classic" GameBoy palette colors
+    private colors: number[];
+    private OBJPalette: any[];
+    private BGPalette: any[];
+    private gbcOBJRawPalette: any[];
+    private gbcBGRawPalette: any[];
+    private gbOBJPalette: any[];
+    private gbBGPalette: any[];
+    private gbcOBJPalette: any[];
+    private gbcBGPalette: any[];
+    private gbBGColorizedPalette: any[];
+    private gbOBJColorizedPalette: any[];
+    private cachedBGPaletteConversion: any[];
+    private cachedOBJPaletteConversion: any[];
+    private updateGBBGPalette: (data) => void;
+    private updateGBOBJPalette: (index, data) => void;
+    private colorizedGBPalettes: boolean;
+    // Reference to the BG rendering function
+    private BGLayerRender: (number) => void;
+    // Reference to the window rendering function
+    private WindowLayerRender: (number) => void;
+    // Reference to the OAM rendering function
+    private SpriteLayerRender: (number) => void;
+    // The internal frame-buffer
+    private frameBuffer: any[]
+    // The secondary gfx buffer that holds the converted RGBA values
+    private swizzledFrame: any[]
+    // imageData handle
+    private canvasBuffer: ImageData;
+    // Temp variable for holding the current working framebuffer offset
+    private pixelStart: number;
+    public onscreenWidth: number;
+    public onscreenHeight: number;
+    private offscreenWidth: number;
+    private offscreenHeight: number;
+    private offscreenRGBCount: number;
+    private resizePathClear: boolean;
+    // Serial Transfer Shift Timer Refill
+    private serialShiftTimerAllocated: number;
+    // Are the interrupts on queue to be enabled?
+    public IRQEnableDelay: number;
+    public iterations: number;
+    public cBATT: boolean;
+    private channel1Enabled: boolean;
+    private channel1canPlay: boolean;
+    private channel1FrequencyTracker: number;
+    private channel1FrequencyCounter: number;
+    private channel1totalLength: number;
+    private channel1envelopeVolume: number;
+    private channel1envelopeType: boolean;
+    private channel1envelopeSweeps: number;
+    private channel1envelopeSweepsLast: number;
+    private channel1consecutive: boolean;
+    private channel1frequency: number;
+    private channel1SweepFault: boolean;
+    private channel1ShadowFrequency: number;
+    private channel1timeSweep: number;
+    private channel1lastTimeSweep: number;
+    private channel1Swept: boolean;
+    private channel1frequencySweepDivider: number;
+    private channel1decreaseSweep: boolean;
+    private channel2Enabled: boolean;
+    private channel2canPlay: boolean;
+    private channel2FrequencyTracker: number;
+    private channel2FrequencyCounter: number;
+    private channel2totalLength: number;
+    private channel2envelopeVolume: number;
+    private channel2envelopeType: boolean;
+    private channel2envelopeSweeps: number;
+    private channel2envelopeSweepsLast: number;
+    private channel2consecutive: boolean;
+    private channel2frequency: number;
+    private channel3Enabled: boolean;
+    private channel3canPlay: boolean;
+    private channel3totalLength: number;
+    private channel3envelopeVolume: number;
+    private channel3patternType: number;
+    private channel3frequency: number;
+    private channel3consecutive: boolean;
+    private channel4Enabled: boolean;
+    private channel4canPlay: boolean;
+    private channel4FrequencyPeriod: number;
+    private channel4lastSampleLookup: number;
+    private channel4totalLength: number;
+    private channel4envelopeVolume: number;
+    private channel4currentVolume: number;
+    private channel4envelopeType: boolean;
+    private channel4envelopeSweeps: number;
+    private channel4envelopeSweepsLast: number;
+    private channel4consecutive: boolean;
+    private channel4BitRange: number;
+    private channel1DutyTracker: number;
+    private channel1CachedDuty: CachedDuty;
+    private channel2DutyTracker: number;
+    private channel2CachedDuty: CachedDuty;
     private sequencerClocks: any;
     private sequencePosition: any;
     private channel3Counter: any;
@@ -294,144 +429,140 @@ export class GameBoyCore {
     private cachedChannel4Sample: any;
     private channel3FrequencyPeriod: any;
     private channel3lastSampleLookup: any;
-    private ROMBankEdge: any;
-    private TICKTable: any
-    public SecondaryTICKTable: any;
-    private channel4VolumeShifter: any;
-    public openRTC: any;
-    public openMBC: any;
-    private numROMBanks: any;
-    private clocksPerSecond: any;
-    private canvasOffscreen: any;
-    private drawContextOffscreen: any;
-    private drawContextOnscreen: any;
+    private ROMBankEdge: number;
+    private TICKTable: any[];
+    public SecondaryTICKTable: any[];
+    private channel4VolumeShifter: number;
+    public openRTC: (string) => any;
+    public openMBC: (string) => any;
+    private numROMBanks: number;
+    private clocksPerSecond: number;
+    private canvasOffscreen: HTMLCanvasElement;
+    private drawContextOffscreen: CanvasRenderingContext2D;
+    private drawContextOnscreen: CanvasRenderingContext2D;
     private resizer: any;
-    private audioResamplerFirstPassFactor: any;
-    private downSampleInputDivider: any;
-    private channel1canPlay: any;
-    private channel2canPlay: any;
-    private channel4canPlay: any;
-    private audioBuffer: any;
-    private sortBuffer: any;
-    private OAMAddressCache: any;
+    private audioResamplerFirstPassFactor: number;
+    private downSampleInputDivider: number;
+    private audioBuffer: any[];
+    private sortBuffer: any[];
+    private OAMAddressCache: any[];
 
-    constructor(canvas = null, ROMImage = null, pause = null) {
-	//Params, etc...
-	this.canvas = canvas;						//Canvas DOM object for drawing out the graphics to.
-	this.ROMImage = ROMImage;					//The game's ROM.
+    constructor(canvas: HTMLCanvasElement = null, ROMImage: string = null, pause: () => void = null) {
+	this.canvas = canvas;
+	this.ROMImage = ROMImage;
 	this.pause = pause;
 	//CPU Registers and Flags:
-	this.registerA = 0x01; 						//Register A (Accumulator)
-	this.FZero = true; 							//Register F  - Result was zero
-	this.FSubtract = false;						//Register F  - Subtraction was executed
-	this.FHalfCarry = true;						//Register F  - Half carry or half borrow
-	this.FCarry = true;							//Register F  - Carry or borrow
-	this.registerB = 0x00;						//Register B
-	this.registerC = 0x13;						//Register C
-	this.registerD = 0x00;						//Register D
-	this.registerE = 0xD8;						//Register E
-	this.registersHL = 0x014D;					//Registers H and L combined
-	this.stackPointer = 0xFFFE;					//Stack Pointer
-	this.programCounter = 0x0100;				//Program Counter
+	this.registerA = 0x01;
+	this.FZero = true;
+	this.FSubtract = false;
+	this.FHalfCarry = true;
+	this.FCarry = true;
+	this.registerB = 0x00;
+	this.registerC = 0x13;
+	this.registerD = 0x00;
+	this.registerE = 0xD8;
+	this.registersHL = 0x014D;
+	this.stackPointer = 0xFFFE;
+	this.programCounter = 0x0100;
 	//Some CPU Emulation State Variables:
-	this.CPUCyclesTotal = 0;					//Relative CPU clocking to speed set, rounded appropriately.
-	this.CPUCyclesTotalBase = 0;				//Relative CPU clocking to speed set base.
-	this.CPUCyclesTotalCurrent = 0;				//Relative CPU clocking to speed set, the directly used value.
-	this.CPUCyclesTotalRoundoff = 0;			//Clocking per iteration rounding catch.
-	this.baseCPUCyclesPerIteration	= 0;		//CPU clocks per iteration at 1x speed.
-	this.remainingClocks = 0;					//HALT clocking overrun carry over.
-	this.inBootstrap = true;					//Whether we're in the GBC boot ROM.
-	this.usedBootROM = false;					//Updated upon ROM loading...
-	this.usedGBCBootROM = false;				//Did we boot to the GBC boot ROM?
-	this.halt = false;							//Has the CPU been suspended until the next interrupt?
-	this.skipPCIncrement = false;				//Did we trip the DMG Halt bug?
-	this.stopEmulator = 3;						//Has the emulation been paused or a frame has ended?
-	this.IME = true;							//Are interrupts enabled?
-	this.IRQLineMatched = 0;					//CPU IRQ assertion.
-	this.interruptsRequested = 0;				//IF Register
-	this.interruptsEnabled = 0;					//IE Register
-	this.hdmaRunning = false;					//HDMA Transfer Flag - GBC only
-	this.CPUTicks = 0;							//The number of clock cycles emulated.
-	this.doubleSpeedShifter = 0;				//GBC double speed clocking shifter.
-	this.JoyPad = 0xFF;							//Joypad State (two four-bit states actually)
-	this.CPUStopped = false;					//CPU STOP status.
+	this.CPUCyclesTotal = 0;
+	this.CPUCyclesTotalBase = 0;
+	this.CPUCyclesTotalCurrent = 0;
+	this.CPUCyclesTotalRoundoff = 0;
+	this.baseCPUCyclesPerIteration	= 0;
+	this.remainingClocks = 0;
+	this.inBootstrap = true;
+	this.usedBootROM = false;
+	this.usedGBCBootROM = false;
+	this.halt = false;
+	this.skipPCIncrement = false;
+	this.stopEmulator = 3;
+	this.IME = true;
+	this.IRQLineMatched = 0;
+	this.interruptsRequested = 0;
+	this.interruptsEnabled = 0;
+	this.hdmaRunning = false;
+	this.CPUTicks = 0;
+	this.doubleSpeedShifter = 0;
+	this.JoyPad = 0xFF;
+	this.CPUStopped = false;
 	//Main RAM, MBC RAM, GBC Main RAM, VRAM, etc.
-	this.memoryReader = [];						//Array of functions mapped to read back memory
-	this.memoryWriter = [];						//Array of functions mapped to write to memory
-	this.memoryHighReader = [];					//Array of functions mapped to read back 0xFFXX memory
-	this.memoryHighWriter = [];					//Array of functions mapped to write to 0xFFXX memory
-	this.ROM = [];								//The full ROM file dumped to an array.
-	this.memory = [];							//Main Core Memory
-	this.MBCRam = [];							//Switchable RAM (Used by games for more RAM) for the main memory range 0xA000 - 0xC000.
-	this.VRAM = [];								//Extra VRAM bank for GBC.
-	this.GBCMemory = [];						//GBC main RAM Banks
-	this.MBC1Mode = false;						//MBC1 Type (4/32, 16/8)
-	this.MBCRAMBanksEnabled = false;			//MBC RAM Access Control.
-	this.currMBCRAMBank = 0;					//MBC Currently Indexed RAM Bank
-	this.currMBCRAMBankPosition = -0xA000;		//MBC Position Adder;
-	this.cGBC = false;							//GameBoy Color detection.
-	this.gbcRamBank = 1;						//Currently Switched GameBoy Color ram bank
-	this.gbcRamBankPosition = -0xD000;			//GBC RAM offset from address start.
-	this.gbcRamBankPositionECHO = -0xF000;		//GBC RAM (ECHO mirroring) offset from address start.
-	this.RAMBanks = [0, 1, 2, 4, 16];			//Used to map the RAM banks to maximum size the MBC used can do.
-	this.ROMBank1offs = 0;						//Offset of the ROM bank switching.
-	this.currentROMBank = 0;					//The parsed current ROM bank selection.
-	this.cartridgeType = 0;						//Cartridge Type
-	this.name = "";								//Name of the game
-	this.gameCode = "";							//Game code (Suffix for older games)
-	this.fromSaveState = false;					//A boolean to see if this was loaded in as a save state.
-	this.savedStateFileName = "";				//When loaded in as a save state, this will not be empty.
-	this.STATTracker = 0;						//Tracker for STAT triggering.
-	this.modeSTAT = 0;							//The scan line mode (for lines 1-144 it's 2-3-0, for 145-154 it's 1)
-	this.spriteCount = 252;						//Mode 3 extra clocking counter (Depends on how many sprites are on the current line.).
-	this.LYCMatchTriggerSTAT = false;			//Should we trigger an interrupt if LY==LYC?
-	this.mode2TriggerSTAT = false;				//Should we trigger an interrupt if in mode 2?
-	this.mode1TriggerSTAT = false;				//Should we trigger an interrupt if in mode 1?
-	this.mode0TriggerSTAT = false;				//Should we trigger an interrupt if in mode 0?
-	this.LCDisOn = false;						//Is the emulated LCD controller on?
-	this.LINECONTROL = [];						//Array of functions to handle each scan line we do (onscreen + offscreen)
+	this.memoryReader = [];
+	this.memoryWriter = [];
+	this.memoryHighReader = [];
+	this.memoryHighWriter = [];
+	this.ROM = [];
+	this.memory = [];
+	this.MBCRam = [];
+	this.VRAM = [];
+	this.GBCMemory = [];
+	this.MBC1Mode = false;
+	this.MBCRAMBanksEnabled = false;
+	this.currMBCRAMBank = 0;
+	this.currMBCRAMBankPosition = -0xA000;
+	this.cGBC = false;
+	this.gbcRamBank = 1;
+	this.gbcRamBankPosition = -0xD000;
+	this.gbcRamBankPositionECHO = -0xF000;
+	this.RAMBanks = [0, 1, 2, 4, 16];
+	this.ROMBank1offs = 0;
+	this.currentROMBank = 0;
+	this.cartridgeType = 0;
+	this.name = "";
+	this.gameCode = "";
+	this.fromSaveState = false;
+	this.savedStateFileName = "";
+	this.STATTracker = 0;
+	this.modeSTAT = 0;
+	this.spriteCount = 252;
+	this.LYCMatchTriggerSTAT = false;
+	this.mode2TriggerSTAT = false;
+	this.mode1TriggerSTAT = false;
+	this.mode0TriggerSTAT = false;
+	this.LCDisOn = false;
+	this.LINECONTROL = [];
 	this.DISPLAYOFFCONTROL = [function (_parentObj: GameBoyCore) {
 		//Array of line 0 function to handle the LCD controller when it's off (Do nothing!).
 	}];
-	this.LCDCONTROL = null;						//Pointer to either LINECONTROL or DISPLAYOFFCONTROL.
+	this.LCDCONTROL = null;
 	this.initializeLCDController();				//Compile the LCD controller functions.
 	//RTC (Real Time Clock for MBC3):
 	this.RTCisLatched = false;
-	this.latchedSeconds = 0;					//RTC latched seconds.
-	this.latchedMinutes = 0;					//RTC latched minutes.
-	this.latchedHours = 0;						//RTC latched hours.
-	this.latchedLDays = 0;						//RTC latched lower 8-bits of the day counter.
-	this.latchedHDays = 0;						//RTC latched high-bit of the day counter.
-	this.RTCSeconds = 0;						//RTC seconds counter.
-	this.RTCMinutes = 0;						//RTC minutes counter.
-	this.RTCHours = 0;							//RTC hours counter.
-	this.RTCDays = 0;							//RTC days counter.
-	this.RTCDayOverFlow = false;				//Did the RTC overflow and wrap the day counter?
-	this.RTCHALT = false;						//Is the RTC allowed to clock up?
+	this.latchedSeconds = 0;
+	this.latchedMinutes = 0;
+	this.latchedHours = 0;
+	this.latchedLDays = 0;
+	this.latchedHDays = 0;
+	this.RTCSeconds = 0;
+	this.RTCMinutes = 0;
+	this.RTCHours = 0;
+	this.RTCDays = 0;
+	this.RTCDayOverFlow = false;
+	this.RTCHALT = false;
 	//Gyro:
 	this.highX = 127;
 	this.lowX = 127;
 	this.highY = 127;
 	this.lowY = 127;
 	//Sound variables:
-	this.audioHandle = null;						//XAudioJS handle
-	this.numSamplesTotal = 0;						//Length of the sound buffers.
+	this.audioHandle = null;
+	this.numSamplesTotal = 0;
 	this.dutyLookup = [								//Map the duty values given to ones we can work with.
 		[false, false, false, false, false, false, false, true],
 		[true, false, false, false, false, false, false, true],
 		[true, false, false, false, false, true, true, true],
 		[false, true, true, true, true, true, true, false]
 	];
-	this.bufferContainAmount = 0;					//Buffer maintenance metric.
+	this.bufferContainAmount = 0;
 	this.LSFR15Table = null;
 	this.LSFR7Table = null;
 	this.noiseSampleTable = null;
 	this.initializeAudioStartState();
-	this.soundMasterEnabled = false;			//As its name implies
-	this.channel3PCM = null;					//Channel 3 adjusted sample buffer.
+	this.soundMasterEnabled = false;
+	this.channel3PCM = null;
 	//Vin Shit:
-	this.VinLeftChannelMasterVolume = 8;		//Computed post-mixing volume.
-	this.VinRightChannelMasterVolume = 8;		//Computed post-mixing volume.
+	this.VinLeftChannelMasterVolume = 8;
+	this.VinRightChannelMasterVolume = 8;
 	//Channel paths enabled:
 	this.leftChannel1 = false;
 	this.leftChannel2 = false;
@@ -469,71 +600,71 @@ export class GameBoyCore {
 	this.emulatorSpeed = 1;
 	this.initializeTiming();
 	//Audio generation counters:
-	this.audioTicks = 0;				//Used to sample the audio system every x CPU instructions.
-	this.audioIndex = 0;				//Used to keep alignment on audio generation.
+	this.audioTicks = 0;
+	this.audioIndex = 0;
 	this.downsampleInput = 0;
-	this.audioDestinationPosition = 0;	//Used to keep alignment on audio generation.
+	this.audioDestinationPosition = 0;
 	//Timing Variables
-	this.emulatorTicks = 0;				//Times for how many instructions to execute before ending the loop.
-	this.DIVTicks = 56;					//DIV Ticks Counter (Invisible lower 8-bit)
-	this.LCDTicks = 60;					//Counter for how many instructions have been executed on a scanline so far.
-	this.timerTicks = 0;				//Counter for the TIMA timer.
-	this.TIMAEnabled = false;			//Is TIMA enabled?
-	this.TACClocker = 1024;				//Timer Max Ticks
-	this.serialTimer = 0;				//Serial IRQ Timer
-	this.serialShiftTimer = 0;			//Serial Transfer Shift Timer
-	this.serialShiftTimerAllocated = 0;	//Serial Transfer Shift Timer Refill
-	this.IRQEnableDelay = 0;			//Are the interrupts on queue to be enabled?
+	this.emulatorTicks = 0;
+	this.DIVTicks = 56;
+	this.LCDTicks = 60;
+	this.timerTicks = 0;
+	this.TIMAEnabled = false;
+	this.TACClocker = 1024;
+	this.serialTimer = 0;
+	this.serialShiftTimer = 0;
+	this.serialShiftTimerAllocated = 0;
+	this.IRQEnableDelay = 0;
 	var dateVar = new Date();
-	this.lastIteration = dateVar.getTime();//The last time we iterated the main loop.
+	this.lastIteration = dateVar.getTime();
 	dateVar = new Date();
 	this.firstIteration = dateVar.getTime();
 	this.iterations = 0;
-	this.actualScanLine = 0;			//Actual scan line...
-	this.lastUnrenderedLine = 0;		//Last rendered scan line...
+	this.actualScanLine = 0;
+	this.lastUnrenderedLine = 0;
 	this.queuedScanLines = 0;
 	this.totalLinesPassed = 0;
-	this.haltPostClocks = 0;			//Post-Halt clocking.
+	this.haltPostClocks = 0;
 	//ROM Cartridge Components:
-	this.cMBC1 = false;					//Does the cartridge use MBC1?
-	this.cMBC2 = false;					//Does the cartridge use MBC2?
-	this.cMBC3 = false;					//Does the cartridge use MBC3?
-	this.cMBC5 = false;					//Does the cartridge use MBC5?
-	this.cMBC7 = false;					//Does the cartridge use MBC7?
-	this.cSRAM = false;					//Does the cartridge use save RAM?
-	this.cMMMO1 = false;				//...
-	this.cRUMBLE = false;				//Does the cartridge use the RUMBLE addressing (modified MBC5)?
-	this.cCamera = false;				//Is the cartridge actually a GameBoy Camera?
-	this.cTAMA5 = false;				//Does the cartridge use TAMA5? (Tamagotchi Cartridge)
-	this.cHuC3 = false;					//Does the cartridge use HuC3 (Hudson Soft / modified MBC3)?
-	this.cHuC1 = false;					//Does the cartridge use HuC1 (Hudson Soft / modified MBC1)?
-	this.cTIMER = false;				//Does the cartridge have an RTC?
+	this.cMBC1 = false;
+	this.cMBC2 = false;
+	this.cMBC3 = false;
+	this.cMBC5 = false;
+	this.cMBC7 = false;
+	this.cSRAM = false;
+	this.cMMMO1 = false;
+	this.cRUMBLE = false;
+	this.cCamera = false;
+	this.cTAMA5 = false;
+	this.cHuC3 = false;
+	this.cHuC1 = false;
+	this.cTIMER = false;
 	this.ROMBanks = [					// 1 Bank = 16 KBytes = 256 Kbits
 		2, 4, 8, 16, 32, 64, 128, 256, 512
 	];
 	this.ROMBanks[0x52] = 72;
 	this.ROMBanks[0x53] = 80;
 	this.ROMBanks[0x54] = 96;
-	this.numRAMBanks = 0;					//How many RAM banks were actually allocated?
+	this.numRAMBanks = 0;
 	////Graphics Variables
-	this.currVRAMBank = 0;					//Current VRAM bank for GBC.
-	this.backgroundX = 0;					//Register SCX (X-Scroll)
-	this.backgroundY = 0;					//Register SCY (Y-Scroll)
-	this.gfxWindowDisplay = false;			//Is the windows enabled?
-	this.gfxSpriteShow = false;				//Are sprites enabled?
-	this.gfxSpriteNormalHeight = true;		//Are we doing 8x8 or 8x16 sprites?
-	this.bgEnabled = true;					//Is the BG enabled?
-	this.BGPriorityEnabled = true;			//Can we flag the BG for priority over sprites?
-	this.gfxWindowCHRBankPosition = 0;		//The current bank of the character map the window uses.
-	this.gfxBackgroundCHRBankPosition = 0;	//The current bank of the character map the BG uses.
-	this.gfxBackgroundBankOffset = 0x80;	//Fast mapping of the tile numbering/
-	this.windowY = 0;						//Current Y offset of the window.
-	this.windowX = 0;						//Current X offset of the window.
-	this.drewBlank = 0;						//To prevent the repeating of drawing a blank screen.
-	this.drewFrame = false;					//Throttle how many draws we can do to once per iteration.
-	this.midScanlineOffset = -1;			//mid-scanline rendering offset.
-	this.pixelEnd = 0;						//track the x-coord limit for line rendering (mid-scanline usage).
-	this.currentX = 0;						//The x-coord we left off at for mid-scanline rendering.
+	this.currVRAMBank = 0;
+	this.backgroundX = 0;
+	this.backgroundY = 0;
+	this.gfxWindowDisplay = false;
+	this.gfxSpriteShow = false;
+	this.gfxSpriteNormalHeight = true;
+	this.bgEnabled = true;
+	this.BGPriorityEnabled = true;
+	this.gfxWindowCHRBankPosition = 0;
+	this.gfxBackgroundCHRBankPosition = 0;
+	this.gfxBackgroundBankOffset = 0x80;
+	this.windowY = 0;
+	this.windowX = 0;
+	this.drewBlank = 0;
+	this.drewFrame = false;
+	this.midScanlineOffset = -1;
+	this.pixelEnd = 0;
+	this.currentX = 0;
 	//BG Tile Pointer Caches:
 	this.BGCHRBank1 = null;
 	this.BGCHRBank2 = null;
@@ -541,7 +672,7 @@ export class GameBoyCore {
 	//Tile Data Cache:
 	this.tileCache = null;
 	//Palettes:
-	this.colors = [0xEFFFDE, 0xADD794, 0x529273, 0x183442];			//"Classic" GameBoy palette colors.
+	this.colors = [0xEFFFDE, 0xADD794, 0x529273, 0x183442];
 	this.OBJPalette = null;
 	this.BGPalette = null;
 	this.gbcOBJRawPalette = null;
@@ -557,13 +688,13 @@ export class GameBoyCore {
 	this.updateGBBGPalette = this.updateGBRegularBGPalette;
 	this.updateGBOBJPalette = this.updateGBRegularOBJPalette;
 	this.colorizedGBPalettes = false;
-	this.BGLayerRender = null;			//Reference to the BG rendering function.
-	this.WindowLayerRender = null;		//Reference to the window rendering function.
-	this.SpriteLayerRender = null;		//Reference to the OAM rendering function.
-	this.frameBuffer = [];				//The internal frame-buffer.
-	this.swizzledFrame = null;			//The secondary gfx buffer that holds the converted RGBA values.
-	this.canvasBuffer = null;			//imageData handle
-	this.pixelStart = 0;				//Temp variable for holding the current working framebuffer offset.
+	this.BGLayerRender = null;
+	this.WindowLayerRender = null;
+	this.SpriteLayerRender = null;
+	this.frameBuffer = [];
+	this.swizzledFrame = null;
+	this.canvasBuffer = null;
+	this.pixelStart = 0;
 	//Variables used for scaling in JS:
 	this.onscreenWidth = this.offscreenWidth = 160;
 	this.onscreenHeight = this.offscreenHeight = 144;
@@ -1324,10 +1455,10 @@ private ROMLoad() {
 	this.checkIRQMatching();
 }
 
-public getROMImage() {
+public getROMImage(): string {
 	//Return the binary version of the ROM image currently running:
 	if (this.ROMImage.length > 0) {
-		return this.ROMImage.length;
+		return this.ROMImage;
 	}
 	var length = this.ROM.length;
 	for (var index = 0; index < length; index++) {
@@ -1690,10 +1821,10 @@ public initLCD() {
 		"image-rendering: " + ((settings.resize_smoothing) ? "optimizeQuality" : "-o-crisp-edges") + ";" +
 		"image-rendering: " + ((settings.resize_smoothing) ? "optimizeQuality" : "-moz-crisp-edges") + ";" +
 		"-ms-interpolation-mode: " + ((settings.resize_smoothing) ? "bicubic" : "nearest-neighbor") + ";");
-		this.drawContextOffscreen.webkitImageSmoothingEnabled  = settings.resize_smoothing;
-		this.drawContextOffscreen.mozImageSmoothingEnabled = settings.resize_smoothing;
-		this.drawContextOnscreen.webkitImageSmoothingEnabled  = settings.resize_smoothing;
-		this.drawContextOnscreen.mozImageSmoothingEnabled = settings.resize_smoothing;
+		(this.drawContextOffscreen as any).webkitImageSmoothingEnabled  = settings.resize_smoothing;
+		(this.drawContextOffscreen as any).mozImageSmoothingEnabled = settings.resize_smoothing;
+		(this.drawContextOnscreen as any).webkitImageSmoothingEnabled  = settings.resize_smoothing;
+		(this.drawContextOnscreen as any).mozImageSmoothingEnabled = settings.resize_smoothing;
 		//Get a CanvasPixelArray buffer:
 		try {
 			this.canvasBuffer = this.drawContextOffscreen.createImageData(this.offscreenWidth, this.offscreenHeight);

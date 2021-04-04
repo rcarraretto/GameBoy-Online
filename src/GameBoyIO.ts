@@ -15,7 +15,7 @@ export function GameBoyEmulatorInitialized() {
 
 export const getGameboy = () => gameboy;
 
-export function start(canvas, ROM) {
+export function start(canvas: HTMLCanvasElement, ROM: string) {
 	clearLastEmulation();
 	autoSave();	//If we are about to load a new game, then save the last one...
 	gameboy = new GameBoyCore(canvas, ROM, pause);

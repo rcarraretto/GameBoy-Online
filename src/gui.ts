@@ -7,7 +7,7 @@ import { settings } from './settings';
 import { base64, base64_decode } from './base64';
 
 var inFullscreen = false;
-var mainCanvas = null;
+var mainCanvas: HTMLCanvasElement = null;
 var fullscreenCanvas = null;
 var showAsMinimal = false;
 var keyZones = [
@@ -32,7 +32,7 @@ export function windowingInitialize() {
 	windowStacks[7] = windowCreate("local_storage_listing", false);
 	windowStacks[8] = windowCreate("freeze_listing", false);
 	windowStacks[9] = windowCreate("save_importer", false);
-	mainCanvas = document.getElementById("mainCanvas");
+	mainCanvas = document.getElementById("mainCanvas") as HTMLCanvasElement;
 	fullscreenCanvas = document.getElementById("fullscreen");
 	try {
 		//Hook the GUI controls.
@@ -147,7 +147,7 @@ function registerGUIEvents() {
 					cout("File loaded.", 0);
 					try {
 						initPlayer();
-						io.start(mainCanvas, this.result);
+						io.start(mainCanvas, this.result.toString());
 					} catch (error) {
 						showAlert(error);
 					}
