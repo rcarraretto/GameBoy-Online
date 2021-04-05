@@ -1,5 +1,5 @@
-import { windowingInitialize } from './gui';
+import { windowingInitialize } from "./gui";
 
 window.onload = function () {
     windowingInitialize();
-}
+};

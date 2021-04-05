@@ -1,40 +1,39 @@
-import { expect } from 'chai';
-import { GameBoyCore } from '../src/GameBoyCore';
-import * as _ from 'lodash';
-import { OPCODE } from '../src/opcodes';
+import { expect } from "chai";
+import { GameBoyCore } from "../src/GameBoyCore";
+import * as _ from "lodash";
+import { OPCODE } from "../src/opcodes";
 
-describe("nop", function() {
-  var core;
+describe("nop", function () {
+    var core;
 
-  beforeEach(function() {
-    core = new GameBoyCore();
-    core.setupRAM();
-    core.registerA = 1;
-    core.registerB = 2;
-    core.registerC = 3;
-    core.registerD = 4;
-    core.registerE = 5;
-    core.registersHL = 6;
-  });
+    beforeEach(function () {
+        core = new GameBoyCore();
+        core.setupRAM();
+        core.registerA = 1;
+        core.registerB = 2;
+        core.registerC = 3;
+        core.registerD = 4;
+        core.registerE = 5;
+        core.registersHL = 6;
+    });
 
-  it("NOP", function() {
-    var before = _.clone(core);
-    OPCODE[0x00](core)
+    it("NOP", function () {
+        var before = _.clone(core);
+        OPCODE[0x00](core);
 
-    expect(core.registerA).to.equal(before.registerA);
-    expect(core.registerB).to.equal(before.registerB);
-    expect(core.registerC).to.equal(before.registerC);
-    expect(core.registerD).to.equal(before.registerD);
-    expect(core.registerE).to.equal(before.registerE);
-    expect(core.registersHL).to.equal(before.registersHL);
+        expect(core.registerA).to.equal(before.registerA);
+        expect(core.registerB).to.equal(before.registerB);
+        expect(core.registerC).to.equal(before.registerC);
+        expect(core.registerD).to.equal(before.registerD);
+        expect(core.registerE).to.equal(before.registerE);
+        expect(core.registersHL).to.equal(before.registersHL);
 
-    expect(core.FZero).to.equal(before.FZero);
-    expect(core.FSubtract).to.equal(before.FSubtract);
-    expect(core.FHalfCarry).to.equal(before.FHalfCarry);
-    expect(core.FCarry).to.equal(before.FCarry);
+        expect(core.FZero).to.equal(before.FZero);
+        expect(core.FSubtract).to.equal(before.FSubtract);
+        expect(core.FHalfCarry).to.equal(before.FHalfCarry);
+        expect(core.FCarry).to.equal(before.FCarry);
 
-    expect(core.stackPointer).to.equal(before.stackPointer);
-    expect(core.programCounter).to.equal(before.programCounter);
-  });
-
+        expect(core.stackPointer).to.equal(before.stackPointer);
+        expect(core.programCounter).to.equal(before.programCounter);
+    });
 });

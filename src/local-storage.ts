@@ -5,7 +5,7 @@ export function checkStorageLength() {
 //Wrapper for localStorage getItem, so that data can be retrieved in various types.
 export function findValue(key) {
     if (window.localStorage.getItem(key) != null) {
-	return JSON.parse(window.localStorage.getItem(key));
+        return JSON.parse(window.localStorage.getItem(key));
     }
     return null;
 }

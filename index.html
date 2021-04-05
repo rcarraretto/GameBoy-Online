@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
     <head>
-        <link rel="stylesheet" href="index.css">
+        <link rel="stylesheet" href="index.css" />
         <script type="text/javascript" src="main.js"></script>
         <title>GameBoy Online</title>
     </head>
@@ -29,7 +29,22 @@
         <div id="about" class="window">
             <div id="about_message">
                 <h1>GameBoy Online</h1>
-                <p>This is a GameBoy Color emulator written purely in JavaScript by Grant Galitz.</p><p>The graphics blitting is done through HTML5 canvas, with the putImageData and drawImage functions.</p><p>Save states are implemented through the window.localStorage object, and are serialized/deserialized through JSON. SRAM saving is also implemented through the window.localStorage object, and are serialized/deserialized through JSON. In order for save states to work properly on most browsers, you need set the maximum size limit for DOM storage higher, to meet the needs of the emulator's save data size.</p><p>For more information about this emulator and its source code, visit the GIT repository at: <a href="https://github.com/taisel/GameBoy-Online" target="_blank">https://github.com/taisel/GameBoy-Online</a>.
+                <p>This is a GameBoy Color emulator written purely in JavaScript by Grant Galitz.</p>
+                <p>
+                    The graphics blitting is done through HTML5 canvas, with the putImageData and drawImage functions.
+                </p>
+                <p>
+                    Save states are implemented through the window.localStorage object, and are serialized/deserialized
+                    through JSON. SRAM saving is also implemented through the window.localStorage object, and are
+                    serialized/deserialized through JSON. In order for save states to work properly on most browsers,
+                    you need set the maximum size limit for DOM storage higher, to meet the needs of the emulator's save
+                    data size.
+                </p>
+                <p>
+                    For more information about this emulator and its source code, visit the GIT repository at:
+                    <a href="https://github.com/taisel/GameBoy-Online" target="_blank"
+                        >https://github.com/taisel/GameBoy-Online</a
+                    >.
                 </p>
             </div>
             <div class="button_rack">
@@ -40,63 +55,63 @@
             <div id="toggle_settings">
                 <div class="setting">
                     <span>Enable Sound:</span>
-                    <input type="checkbox" checked="checked" id="enable_sound">
+                    <input type="checkbox" checked="checked" id="enable_sound" />
                 </div>
                 <div class="setting">
                     <span>GB mode has priority over GBC mode:</span>
-                    <input type="checkbox" id="disable_colors">
+                    <input type="checkbox" id="disable_colors" />
                 </div>
                 <div class="setting">
                     <span>Use the BIOS ROM:</span>
-                    <input type="checkbox" checked="checked" id="enable_gbc_bios">
+                    <input type="checkbox" checked="checked" id="enable_gbc_bios" />
                 </div>
                 <div class="setting">
                     <span>Override ROM only cartridge typing to MBC1:</span>
-                    <input type="checkbox" checked="checked" id="rom_only_override">
+                    <input type="checkbox" checked="checked" id="rom_only_override" />
                 </div>
                 <div class="setting">
                     <span>Always allow reading and writing to the MBC banks:</span>
-                    <input type="checkbox" checked="checked" id="mbc_enable_override">
+                    <input type="checkbox" checked="checked" id="mbc_enable_override" />
                 </div>
                 <div class="setting">
                     <span>Colorize Classic GameBoy Palettes:</span>
-                    <input type="checkbox" checked="checked" id="enable_colorization">
+                    <input type="checkbox" checked="checked" id="enable_colorization" />
                 </div>
                 <div class="setting">
                     <span>Minimal view on fullscreen:</span>
-                    <input type="checkbox" checked="checked" id="do_minimal">
+                    <input type="checkbox" checked="checked" id="do_minimal" />
                 </div>
                 <div class="setting">
                     <span>Resize canvas directly in JavaScript:</span>
-                    <input type="checkbox" id="software_resizing">
+                    <input type="checkbox" id="software_resizing" />
                 </div>
                 <div class="setting">
                     <span>Disallow typed arrays to be used:</span>
-                    <input type="checkbox" id="typed_arrays_disallow">
+                    <input type="checkbox" id="typed_arrays_disallow" />
                 </div>
                 <div class="setting">
                     <span>Use the DMG boot ROM instead of CGB:</span>
-                    <input type="checkbox" id="gb_boot_rom_utilized">
+                    <input type="checkbox" id="gb_boot_rom_utilized" />
                 </div>
                 <div class="setting">
                     <span>Smooth upon resizing canvas:</span>
-                    <input type="checkbox" checked="checked" id="resize_smoothing">
+                    <input type="checkbox" checked="checked" id="resize_smoothing" />
                 </div>
                 <div class="setting">
                     <span>Enable Channel 1 Audio:</span>
-                    <input type="checkbox" checked="checked" id="channel1">
+                    <input type="checkbox" checked="checked" id="channel1" />
                 </div>
                 <div class="setting">
                     <span>Enable Channel 2 Audio:</span>
-                    <input type="checkbox" checked="checked" id="channel2">
+                    <input type="checkbox" checked="checked" id="channel2" />
                 </div>
                 <div class="setting">
                     <span>Enable Channel 3 Audio:</span>
-                    <input type="checkbox" checked="checked" id="channel3">
+                    <input type="checkbox" checked="checked" id="channel3" />
                 </div>
                 <div class="setting">
                     <span>Enable Channel 4 Audio:</span>
-                    <input type="checkbox" checked="checked" id="channel4">
+                    <input type="checkbox" checked="checked" id="channel4" />
                 </div>
             </div>
             <div class="button_rack">
@@ -121,7 +136,7 @@
         </div>
         <div id="input_select" class="window">
             <form>
-                <input type="file" id="local_file_open">
+                <input type="file" id="local_file_open" />
             </form>
             <div class="button_rack">
                 <button id="input_select_close_button" class="center">Close File Input</button>
@@ -129,7 +144,7 @@
         </div>
         <div id="save_importer" class="window">
             <form>
-                <input type="file" id="save_open">
+                <input type="file" id="save_open" />
             </form>
             <div class="button_rack">
                 <button id="save_importer_close_button" class="center">Close Save Importer</button>
@@ -165,10 +180,13 @@
             </div>
         </div>
         <ul class="menu" id="GameBoy_file_popup">
-            <li>Open As<ul class="menu">
-                <li id="data_uri_clicker">Base 64 Encoding</li>
-                <li id="internal_file_clicker">Local File</li>
-            </ul></li>
+            <li>
+                Open As
+                <ul class="menu">
+                    <li id="data_uri_clicker">Base 64 Encoding</li>
+                    <li id="internal_file_clicker">Local File</li>
+                </ul>
+            </li>
             <li id="save_SRAM_state_clicker">Save Game Memory</li>
             <li id="save_state_clicker">Save Freeze State</li>
             <li id="set_volume">Set Volume</li>

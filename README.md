@@ -26,18 +26,21 @@ SOFTWARE.
 
 ## CPU instruction set accuracy test results (Blargg's cpu_instrs.gb test ROM):
 
-* **GameBoy Online:**
+-   **GameBoy Online:**
 
-	![GameBoy Online (This emulator)](http://i.imgur.com/ivs7F.png "Passes")
-* **Visual Boy Advance 1.7.2:**
+    ![GameBoy Online (This emulator)](http://i.imgur.com/ivs7F.png "Passes")
 
-	![Visual Boy Advance 1.7.2](http://i.imgur.com/NYnYu.png "Fails")
-* **KiGB:**
+-   **Visual Boy Advance 1.7.2:**
 
-	![KiGB](http://i.imgur.com/eYHDH.png "Fails")
-* **Gambatte:**
+    ![Visual Boy Advance 1.7.2](http://i.imgur.com/NYnYu.png "Fails")
 
-	![Gambatte](http://i.imgur.com/vGHFz.png "Passes")
+-   **KiGB:**
+
+    ![KiGB](http://i.imgur.com/eYHDH.png "Fails")
+
+-   **Gambatte:**
+
+    ![Gambatte](http://i.imgur.com/vGHFz.png "Passes")
 
 ## Install
 
