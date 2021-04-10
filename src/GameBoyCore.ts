@@ -178,8 +178,7 @@ export class GameBoyCore {
     private lowX: number;
     private highY: number;
     private lowY: number;
-    // XAudioJS handle
-    private audioHandle: any;
+    private audioHandle: XAudioServer;
     // Length of the sound buffers
     private numSamplesTotal: number;
     private dutyLookup: CachedDuty[];
@@ -1814,7 +1813,6 @@ export class GameBoyCore {
                     (this.baseCPUCyclesPerIteration * settings.audio_buffer_max) / this.audioResamplerFirstPassFactor,
                     8192,
                 ) << 1,
-                null,
                 settings.volume,
                 function () {
                     settings.enable_sound = false;
